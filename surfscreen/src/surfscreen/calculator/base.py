@@ -78,8 +78,15 @@ class Calculator(ABC):
         Returns:
             OptimizationResult
         """
+        # Save constraints BEFORE copy (copy() doesn't preserve them in ASE)
+        original_constraints = list(atoms.constraints) if atoms.constraints else []
+        
         atoms = atoms.copy()
         atoms.calc = self.get_ase_calculator()
+        
+        # Re-apply constraints
+        if original_constraints:
+            atoms.set_constraint(original_constraints)
         
         initial_energy = atoms.get_potential_energy()
         

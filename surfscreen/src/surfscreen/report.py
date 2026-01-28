@@ -1058,11 +1058,34 @@ class ReportGenerator:
             
             const xyz = trajFrames[trajCurrentFrame].replace(/\\\\n/g, '\\n');
             modalViewer.removeAllModels();
-            modalViewer.addModel(xyz, 'xyz');
-            modalViewer.setStyle({{}}, {{
-                stick: {{ radius: 0.12, colorscheme: 'Jmol' }},
-                sphere: {{ scale: 0.25, colorscheme: 'Jmol' }}
-            }});
+            modalViewer.removeAllShapes();
+            
+            // Apply PBC if enabled
+            if (modalState.pbc && cellParams) {{
+                const a = cellParams.a, b = cellParams.b;
+                const repeatCount = parseInt(document.getElementById('pbcRepeat').value) || 3;
+                const half = Math.floor(repeatCount / 2);
+                
+                for (let i = -half; i <= half; i++) {{
+                    for (let j = -half; j <= half; j++) {{
+                        const dx = i * a[0] + j * b[0];
+                        const dy = i * a[1] + j * b[1];
+                        const translatedXyz = translateXyz(trajFrames[trajCurrentFrame], dx, dy, 0);
+                        const model = modalViewer.addModel(translatedXyz, 'xyz');
+                        const isCenter = (i === 0 && j === 0);
+                        const style = isCenter ?
+                            {{ stick:{{radius:0.12,colorscheme:'Jmol'}}, sphere:{{scale:0.25,colorscheme:'Jmol'}} }} :
+                            {{ stick:{{radius:0.10,colorscheme:'Jmol',opacity:0.4}}, sphere:{{scale:0.20,colorscheme:'Jmol',opacity:0.4}} }};
+                        model.setStyle({{}}, style);
+                    }}
+                }}
+            }} else {{
+                modalViewer.addModel(xyz, 'xyz');
+                modalViewer.setStyle({{}}, {{
+                    stick: {{ radius: 0.12, colorscheme: 'Jmol' }},
+                    sphere: {{ scale: 0.25, colorscheme: 'Jmol' }}
+                }});
+            }}
             modalViewer.render();
             
             // Update UI
