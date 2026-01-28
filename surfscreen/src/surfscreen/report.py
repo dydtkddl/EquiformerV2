@@ -1024,11 +1024,13 @@ class ReportGenerator:
                 trajPlaying = true;
                 document.getElementById('trajPlayBtn').textContent = '⏸️ Pause';
                 trajInterval = setInterval(() => {{
-                    trajNext();
                     if (trajCurrentFrame >= trajFrames.length - 1) {{
-                        trajPlayPause(); // Stop at end
+                        trajCurrentFrame = 0; // Loop back to start
+                    }} else {{
+                        trajCurrentFrame++;
                     }}
-                }}, 200);
+                    updateTrajFrame();
+                }}, 100); // Faster playback (100ms per frame)
             }}
         }}
         
@@ -1816,8 +1818,8 @@ class ReportGenerator:
                 y_range = max(y_coords) - min(y_coords) if y_coords else 6.65
                 
                 return {
-                    "a": [x_range * 1.1, 0.0],
-                    "b": [0.0, y_range * 1.1],
+                    "a": [x_range, 0.0],
+                    "b": [0.0, y_range],
                     "c": 15.0,
                     "zmin": zmin
                 }
