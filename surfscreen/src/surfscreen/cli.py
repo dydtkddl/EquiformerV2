@@ -242,10 +242,31 @@ def screen():
 @click.option("--rotations", "-r", default="0,45,90,135", help="Rotation angles")
 @click.option("--output-dir", "-o", default="screening_results", help="Output directory")
 @click.option("--max-configs", default=50, help="Max configurations per molecule")
-def screen_run(surface, molecules, engine, model, device, rotations, output_dir, max_configs):
+@click.option("--ncpus", default=None, type=int, help="Number of CPU threads (default: 80%% of total)")
+def screen_run(surface, molecules, engine, model, device, rotations, output_dir, max_configs, ncpus):
     """Run adsorption screening"""
+    import os
     from pathlib import Path
     import glob
+    
+    # CPU 스레드 제한 설정
+    total_cpus = os.cpu_count() or 1
+    if ncpus is None:
+        ncpus = max(1, int(total_cpus * 0.8))  # 기본: 전체의 80%
+    
+    # 환경변수로 스레드 제한
+    os.environ["OMP_NUM_THREADS"] = str(ncpus)
+    os.environ["MKL_NUM_THREADS"] = str(ncpus)
+    os.environ["OPENBLAS_NUM_THREADS"] = str(ncpus)
+    os.environ["NUMEXPR_NUM_THREADS"] = str(ncpus)
+    
+    # PyTorch 스레드 제한
+    try:
+        import torch
+        torch.set_num_threads(ncpus)
+    except ImportError:
+        pass
+    
     from surfscreen.surface import SurfaceBuilder
     from surfscreen.molecule import MoleculeBuilder
     from surfscreen.adsorption import AdsorptionSystem
@@ -265,6 +286,7 @@ def screen_run(surface, molecules, engine, model, device, rotations, output_dir,
     console.print(f"  Surface: {surface}")
     console.print(f"  Molecules: {len(mol_files)} files")
     console.print(f"  Engine: {engine}")
+    console.print(f"  CPUs: {ncpus}/{total_cpus}")
     
     calc = CalculatorFactory.create(engine, model=model, device=device)
     
