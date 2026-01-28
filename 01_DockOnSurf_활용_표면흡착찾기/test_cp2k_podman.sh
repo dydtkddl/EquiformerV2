@@ -28,12 +28,20 @@ fi
 # 기존 run_cp2k.sh 확인
 echo ""
 echo "[2] Checking existing CP2K runner..."
-if [ -f ~/run_cp2k.sh ]; then
-    echo "Found: ~/run_cp2k.sh"
-    echo "=== run_cp2k.sh content ==="
-    head -30 ~/run_cp2k.sh
+CP2K_RUNNER=""
+if [ -f ~/PSID_SIMULATION_TOOLS/cp2k/run_cp2k.new.docker.sh ]; then
+    CP2K_RUNNER="$HOME/PSID_SIMULATION_TOOLS/cp2k/run_cp2k.new.docker.sh"
+    echo "Found: $CP2K_RUNNER (Docker)"
+elif [ -f ~/run_cp2k.sh ]; then
+    CP2K_RUNNER="$HOME/run_cp2k.sh"
+    echo "Found: $CP2K_RUNNER"
 else
-    echo "~/run_cp2k.sh not found"
+    echo "No CP2K runner found"
+fi
+
+if [ -n "$CP2K_RUNNER" ]; then
+    echo "=== Runner script (first 30 lines) ==="
+    head -30 "$CP2K_RUNNER"
 fi
 
 # CP2K 데이터 디렉토리 확인
@@ -137,10 +145,10 @@ ls -la
 
 echo ""
 echo "[5] Testing CP2K execution..."
-if [ -f ~/run_cp2k.sh ]; then
-    echo "Running: ~/run_cp2k.sh cp2k.inp"
+if [ -n "$CP2K_RUNNER" ]; then
+    echo "Running: $CP2K_RUNNER cp2k.inp"
     # CP2K 실행 (타임아웃 5분)
-    timeout 300 ~/run_cp2k.sh cp2k.inp 2>&1 || {
+    timeout 300 "$CP2K_RUNNER" cp2k.inp 2>&1 || {
         echo "CP2K execution failed or timed out"
     }
 else

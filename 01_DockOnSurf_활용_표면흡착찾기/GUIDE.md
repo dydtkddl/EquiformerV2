@@ -87,11 +87,19 @@ num_conformers = 10  # 최소 10개 권장
 
 **원인**: 잘못된 pbc_cell 형식 (`15.0, 15.0, 15.0`)
 
-**해결**: Isolated 계산에서는 `pbc_cell = False` 사용
+**해결**:
+
+- Isolated 계산: `pbc_cell = False`
+- Screening/표면 계산: 3x3 행렬 형식 사용
 
 ```ini
-[Global]
-pbc_cell = False  # 분자 최적화에서는 False
+# Isolated (분자만)
+pbc_cell = False
+
+# Screening (표면 + 분자)
+pbc_cell = 10.0, 0.0, 0.0
+           0.0, 10.0, 0.0
+           0.0, 0.0, 25.0
 ```
 
 ---
