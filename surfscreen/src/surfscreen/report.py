@@ -1128,7 +1128,7 @@ class ReportGenerator:
                     const x = parseFloat(parts[1]) + dx;
                     const y = parseFloat(parts[2]) + dy;
                     const z = parseFloat(parts[3]) + dz;
-                    result.push(`${{symbol}} ${{x.toFixed(6)}} ${{y.toFixed(6)}} ${{z.toFixed(6)}}`);
+                    result.push(symbol + ' ' + x.toFixed(6) + ' ' + y.toFixed(6) + ' ' + z.toFixed(6));
                 }} else {{
                     result.push(lines[i]);
                 }}
