@@ -676,6 +676,8 @@ class ReportGenerator:
             background: #1a1a2e;
             border-radius: 12px;
             margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
         }}
         
         .modal-info {{
@@ -913,6 +915,12 @@ class ReportGenerator:
                 <div class="viewer-controls">
                     <button class="viewer-btn" onclick="toggleModalAxes()" title="Toggle cell axes">📐 Axes</button>
                     <button class="viewer-btn" onclick="toggleModalPBC()" title="Toggle periodic images">🔁 PBC</button>
+                    <select id="pbcRepeat" class="viewer-btn" onchange="updateModalPBC()" title="PBC repeat count">
+                        <option value="1">1×1</option>
+                        <option value="2">2×2</option>
+                        <option value="3" selected>3×3</option>
+                        <option value="5">5×5</option>
+                    </select>
                     <button class="viewer-btn" onclick="toggleModalSpin()" title="Toggle rotation">🔄 Spin</button>
                     <button class="modal-close" onclick="closeModal()">✕</button>
                 </div>
@@ -1292,18 +1300,38 @@ class ReportGenerator:
         function toggleModalPBC() {{
             modalState.pbc = !modalState.pbc;
             event.target.classList.toggle('active', modalState.pbc);
-            
+            renderModalPBC();
+        }}
+        
+        function updateModalPBC() {{
+            if (modalState.pbc) {{
+                renderModalPBC();
+            }}
+        }}
+        
+        function renderModalPBC() {{
             modalViewer.removeAllModels();
             modalViewer.removeAllShapes();
             
             const xyz = currentModalXyz.replace(/\\\\n/g, '\\n');
+            const repeatCount = parseInt(document.getElementById('pbcRepeat').value) || 3;
             
             if (modalState.pbc && cellParams) {{
                 const a = cellParams.a, b = cellParams.b;
-                const offsets = [[0,0],[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
-                offsets.forEach(([i,j]) => {{
+                const half = Math.floor(repeatCount / 2);
+                
+                // Generate offsets based on repeat count
+                const offsets = [];
+                for (let i = -half; i <= half; i++) {{
+                    for (let j = -half; j <= half; j++) {{
+                        offsets.push([i, j]);
+                    }}
+                }}
+                
+                offsets.forEach(([i, j]) => {{
                     modalViewer.addModel(xyz, 'xyz');
-                    const style = (i===0 && j===0) ? 
+                    const isCenter = (i === 0 && j === 0);
+                    const style = isCenter ? 
                         {{ stick:{{radius:0.12,colorscheme:'Jmol'}}, sphere:{{scale:0.25,colorscheme:'Jmol'}} }} :
                         {{ stick:{{radius:0.10,colorscheme:'Jmol',opacity:0.4}}, sphere:{{scale:0.20,colorscheme:'Jmol',opacity:0.4}} }};
                     modalViewer.setStyle({{}}, style);
