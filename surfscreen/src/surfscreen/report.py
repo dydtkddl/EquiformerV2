@@ -1157,20 +1157,16 @@ class ReportGenerator:
                 
                 offsets.forEach(([i, j]) => {{
                     const model = vdata.viewer.addModel(vdata.xyz, 'xyz');
-                    // Translate
+                    // Translate by cell vectors
                     const dx = i * a[0] + j * b[0];
                     const dy = i * a[1] + j * b[1];
-                    model.setStyle({{}}, {{
-                        stick: {{ radius: 0.12, colorscheme: 'Jmol' }},
-                        sphere: {{ scale: 0.25, colorscheme: 'Jmol' }}
-                    }});
-                    if (i !== 0 || j !== 0) {{
-                        // Fade periodic images
-                        model.setStyle({{}}, {{
-                            stick: {{ radius: 0.10, colorscheme: 'Jmol', opacity: 0.4 }},
-                            sphere: {{ scale: 0.20, colorscheme: 'Jmol', opacity: 0.4 }}
-                        }});
-                    }}
+                    vdata.viewer.translate({{ x: dx, y: dy, z: 0 }}, model);
+                    
+                    const isCenter = (i === 0 && j === 0);
+                    const style = isCenter ?
+                        {{ stick: {{ radius: 0.12, colorscheme: 'Jmol' }}, sphere: {{ scale: 0.25, colorscheme: 'Jmol' }} }} :
+                        {{ stick: {{ radius: 0.10, colorscheme: 'Jmol', opacity: 0.4 }}, sphere: {{ scale: 0.20, colorscheme: 'Jmol', opacity: 0.4 }} }};
+                    model.setStyle({{}}, style);
                 }});
             }} else {{
                 vdata.viewer.addModel(vdata.xyz, 'xyz');
@@ -1329,8 +1325,14 @@ class ReportGenerator:
                 }}
                 
                 offsets.forEach(([i, j]) => {{
-                    modalViewer.addModel(xyz, 'xyz');
+                    const model = modalViewer.addModel(xyz, 'xyz');
                     const isCenter = (i === 0 && j === 0);
+                    
+                    // Apply translation based on cell vectors
+                    const dx = i * a[0] + j * b[0];
+                    const dy = i * a[1] + j * b[1];
+                    modalViewer.translate({{ x: dx, y: dy, z: 0 }}, model);
+                    
                     const style = isCenter ? 
                         {{ stick:{{radius:0.12,colorscheme:'Jmol'}}, sphere:{{scale:0.25,colorscheme:'Jmol'}} }} :
                         {{ stick:{{radius:0.10,colorscheme:'Jmol',opacity:0.4}}, sphere:{{scale:0.20,colorscheme:'Jmol',opacity:0.4}} }};
