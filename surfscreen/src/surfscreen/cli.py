@@ -4,6 +4,24 @@ SurfScreen CLI
 Click 기반 명령행 인터페이스
 """
 
+import os
+
+# CPU 스레드 기본값 설정 (라이브러리 import 전에!)
+def _set_cpu_threads():
+    """전역 CPU 스레드 제한 (80% 기본)"""
+    if "SURFSCREEN_NCPUS" in os.environ:
+        ncpus = os.environ["SURFSCREEN_NCPUS"]
+    else:
+        total = os.cpu_count() or 1
+        ncpus = str(max(1, int(total * 0.8)))
+    
+    os.environ.setdefault("OMP_NUM_THREADS", ncpus)
+    os.environ.setdefault("MKL_NUM_THREADS", ncpus)
+    os.environ.setdefault("OPENBLAS_NUM_THREADS", ncpus)
+    os.environ.setdefault("NUMEXPR_NUM_THREADS", ncpus)
+    
+_set_cpu_threads()
+
 import click
 from rich.console import Console
 from rich.table import Table
