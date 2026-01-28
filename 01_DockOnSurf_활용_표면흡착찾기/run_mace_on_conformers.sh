@@ -62,7 +62,7 @@ for conf_dir in sorted(work_dir.glob("conf_*")):
     print(f"\n=== Processing {conf_dir.name} ===")
     
     # XYZ 파일 찾기 (여러 가능한 이름)
-    xyz_files = list(conf_dir.glob("*.xyz")) + list(conf_dir.glob("coord.*"))
+    xyz_files = list(conf_dir.glob("*.xyz")) + list(conf_dir.glob("*.gen")) + list(conf_dir.glob("struct_*.gen"))
     
     if not xyz_files:
         print(f"  No structure file found in {conf_dir}")
