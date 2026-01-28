@@ -14,29 +14,22 @@ calculator: "mace"
 environment:
   dockonsurf_conda: "dockonsurf"
   mace_conda: "mace"
-  # CP2K 실행 방식: "podman" | "direct"
-  cp2k_mode: "podman"
+  cp2k_command: "cp2k.psmp"
   cp2k_data_dir: "${HOME}/cp2k/data"
   use_gpu: true
   n_cpu: 16
 
 # MACE 설정
 mace:
-  # Foundation model 사용 (자동 다운로드)
-  model_type: "mace-mp-0-medium"
-  # 또는 로컬 모델 경로
-  # model_path: "/path/to/custom.model"
+  model_path: "/path/to/mace-mpa-0-medium.model"
   device: "cuda"
   default_dtype: "float32"
 
-# CP2K 설정 (Podman 컨테이너 사용)
+# CP2K 설정
 cp2k:
-  container_image: "docker.io/cp2k/cp2k:latest"
-  mpi_procs: 7
-  omp_threads: 4
-  basis_set_file: "/opt/cp2k/data/BASIS_MOLOPT"
-  potential_file: "/opt/cp2k/data/GTH_POTENTIALS"
-  dftd3_file: "/opt/cp2k/data/dftd3.dat"
+  basis_set_file: "${CP2K_DATA_DIR}/BASIS_MOLOPT"
+  potential_file: "${CP2K_DATA_DIR}/GTH_POTENTIALS"
+  dftd3_file: "${CP2K_DATA_DIR}/dftd3.dat"
   xc_functional: "PBE"
   cutoff: 400
   scf_eps: 1.0E-6

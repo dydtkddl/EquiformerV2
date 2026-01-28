@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 DockOnSurf + MACE/CP2K Unified Pipeline
-WSL 및 Linux HPC 클러스터 호환 (Podman CP2K 지원)
+WSL 및 Linux HPC 클러스터 호환
 """
 import argparse
 import subprocess
@@ -48,141 +48,6 @@ class PipelineConfig:
         return val
 
 
-class MACECalculator:
-    """MACE를 사용한 구조 최적화"""
-    
-    def __init__(self, config: PipelineConfig, work_dir: Path):
-        self.config = config
-        self.work_dir = work_dir
-        
-    def optimize(self, input_xyz: Path, output_xyz: Path) -> float:
-        """MACE로 구조 최적화"""
-        mace_conda = self.config.get('environment.mace_conda', 'mace')
-        device = self.config.get('mace.device', 'cuda')
-        model_type = self.config.get('mace.model_type', 'mace-mp-0-medium')
-        
-        script = f'''
-import torch
-from ase.io import read, write
-from ase.optimize import BFGS
-from mace.calculators import mace_mp
-
-device = "{device}" if torch.cuda.is_available() else "cpu"
-print(f"Using device: {{device}}")
-
-calc = mace_mp(model="{model_type}", device=device, default_dtype="float32")
-
-atoms = read("{input_xyz}")
-atoms.calc = calc
-
-opt = BFGS(atoms, trajectory="{self.work_dir}/opt.traj")
-opt.run(fmax=0.05, steps=200)
-
-write("{output_xyz}", atoms)
-energy = atoms.get_potential_energy()
-print(f"FINAL_ENERGY: {{energy:.6f}}")
-'''
-        
-        script_path = self.work_dir / "run_mace_opt.py"
-        script_path.write_text(script)
-        
-        cmd = f"conda run -n {mace_conda} python {script_path}"
-        logger.info(f"Running MACE optimization: {cmd}")
-        
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        
-        # 로그 저장
-        log_path = self.work_dir / "mace_opt.log"
-        with open(log_path, 'w') as f:
-            f.write(f"=== STDOUT ===\n{result.stdout}\n")
-            f.write(f"=== STDERR ===\n{result.stderr}\n")
-        
-        if result.returncode != 0:
-            logger.error(f"MACE failed: {result.stderr}")
-            raise RuntimeError(result.stderr)
-        
-        # 에너지 파싱
-        for line in result.stdout.split('\n'):
-            if 'FINAL_ENERGY' in line:
-                return float(line.split(':')[1].strip())
-        
-        return 0.0
-
-
-class CP2KCalculator:
-    """Podman 기반 CP2K 계산"""
-    
-    def __init__(self, config: PipelineConfig, work_dir: Path):
-        self.config = config
-        self.work_dir = work_dir
-        self.template_path = Path(__file__).parent / "config" / "cp2k_template.inp"
-        
-    def generate_input(self, project_name: str = "surface_ads") -> Path:
-        """CP2K 입력 파일 생성"""
-        
-        if not self.template_path.exists():
-            raise FileNotFoundError(f"CP2K template not found: {self.template_path}")
-        
-        with open(self.template_path) as f:
-            template = Template(f.read())
-        
-        cell = self.config.get('cell', {})
-        
-        substitutions = {
-            'PROJECT_NAME': project_name,
-            'BASIS_SET_FILE': self.config.get('cp2k.basis_set_file'),
-            'POTENTIAL_FILE': self.config.get('cp2k.potential_file'),
-            'DFTD3_FILE': self.config.get('cp2k.dftd3_file'),
-            'XC_FUNCTIONAL': self.config.get('cp2k.xc_functional', 'PBE'),
-            'CUTOFF': self.config.get('cp2k.cutoff', 400),
-            'SCF_EPS': self.config.get('cp2k.scf_eps', '1.0E-6'),
-            'CELL_A': ' '.join(map(str, cell.get('a', [15.0, 0.0, 0.0]))),
-            'CELL_B': ' '.join(map(str, cell.get('b', [0.0, 15.0, 0.0]))),
-            'CELL_C': ' '.join(map(str, cell.get('c', [0.0, 0.0, 25.0]))),
-            'PERIODIC': cell.get('periodic', 'XYZ'),
-        }
-        
-        content = template.safe_substitute(substitutions)
-        
-        inp_path = self.work_dir / "cp2k_input.inp"
-        inp_path.write_text(content)
-        logger.info(f"Generated CP2K input: {inp_path}")
-        
-        return inp_path
-    
-    def run_podman(self, input_file: Path) -> subprocess.CompletedProcess:
-        """Podman으로 CP2K 실행"""
-        
-        image = self.config.get('cp2k.container_image', 'docker.io/cp2k/cp2k:latest')
-        mpi_procs = self.config.get('cp2k.mpi_procs', 7)
-        omp_threads = self.config.get('cp2k.omp_threads', 4)
-        cp2k_data = self.config.get('environment.cp2k_data_dir', f"{os.environ['HOME']}/cp2k/data")
-        
-        cmd = f'''sudo podman run --rm \
-            -v "{cp2k_data}":/opt/cp2k/data:Z \
-            -v "{self.work_dir}":/work:Z \
-            -w /work {image} \
-            mpirun -n {mpi_procs} -genv OMP_NUM_THREADS={omp_threads} \
-            cp2k -i {input_file.name} -o output.out'''
-        
-        logger.info(f"Running CP2K via Podman")
-        logger.info(f"Command: {cmd}")
-        
-        result = subprocess.run(
-            cmd, shell=True, cwd=self.work_dir,
-            capture_output=True, text=True
-        )
-        
-        # 로그 저장
-        log_path = self.work_dir / "cp2k.log"
-        with open(log_path, 'w') as f:
-            f.write(f"=== STDOUT ===\n{result.stdout}\n")
-            f.write(f"=== STDERR ===\n{result.stderr}\n")
-            f.write(f"=== RETURN CODE: {result.returncode} ===\n")
-        
-        return result
-
-
 class DockOnSurfRunner:
     """DockOnSurf 실행 래퍼"""
     
@@ -202,9 +67,7 @@ code = {calculator}
 """
         
         if calculator == "mace":
-            model_path = self.config.get('mace.model_path', '')
-            if model_path:
-                inp_content += f"model_mace = {model_path}\n"
+            inp_content += f"model_mace = {self.config.get('mace.model_path')}\n"
         
         # Isolated 섹션
         if "isolated" in run_type:
@@ -268,6 +131,53 @@ energy_cutoff = {self.config.get('dockonsurf.energy_cutoff', 0.5)}
         logger.info(f"Generated MACE config: {yaml_path}")
         return yaml_path
     
+    def generate_cp2k_input(self, template_path: Path) -> Path:
+        """CP2K 입력 파일 생성 (템플릿 변수 치환)"""
+        
+        with open(template_path) as f:
+            template = Template(f.read())
+        
+        cell = self.config.get('cell', {})
+        
+        substitutions = {
+            'PROJECT_NAME': self.config.get('project.name', 'project'),
+            'BASIS_SET_FILE': self.config.get('cp2k.basis_set_file', ''),
+            'POTENTIAL_FILE': self.config.get('cp2k.potential_file', ''),
+            'DFTD3_FILE': self.config.get('cp2k.dftd3_file', ''),
+            'XC_FUNCTIONAL': self.config.get('cp2k.xc_functional', 'PBE'),
+            'CUTOFF': self.config.get('cp2k.cutoff', 400),
+            'SCF_EPS': self.config.get('cp2k.scf_eps', '1.0E-6'),
+            'CELL_A': ' '.join(map(str, cell.get('a', [15.0, 0.0, 0.0]))),
+            'CELL_B': ' '.join(map(str, cell.get('b', [0.0, 15.0, 0.0]))),
+            'CELL_C': ' '.join(map(str, cell.get('c', [0.0, 0.0, 25.0]))),
+            'PERIODIC': cell.get('periodic', 'XYZ'),
+        }
+        
+        content = template.safe_substitute(substitutions)
+        
+        inp_path = self.work_dir / "screening.inp"
+        inp_path.write_text(content)
+        logger.info(f"Generated CP2K input: {inp_path}")
+        
+        # refinement.inp도 같이 생성 (동일 내용)
+        refinement_path = self.work_dir / "refinement.inp"
+        refinement_path.write_text(content)
+        
+        return inp_path
+    
+    def copy_input_files(self):
+        """분자/표면 파일 복사"""
+        mol_file = Path(self.config.get('inputs.molecule_file', ''))
+        surf_file = Path(self.config.get('inputs.surface_file', ''))
+        
+        if mol_file.exists():
+            shutil.copy(mol_file, self.work_dir / mol_file.name)
+            logger.info(f"Copied molecule file: {mol_file}")
+        
+        if surf_file.exists():
+            shutil.copy(surf_file, self.work_dir / surf_file.name)
+            logger.info(f"Copied surface file: {surf_file}")
+    
     def run(self, calculator: str, run_type: str = "isolated,screening,refinement", 
             dry_run: bool = False):
         """파이프라인 실행"""
@@ -276,7 +186,15 @@ energy_cutoff = {self.config.get('dockonsurf.energy_cutoff', 0.5)}
         
         # 입력 파일 생성
         dos_inp = self.generate_dos_input(run_type, calculator)
-        self.generate_mace_yaml()
+        
+        if calculator == "mace":
+            self.generate_mace_yaml()
+        else:
+            template = Path(__file__).parent / "config" / "cp2k_template.inp"
+            if template.exists():
+                self.generate_cp2k_input(template)
+            else:
+                logger.warning(f"CP2K template not found: {template}")
         
         # DockOnSurf 실행 명령어
         cmd = f"conda run -n {dos_conda} dockonsurf.py {dos_inp.name}"
@@ -316,14 +234,11 @@ Examples:
   # MACE로 전체 파이프라인 실행
   python run_pipeline.py -c config/pipeline_config.yaml --calc mace
   
-  # CP2K로 refinement만 실행 (Podman)
+  # CP2K로 refinement만 실행
   python run_pipeline.py -c config/pipeline_config.yaml --calc cp2k --run-type refinement
   
-  # Dry run (입력 파일만 생성)
+  # Dry run (입력 파일만 생성, 실행 안함)
   python run_pipeline.py -c config/pipeline_config.yaml --dry-run
-  
-  # 단독 MACE 최적화 (DockOnSurf 없이)
-  python run_pipeline.py -c config/pipeline_config.yaml --mace-only --input mol.xyz
         """
     )
     parser.add_argument("--config", "-c", required=True, help="Path to pipeline_config.yaml")
@@ -335,30 +250,13 @@ Examples:
                         help="Working directory (default: ./work)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Generate input files only, don't run")
-    parser.add_argument("--mace-only", action="store_true",
-                        help="Run MACE optimization without DockOnSurf")
-    parser.add_argument("--input", type=Path, help="Input XYZ file for --mace-only")
     args = parser.parse_args()
     
     config = PipelineConfig(args.config)
-    
-    # MACE 단독 모드
-    if args.mace_only:
-        if not args.input:
-            parser.error("--mace-only requires --input")
-        
-        args.work_dir.mkdir(parents=True, exist_ok=True)
-        mace = MACECalculator(config, args.work_dir)
-        output = args.work_dir / f"{args.input.stem}_opt.xyz"
-        energy = mace.optimize(args.input, output)
-        logger.info(f"Optimized structure: {output}")
-        logger.info(f"Final energy: {energy:.6f} eV")
-        return
-    
-    # DockOnSurf 파이프라인
     runner = DockOnSurfRunner(config, args.work_dir)
     
     if args.calc == "both":
+        # MACE 먼저, 그 다음 CP2K
         logger.info("=" * 50)
         logger.info("Phase 1: MACE Pre-screening")
         logger.info("=" * 50)
@@ -367,6 +265,7 @@ Examples:
         logger.info("=" * 50)
         logger.info("Phase 2: CP2K Refinement")
         logger.info("=" * 50)
+        # CP2K는 refinement만
         runner.run("cp2k", "refinement", dry_run=args.dry_run)
     else:
         runner.run(args.calc, args.run_type, dry_run=args.dry_run)
