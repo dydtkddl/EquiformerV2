@@ -168,7 +168,7 @@ class SurfaceBuilder:
         # ASE 빌더 사용 (일반적인 표면)
         if structure == "fcc" and miller_index == (1, 1, 1):
             atoms = fcc111(element, size=(supercell[0], supercell[1], layers),
-                          a=a, vacuum=vacuum, orthogonal=orthogonal)
+                          a=a, vacuum=vacuum, orthogonal=False)
         elif structure == "bcc" and miller_index == (1, 1, 0):
             atoms = bcc110(element, size=(supercell[0], supercell[1], layers),
                           a=a, vacuum=vacuum, orthogonal=orthogonal)
