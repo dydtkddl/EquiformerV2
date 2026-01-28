@@ -1815,37 +1815,39 @@ class ReportGenerator:
             return default_params
         
         try:
-            # XYZ 파일 파싱하여 z 범위 계산
-            lines = xyz_path.read_text().strip().split('\n')
-            if len(lines) < 3:
-                return default_params
+            # ASE로 읽어서 cell 정보 추출
+            from ase.io import read
+            atoms = read(str(xyz_path))
             
-            z_coords = []
-            x_coords = []
-            y_coords = []
-            
-            for line in lines[2:]:  # 첫 2줄 스킵 (원자 수, 주석)
-                parts = line.split()
-                if len(parts) >= 4:
-                    try:
-                        x_coords.append(float(parts[1]))
-                        y_coords.append(float(parts[2]))
-                        z_coords.append(float(parts[3]))
-                    except ValueError:
-                        continue
-            
-            if z_coords:
-                zmin = min(z_coords)
-                # 셀 크기 추정 (원자 위치 범위에서)
-                x_range = max(x_coords) - min(x_coords) if x_coords else 7.67
-                y_range = max(y_coords) - min(y_coords) if y_coords else 6.65
+            # 실제 cell 사용 (cell이 있으면)
+            cell = atoms.get_cell()
+            if cell.any():
+                a_vec = cell[0][:2]  # x, y 성분
+                b_vec = cell[1][:2]  # x, y 성분
+                zmin = atoms.positions[:, 2].min()
                 
                 return {
-                    "a": [x_range, 0.0],
-                    "b": [0.0, y_range],
-                    "c": 15.0,
-                    "zmin": zmin
+                    "a": [float(a_vec[0]), float(a_vec[1])],
+                    "b": [float(b_vec[0]), float(b_vec[1])],
+                    "c": float(cell[2, 2]),
+                    "zmin": float(zmin)
                 }
+            
+            # cell이 없으면 원자 위치에서 추정
+            positions = atoms.positions
+            x_coords = positions[:, 0]
+            y_coords = positions[:, 1]
+            z_coords = positions[:, 2]
+            
+            x_range = x_coords.max() - x_coords.min() if len(x_coords) else 7.67
+            y_range = y_coords.max() - y_coords.min() if len(y_coords) else 6.65
+            
+            return {
+                "a": [x_range, 0.0],
+                "b": [0.0, y_range],
+                "c": 15.0,
+                "zmin": z_coords.min() if len(z_coords) else 0.0
+            }
         except Exception:
             pass
         

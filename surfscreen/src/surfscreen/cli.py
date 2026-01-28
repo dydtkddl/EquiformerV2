@@ -261,7 +261,8 @@ def screen():
 @click.option("--output-dir", "-o", default="screening_results", help="Output directory")
 @click.option("--max-configs", default=50, help="Max configurations per molecule")
 @click.option("--ncpus", default=None, type=int, help="Number of CPU threads (default: 80%% of total)")
-def screen_run(surface, molecules, engine, model, device, rotations, output_dir, max_configs, ncpus):
+@click.option("--fix-layers", default=2, type=int, help="Number of bottom layers to fix (default: 2)")
+def screen_run(surface, molecules, engine, model, device, rotations, output_dir, max_configs, ncpus, fix_layers):
     """Run adsorption screening"""
     import os
     from pathlib import Path
@@ -291,7 +292,7 @@ def screen_run(surface, molecules, engine, model, device, rotations, output_dir,
     from surfscreen.calculator import CalculatorFactory
     
     # 파일 로드
-    surf = SurfaceBuilder.from_file(surface)
+    surf = SurfaceBuilder.from_file(surface, fixed_layers=fix_layers)
     
     # 분자 파일 목록
     mol_files = glob.glob(molecules) if '*' in molecules else [molecules]

@@ -377,14 +377,35 @@ class SurfaceBuilder:
     def from_file(cls,
                   path: str,
                   miller_index: Tuple[int, int, int] = (1, 1, 1),
-                  name: str = "") -> Surface:
-        """파일에서 표면 읽기 (이미 슬랩인 경우)"""
+                  name: str = "",
+                  fixed_layers: int = 2) -> Surface:
+        """파일에서 표면 읽기 (이미 슬랩인 경우)
+        
+        Args:
+            path: 파일 경로
+            miller_index: 밀러 지수
+            name: 표면 이름
+            fixed_layers: 고정할 하단 레이어 수 (기본: 2)
+        """
         atoms = read(path)
+        
+        # 하단 레이어 고정
+        fixed_atoms = []
+        if fixed_layers > 0:
+            positions = atoms.get_positions()
+            z_coords = positions[:, 2]
+            z_sorted = np.sort(np.unique(np.round(z_coords, 2)))
+            
+            z_threshold = z_sorted[min(fixed_layers, len(z_sorted)) - 1] + 0.1
+            fixed_atoms = list(np.where(z_coords < z_threshold)[0])
+            
+            atoms.set_constraint(FixAtoms(indices=fixed_atoms))
         
         return Surface(
             atoms=atoms,
             name=name or Path(path).stem,
-            miller_index=miller_index
+            miller_index=miller_index,
+            fixed_atoms=fixed_atoms
         )
     
     @classmethod
