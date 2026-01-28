@@ -1112,6 +1112,30 @@ class ReportGenerator:
             }});
         }}
         
+        // Helper function to translate XYZ coordinates
+        function translateXyz(xyzString, dx, dy, dz) {{
+            const lines = xyzString.replace(/\\\\n/g, '\\n').split('\\n');
+            const result = [];
+            for (let i = 0; i < lines.length; i++) {{
+                const line = lines[i].trim();
+                if (i < 2 || !line) {{
+                    result.push(lines[i]);
+                    continue;
+                }}
+                const parts = line.split(/\\s+/);
+                if (parts.length >= 4) {{
+                    const symbol = parts[0];
+                    const x = parseFloat(parts[1]) + dx;
+                    const y = parseFloat(parts[2]) + dy;
+                    const z = parseFloat(parts[3]) + dz;
+                    result.push(`${{symbol}} ${{x.toFixed(6)}} ${{y.toFixed(6)}} ${{z.toFixed(6)}}`);
+                }} else {{
+                    result.push(lines[i]);
+                }}
+            }}
+            return result.join('\\n');
+        }}
+        
         // Theme Toggle
         function toggleTheme() {{
             const body = document.body;
@@ -1315,12 +1339,11 @@ class ReportGenerator:
                 ];
                 
                 offsets.forEach(([i, j]) => {{
-                    const model = vdata.viewer.addModel(vdata.xyz, 'xyz');
-                    // Translate by cell vectors
                     const dx = i * a[0] + j * b[0];
                     const dy = i * a[1] + j * b[1];
-                    vdata.viewer.translate({{ x: dx, y: dy, z: 0 }}, model);
+                    const translatedXyz = translateXyz(vdata.xyz, dx, dy, 0);
                     
+                    const model = vdata.viewer.addModel(translatedXyz, 'xyz');
                     const isCenter = (i === 0 && j === 0);
                     const style = isCenter ?
                         {{ stick: {{ radius: 0.12, colorscheme: 'Jmol' }}, sphere: {{ scale: 0.25, colorscheme: 'Jmol' }} }} :
@@ -1515,18 +1538,16 @@ class ReportGenerator:
                 }}
                 
                 offsets.forEach(([i, j]) => {{
-                    const model = modalViewer.addModel(xyz, 'xyz');
-                    const isCenter = (i === 0 && j === 0);
-                    
-                    // Apply translation based on cell vectors
                     const dx = i * a[0] + j * b[0];
                     const dy = i * a[1] + j * b[1];
-                    modalViewer.translate({{ x: dx, y: dy, z: 0 }}, model);
+                    const translatedXyz = translateXyz(currentModalXyz, dx, dy, 0);
                     
+                    const model = modalViewer.addModel(translatedXyz, 'xyz');
+                    const isCenter = (i === 0 && j === 0);
                     const style = isCenter ? 
                         {{ stick:{{radius:0.12,colorscheme:'Jmol'}}, sphere:{{scale:0.25,colorscheme:'Jmol'}} }} :
                         {{ stick:{{radius:0.10,colorscheme:'Jmol',opacity:0.4}}, sphere:{{scale:0.20,colorscheme:'Jmol',opacity:0.4}} }};
-                    modalViewer.setStyle({{}}, style);
+                    model.setStyle({{}}, style);
                 }});
             }} else {{
                 modalViewer.addModel(xyz, 'xyz');
