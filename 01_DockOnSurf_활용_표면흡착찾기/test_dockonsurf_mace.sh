@@ -38,7 +38,7 @@ run_type = isolated
 code = mace
 model_mace = ${MACE_MODEL}
 batch_q_sys = local
-pbc_cell = 15.0, 15.0, 15.0
+pbc_cell = False
 
 [Isolated]
 isol_inp_file = mace_input.yaml
