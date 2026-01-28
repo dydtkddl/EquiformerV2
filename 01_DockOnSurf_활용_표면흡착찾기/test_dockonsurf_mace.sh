@@ -53,10 +53,10 @@ ls -la
 # DockOnSurf 실행
 echo ""
 echo "Running DockOnSurf (Isolated)..."
-echo "Command: dockonsurf.py dockonsurf_isolated.inp"
+echo "Command: dockonsurf.py -i dockonsurf_isolated.inp"
 echo ""
 
-dockonsurf.py dockonsurf_isolated.inp
+dockonsurf.py -i dockonsurf_isolated.inp
 
 echo ""
 echo "=========================================="
