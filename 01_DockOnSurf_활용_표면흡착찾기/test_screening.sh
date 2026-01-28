@@ -61,7 +61,7 @@ max_structures = 20
 distance = 2.0
 num_conformers = 10
 pre_opt = MMFF
-molec_ctrs = auto
+molec_ctrs = 2
 EOF
 
 echo ""
