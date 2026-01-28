@@ -337,6 +337,8 @@ class ReportGenerator:
         .mol-viewer {{
             height: 350px;
             background: #1a1a2e;
+            position: relative;
+            overflow: hidden;
         }}
         
         .viewer-controls {{
