@@ -382,6 +382,7 @@ def screen_results(results_file, sort, top):
 @click.option("--output", "-o", default="report.html", help="Output HTML file")
 def screen_report(results_dir, output):
     """Generate interactive HTML report"""
+    from pathlib import Path
     from surfscreen.report import ReportGenerator
     
     with console.status("[bold green]Generating report..."):
