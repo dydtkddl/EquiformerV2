@@ -1,15 +1,41 @@
-29-Jan-26 03:41:04-INFO: DockOnSurf started on /home/yongsang/20260129_Equiformer/01_DockOnSurf_활용_표면흡착찾기/work/dockonsurf_test.
-29-Jan-26 03:41:04-INFO: To kill DockOnSurf execution type: `$ kill 1300868`.
-29-Jan-26 03:41:04-INFO: Using 'dockonsurf_isolated.inp' as input.
-29-Jan-26 03:41:04-ERROR: 'pbc_cell' must be either 3 vectors of size 3 or False.
-29-Jan-26 03:41:04-ERROR: 
+29-Jan-26 03:55:27-INFO: DockOnSurf started on /home/yongsang/20260129_Equiformer/01_DockOnSurf_활용_표면흡착찾기/work/dockonsurf_test.
+29-Jan-26 03:55:27-INFO: To kill DockOnSurf execution type: `$ kill 1309665`.
+29-Jan-26 03:55:27-INFO: Using 'dockonsurf_isolated.inp' as input.
+29-Jan-26 03:55:27-INFO: Correctly read dockonsurf_isolated.inp parameters: 
+
+	isolated: True
+	screening: False
+	refinement: False
+	code: mace
+	batch_q_sys: local
+	max_jobs: {'r': inf, 'p': inf, 'rp': inf}
+	model_mace: /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+	pbc_cell: False
+	project_name: mace_test
+	special_atoms: []
+	isol_inp_file: mace_input.yaml
+	molec_file: molecule.xyz
+	num_conformers: 5
+	pre_opt: mmff
+
+29-Jan-26 03:55:27-INFO: Carrying out procedures for the isolated molecule.
+29-Jan-26 03:55:27-INFO: Generated 5 conformers.
+29-Jan-26 03:55:28-INFO: Pre-optimized conformers with mmff.
+29-Jan-26 03:55:28-INFO: Clustering using affinity matrix.
+29-Jan-26 03:55:28-INFO: Conformers are grouped in 1 clusters.
+29-Jan-26 03:55:28-INFO: Running isolated calculation with mace on local.
+29-Jan-26 03:55:28-INFO: Preparing MACE optimization with BFGS, fmax=0.05, max_steps=60
+29-Jan-26 03:55:28-INFO: MACE preparation completed.
+29-Jan-26 03:55:28-INFO: Finished the procedures for the isolated molecule section. 
+29-Jan-26 03:55:28-WARNING: No opt_log.out file found in isolated/conf_0/.
+29-Jan-26 03:55:28-ERROR: 
 Traceback (most recent call last):
   File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/dockonsurf.py", line 50, in <module>
     dockonsurf()
-  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/dockonsurf.py", line 22, in dockonsurf
-    inp_vars = read_input(args.input)
-  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/dos_input.py", line 994, in read_input
-    inp_vars['pbc_cell'] = get_pbc_cell()
-  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/dos_input.py", line 388, in get_pbc_cell
-    raise ValueError(err_msg)
-ValueError: 'pbc_cell' must be either 3 vectors of size 3 or False.
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/dockonsurf.py", line 25, in dockonsurf
+    run_isolated(inp_vars)
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/isolated.py", line 178, in run_isolated
+    most_stable_conf = select_stable_confs(conf_list, 0)[0]
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/refinement.py", line 19, in select_stable_confs
+    lowest_e = sorted_list[0].info['energy']
+IndexError: list index out of range
