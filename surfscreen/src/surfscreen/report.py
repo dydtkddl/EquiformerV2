@@ -339,6 +339,32 @@ class ReportGenerator:
             background: #1a1a2e;
         }}
         
+        .viewer-controls {{
+            display: flex;
+            gap: 0.5rem;
+        }}
+        
+        .viewer-btn {{
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-hover);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }}
+        
+        .viewer-btn:hover {{
+            background: var(--accent);
+            color: white;
+        }}
+        
+        .viewer-btn.active {{
+            background: var(--accent);
+            color: white;
+        }}
+        
         .viewer-info {{
             padding: 1rem;
             display: grid;
@@ -665,6 +691,11 @@ class ReportGenerator:
                                 <span class="viewer-badge rank-1">🥇 #1</span>
                                 {best_config}
                             </div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" onclick="toggleAxes(1)" title="Toggle cell axes">📐 Axes</button>
+                                <button class="viewer-btn" onclick="togglePBC(1)" title="Toggle periodic images">🔁 PBC</button>
+                                <button class="viewer-btn" onclick="toggleSpin(1)" title="Toggle rotation">🔄 Spin</button>
+                            </div>
                         </div>
                         <div class="mol-viewer" id="viewer-1"></div>
                         <div class="viewer-info">
@@ -684,6 +715,11 @@ class ReportGenerator:
                             <div class="viewer-title">
                                 <span class="viewer-badge rank-2">🥈 #2</span>
                                 {second_config}
+                            </div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" onclick="toggleAxes(2)" title="Toggle cell axes">📐 Axes</button>
+                                <button class="viewer-btn" onclick="togglePBC(2)" title="Toggle periodic images">🔁 PBC</button>
+                                <button class="viewer-btn" onclick="toggleSpin(2)" title="Toggle rotation">🔄 Spin</button>
                             </div>
                         </div>
                         <div class="mol-viewer" id="viewer-2"></div>
@@ -841,24 +877,173 @@ class ReportGenerator:
             margin: {{ t: 20, b: 50, l: 60, r: 20 }}
         }}, {{responsive: true}});
         
-        // 3D Viewers
-        function initViewer(id, xyz) {{
+        // 3D Viewers - State
+        const viewers = {{}};
+        const viewerState = {{
+            1: {{ axes: false, pbc: false, spin: true }},
+            2: {{ axes: false, pbc: false, spin: true }}
+        }};
+        
+        // Cell parameters (from surface) - approximate for Cu(111) 3x3
+        const cellParams = {cell_params};
+        
+        function initViewer(id, xyz, viewerId) {{
             if (!xyz) return;
             const viewer = $3Dmol.createViewer(id, {{
                 backgroundColor: '#1a1a2e'
             }});
+            viewers[viewerId] = {{ viewer, xyz, models: [] }};
+            
+            // Add main model
             viewer.addModel(xyz, 'xyz');
             viewer.setStyle({{}}, {{
                 stick: {{ radius: 0.12, colorscheme: 'Jmol' }},
                 sphere: {{ scale: 0.25, colorscheme: 'Jmol' }}
             }});
+            
             viewer.zoomTo();
             viewer.render();
             viewer.spin('y', 0.5);
         }}
         
-        initViewer('viewer-1', `{xyz_best}`);
-        initViewer('viewer-2', `{xyz_second}`);
+        function toggleAxes(viewerId) {{
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata) return;
+            
+            state.axes = !state.axes;
+            const btn = event.target;
+            btn.classList.toggle('active', state.axes);
+            
+            if (state.axes && cellParams) {{
+                // Draw cell axes from origin
+                const origin = [0, 0, cellParams.zmin];
+                const a = cellParams.a;
+                const b = cellParams.b;
+                const c = cellParams.c || 10;
+                
+                // X axis (red)
+                vdata.viewer.addArrow({{
+                    start: {{ x: origin[0], y: origin[1], z: origin[2] }},
+                    end: {{ x: origin[0] + a[0], y: origin[1] + a[1], z: origin[2] }},
+                    radius: 0.1,
+                    color: '#ff4444'
+                }});
+                // Y axis (green)
+                vdata.viewer.addArrow({{
+                    start: {{ x: origin[0], y: origin[1], z: origin[2] }},
+                    end: {{ x: origin[0] + b[0], y: origin[1] + b[1], z: origin[2] }},
+                    radius: 0.1,
+                    color: '#44ff44'
+                }});
+                // Z axis (blue)
+                vdata.viewer.addArrow({{
+                    start: {{ x: origin[0], y: origin[1], z: origin[2] }},
+                    end: {{ x: origin[0], y: origin[1], z: origin[2] + c }},
+                    radius: 0.1,
+                    color: '#4444ff'
+                }});
+                
+                // Draw cell box outline
+                const corners = [
+                    origin,
+                    [origin[0] + a[0], origin[1] + a[1], origin[2]],
+                    [origin[0] + a[0] + b[0], origin[1] + a[1] + b[1], origin[2]],
+                    [origin[0] + b[0], origin[1] + b[1], origin[2]]
+                ];
+                for (let i = 0; i < 4; i++) {{
+                    const c1 = corners[i];
+                    const c2 = corners[(i + 1) % 4];
+                    vdata.viewer.addCylinder({{
+                        start: {{ x: c1[0], y: c1[1], z: c1[2] }},
+                        end: {{ x: c2[0], y: c2[1], z: c2[2] }},
+                        radius: 0.03,
+                        color: '#888888',
+                        dashed: true
+                    }});
+                }}
+            }} else {{
+                // Remove shapes by re-rendering
+                vdata.viewer.removeAllShapes();
+            }}
+            vdata.viewer.render();
+        }}
+        
+        function togglePBC(viewerId) {{
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata || !cellParams) return;
+            
+            state.pbc = !state.pbc;
+            const btn = event.target;
+            btn.classList.toggle('active', state.pbc);
+            
+            // Clear and rebuild
+            vdata.viewer.removeAllModels();
+            vdata.viewer.removeAllShapes();
+            
+            if (state.pbc) {{
+                // Add main + 8 periodic images (3x3 in xy)
+                const a = cellParams.a;
+                const b = cellParams.b;
+                const offsets = [
+                    [0, 0], [-1, 0], [1, 0], [0, -1], [0, 1],
+                    [-1, -1], [-1, 1], [1, -1], [1, 1]
+                ];
+                
+                offsets.forEach(([i, j]) => {{
+                    const model = vdata.viewer.addModel(vdata.xyz, 'xyz');
+                    // Translate
+                    const dx = i * a[0] + j * b[0];
+                    const dy = i * a[1] + j * b[1];
+                    model.setStyle({{}}, {{
+                        stick: {{ radius: 0.12, colorscheme: 'Jmol' }},
+                        sphere: {{ scale: 0.25, colorscheme: 'Jmol' }}
+                    }});
+                    if (i !== 0 || j !== 0) {{
+                        // Fade periodic images
+                        model.setStyle({{}}, {{
+                            stick: {{ radius: 0.10, colorscheme: 'Jmol', opacity: 0.4 }},
+                            sphere: {{ scale: 0.20, colorscheme: 'Jmol', opacity: 0.4 }}
+                        }});
+                    }}
+                }});
+            }} else {{
+                vdata.viewer.addModel(vdata.xyz, 'xyz');
+                vdata.viewer.setStyle({{}}, {{
+                    stick: {{ radius: 0.12, colorscheme: 'Jmol' }},
+                    sphere: {{ scale: 0.25, colorscheme: 'Jmol' }}
+                }});
+            }}
+            
+            // Re-add axes if enabled
+            if (state.axes) {{
+                state.axes = false;
+                toggleAxes(viewerId);
+            }}
+            
+            vdata.viewer.zoomTo();
+            vdata.viewer.render();
+        }}
+        
+        function toggleSpin(viewerId) {{
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata) return;
+            
+            state.spin = !state.spin;
+            const btn = event.target;
+            btn.classList.toggle('active', state.spin);
+            
+            if (state.spin) {{
+                vdata.viewer.spin('y', 0.5);
+            }} else {{
+                vdata.viewer.spin(false);
+            }}
+        }}
+        
+        initViewer('viewer-1', `{xyz_best}`, 1);
+        initViewer('viewer-2', `{xyz_second}`, 2);
         
         // Table Filter
         function filterTable() {{
@@ -1016,6 +1201,9 @@ class ReportGenerator:
         xyz_best = self._read_xyz(best_config)
         xyz_second = self._read_xyz(second_config)
         
+        # Cell parameters (try to extract from best xyz)
+        cell_params = self._get_cell_params(best_config)
+        
         # HTML 생성
         html = self.HTML_TEMPLATE.format(
             title=self.results_dir.name,
@@ -1031,7 +1219,8 @@ class ReportGenerator:
             table_rows="".join(table_rows),
             results_json=json.dumps(results_json),
             xyz_best=xyz_best,
-            xyz_second=xyz_second
+            xyz_second=xyz_second,
+            cell_params=json.dumps(cell_params)
         )
         
         output_path = Path(output_path)
@@ -1044,3 +1233,55 @@ class ReportGenerator:
         if xyz_path.exists():
             return xyz_path.read_text().replace('\n', '\\n').replace("'", "\\'")
         return ""
+    
+    def _get_cell_params(self, config_name: str) -> dict:
+        """XYZ 파일에서 셀 파라미터 추출 (또는 기본값 사용)"""
+        xyz_path = self.results_dir / f"{config_name}.xyz"
+        
+        # 기본값 (Cu(111) 3x3 slab 근사치)
+        default_params = {
+            "a": [7.67, 0.0],      # a 벡터 (x, y)
+            "b": [3.84, 6.65],     # b 벡터 (x, y)
+            "c": 15.0,             # z 방향 높이
+            "zmin": 0.0
+        }
+        
+        if not xyz_path.exists():
+            return default_params
+        
+        try:
+            # XYZ 파일 파싱하여 z 범위 계산
+            lines = xyz_path.read_text().strip().split('\n')
+            if len(lines) < 3:
+                return default_params
+            
+            z_coords = []
+            x_coords = []
+            y_coords = []
+            
+            for line in lines[2:]:  # 첫 2줄 스킵 (원자 수, 주석)
+                parts = line.split()
+                if len(parts) >= 4:
+                    try:
+                        x_coords.append(float(parts[1]))
+                        y_coords.append(float(parts[2]))
+                        z_coords.append(float(parts[3]))
+                    except ValueError:
+                        continue
+            
+            if z_coords:
+                zmin = min(z_coords)
+                # 셀 크기 추정 (원자 위치 범위에서)
+                x_range = max(x_coords) - min(x_coords) if x_coords else 7.67
+                y_range = max(y_coords) - min(y_coords) if y_coords else 6.65
+                
+                return {
+                    "a": [x_range * 1.1, 0.0],
+                    "b": [0.0, y_range * 1.1],
+                    "c": 15.0,
+                    "zmin": zmin
+                }
+        except Exception:
+            pass
+        
+        return default_params
