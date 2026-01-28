@@ -1,0 +1,46 @@
+[project]
+name = "surfscreen"
+version = "0.1.0"
+description = "Enterprise-grade surface adsorption screening platform"
+authors = [{name = "User", email = "user@example.com"}]
+requires-python = ">=3.9"
+license = {text = "MIT"}
+readme = "README.md"
+
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "ase>=3.22",
+    "pymatgen>=2023.0",
+    "rdkit>=2023.0",
+    "requests>=2.28",
+    "click>=8.1",
+    "rich>=13.0",
+    "pyyaml>=6.0",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+mace = ["mace-torch>=0.3", "torch>=2.0"]
+xtb = ["xtb-python>=22.1"]
+gui = ["PySide6>=6.5", "pyvista>=0.40", "vtk>=9.2"]
+dev = ["pytest>=7.0", "pytest-cov>=4.0", "black>=23.0", "ruff>=0.1"]
+all = ["surfscreen[mace,xtb,gui,dev]"]
+
+[project.scripts]
+surfscreen = "surfscreen.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311"]
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "W", "I", "N", "UP"]
