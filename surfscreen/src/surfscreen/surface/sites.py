@@ -78,6 +78,16 @@ class SiteDetector:
         self.positions = surface.atoms.get_positions()
         self.cell = surface.atoms.get_cell()
         
+        # 셀이 유효한지 확인
+        cell_array = self.cell.array if hasattr(self.cell, 'array') else np.array(self.cell)
+        try:
+            self.cell_inv = np.linalg.inv(cell_array[:3, :3])
+            self.has_pbc = True
+        except np.linalg.LinAlgError:
+            # 셀이 singular하면 PBC 비활성화
+            self.has_pbc = False
+            self.cell_inv = None
+        
         # 표면 원자 좌표
         self.surf_positions = self.positions[self.surface_atoms]
         self.z_surface = self.surf_positions[:, 2].max()
@@ -240,28 +250,38 @@ class SiteDetector:
         """주기적 경계 조건을 고려한 거리 벡터"""
         diff = pos2 - pos1
         
-        # 셀 벡터의 역행렬
-        cell_inv = np.linalg.inv(self.cell[:3, :3])
+        # PBC 비활성화된 경우 단순 거리 반환
+        if not self.has_pbc:
+            return diff
         
         # 분수 좌표로 변환
-        frac = diff @ cell_inv
+        frac = diff @ self.cell_inv
         
         # 최소 이미지
         frac = frac - np.round(frac)
         
         # 직교 좌표로 변환
-        return frac @ self.cell[:3, :3]
+        cell_array = self.cell.array if hasattr(self.cell, 'array') else np.array(self.cell)
+        return frac @ cell_array[:3, :3]
     
     def _pbc_diff_2d(self, xy1: np.ndarray, xy2: np.ndarray) -> np.ndarray:
         """2D 주기적 경계 조건"""
         diff = xy2 - xy1
-        cell_2d = self.cell[:2, :2]
         
-        cell_inv = np.linalg.inv(cell_2d)
-        frac = diff @ cell_inv
-        frac = frac - np.round(frac)
+        # PBC 비활성화된 경우 단순 거리 반환
+        if not self.has_pbc:
+            return diff
         
-        return frac @ cell_2d
+        cell_array = self.cell.array if hasattr(self.cell, 'array') else np.array(self.cell)
+        cell_2d = cell_array[:2, :2]
+        
+        try:
+            cell_inv = np.linalg.inv(cell_2d)
+            frac = diff @ cell_inv
+            frac = frac - np.round(frac)
+            return frac @ cell_2d
+        except np.linalg.LinAlgError:
+            return diff
     
     def _reduce_by_symmetry(self, 
                             sites: List[AdsorptionSite],
