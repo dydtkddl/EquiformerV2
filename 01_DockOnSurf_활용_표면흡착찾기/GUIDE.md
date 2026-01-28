@@ -96,10 +96,8 @@ num_conformers = 10  # 최소 10개 권장
 # Isolated (분자만)
 pbc_cell = False
 
-# Screening (표면 + 분자)
-pbc_cell = 10.0, 0.0, 0.0
-           0.0, 10.0, 0.0
-           0.0, 0.0, 25.0
+# Screening (표면 + 분자) - 괄호로 각 벡터 감싸기
+pbc_cell = (10.0 0.0 0.0) (0.0 10.0 0.0) (0.0 0.0 25.0)
 ```
 
 ---

@@ -49,9 +49,7 @@ code = mace
 model_mace = ${MACE_MODEL}
 batch_q_sys = slurm
 subm_script = sub_mace.sh
-pbc_cell = 10.0, 0.0, 0.0
-           0.0, 10.0, 0.0
-           0.0, 0.0, 25.0
+pbc_cell = (10.0 0.0 0.0) (0.0 10.0 0.0) (0.0 0.0 25.0)
 
 [Screening]
 screen_inp_file = mace_input.yaml
