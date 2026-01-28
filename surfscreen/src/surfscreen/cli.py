@@ -377,6 +377,21 @@ def screen_results(results_file, sort, top):
     console.print(table)
 
 
+@screen.command("report")
+@click.argument("results_dir")
+@click.option("--output", "-o", default="report.html", help="Output HTML file")
+def screen_report(results_dir, output):
+    """Generate interactive HTML report"""
+    from surfscreen.report import ReportGenerator
+    
+    with console.status("[bold green]Generating report..."):
+        gen = ReportGenerator(results_dir)
+        out_path = gen.generate(output)
+    
+    console.print(f"[green]✓[/green] Report generated: {out_path}")
+    console.print(f"[dim]Open in browser: file://{Path(out_path).absolute()}[/dim]")
+
+
 # ============ Config Commands ============
 
 @main.group()

@@ -1,52 +1,79 @@
 # SurfScreen
 
-엔터프라이즈급 표면 흡착 스크리닝 플랫폼
+Enterprise-grade surface adsorption screening platform using MACE MLIP.
 
-## 설치
+## Installation
 
 ```bash
-# 기본 설치
-pip install -e .
-
-# MACE 포함
+cd surfscreen
 pip install -e ".[mace]"
-
-# 전체 설치
-pip install -e ".[all]"
 ```
 
-## 빠른 시작
+## Quick Start
 
-### CLI 사용
+### 1. Create Molecule
 
 ```bash
-# 분자 가져오기
-surfscreen molecule from-smiles "CCO" --output ethanol.xyz
-surfscreen molecule from-pubchem 2244 --output aspirin.xyz
+# From SMILES
+surfscreen molecule from-smiles "CCO" -o ethanol.xyz
 
-# 표면 생성
-surfscreen surface create Cu --miller 111 --layers 4 --supercell 3x3x1
-
-# 스크리닝
-surfscreen screen run --surface cu111.xyz --molecules "*.xyz" --engine mace
+# From PubChem
+surfscreen molecule from-pubchem 2244 --by cid -o aspirin.xyz
+surfscreen molecule from-pubchem acetone --by name -o acetone.xyz
 ```
 
-### Python API
+### 2. Create Surface
+
+```bash
+surfscreen surface create Cu --miller 111 --supercell 3x3x1 -o cu111.xyz
+surfscreen surface create Pt --miller 100 --supercell 4x4x1 -o pt100.xyz
+```
+
+### 3. Run Screening
+
+```bash
+surfscreen screen run -s cu111.xyz -m ethanol.xyz --engine mace --device cuda
+```
+
+### 4. Generate Report
+
+```bash
+surfscreen screen report screening_results/ethanol -o report.html
+```
+
+## CPU Thread Control
+
+By default, SurfScreen uses 80% of available CPUs. To control:
+
+```bash
+# Option 1: CLI argument
+surfscreen screen run -s cu111.xyz -m mol.xyz --ncpus 8
+
+# Option 2: Environment variable (RECOMMENDED - set before run)
+export OMP_NUM_THREADS=8
+export MKL_NUM_THREADS=8
+surfscreen screen run -s cu111.xyz -m mol.xyz
+```
+
+## Python API
 
 ```python
-from surfscreen import MoleculeBuilder, SurfaceBuilder, Calculator
+from surfscreen import MoleculeBuilder, SurfaceBuilder
+from surfscreen.adsorption import AdsorptionSystem
+from surfscreen.calculator import CalculatorFactory
 
-# 분자 생성
+# Create molecule and surface
 mol = MoleculeBuilder.from_smiles("CCO")
+surf = SurfaceBuilder.from_element("Cu", (1,1,1), layers=4)
 
-# 표면 생성
-surface = SurfaceBuilder.from_element("Cu", miller_index=(1,1,1))
+# Run screening
+system = AdsorptionSystem(surf, mol)
+configs = system.generate_configurations()
 
-# 계산
-calc = Calculator(engine="mace", device="cuda")
-result = calc.optimize(mol)
+calc = CalculatorFactory.create("mace", device="cuda")
+results = system.optimize_all(calc)
 ```
 
-## 문서
+## License
 
-- [설계 문서](../SurfScreen_DESIGN.md)
+MIT

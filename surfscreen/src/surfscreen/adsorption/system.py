@@ -30,6 +30,7 @@ class AdsorptionResult:
     config_name: str
     atoms: Atoms
     site_idx: int
+    site_type: str
     rotation: float
     center_atom: int
     initial_energy: float
@@ -271,6 +272,7 @@ class AdsorptionSystem:
                     config_name=name,
                     atoms=opt_result.atoms,
                     site_idx=info['site_idx'],
+                    site_type=info['site_type'],
                     rotation=info['rotation'],
                     center_atom=info['center_atom'],
                     initial_energy=initial_e,
@@ -310,6 +312,7 @@ class AdsorptionSystem:
             data.append({
                 'name': r.config_name,
                 'site_idx': r.site_idx,
+                'site_type': r.site_type,
                 'rotation': r.rotation,
                 'initial_energy': r.initial_energy,
                 'final_energy': r.final_energy,
