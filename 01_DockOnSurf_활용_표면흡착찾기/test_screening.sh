@@ -140,6 +140,10 @@ for conf_dir in sorted(isolated_dir.glob("conf_*")):
         output_file = conf_dir / "optimized.xyz"
         write(str(output_file), atoms)
         
+        # opt_log.out에 완료 마커 추가 (DockOnSurf가 인식하도록)
+        with open(str(opt_log), 'a') as f:
+            f.write(f"Optimization completed: energy = {final_e:.6f} eV\n")
+        
         # 에너지 정보 저장 (.info에 저장)
         atoms.info['energy'] = final_e
         write(str(conf_dir / f"struct_0.gen"), atoms, format='gen')
