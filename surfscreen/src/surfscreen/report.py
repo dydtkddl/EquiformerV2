@@ -1834,13 +1834,19 @@ class ReportGenerator:
                 }
             
             # cell이 없으면 원자 위치에서 추정
+            # XYZ doesn't store cell info, so estimate from atom positions
+            # Add typical nearest-neighbor distance to get full unit cell
             positions = atoms.positions
             x_coords = positions[:, 0]
             y_coords = positions[:, 1]
             z_coords = positions[:, 2]
             
-            x_range = x_coords.max() - x_coords.min() if len(x_coords) else 7.67
-            y_range = y_coords.max() - y_coords.min() if len(y_coords) else 6.65
+            # Estimate nearest-neighbor distance (typical: ~2.5 Å for metals)
+            # This accounts for atoms at cell edges
+            nn_dist = 2.55  # Cu nearest-neighbor ~2.55 Å
+            
+            x_range = (x_coords.max() - x_coords.min() + nn_dist) if len(x_coords) else 7.67
+            y_range = (y_coords.max() - y_coords.min() + nn_dist) if len(y_coords) else 6.65
             
             return {
                 "a": [x_range, 0.0],

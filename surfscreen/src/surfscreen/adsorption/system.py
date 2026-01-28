@@ -39,7 +39,8 @@ class AdsorptionResult:
     steps: int
     converged: bool
     
-    def save(self, path: str, format: str = "xyz"):
+    def save(self, path: str, format: str = "extxyz"):
+        """Save result to file. Uses extxyz to preserve cell info."""
         write(path, self.atoms, format=format)
 
 
