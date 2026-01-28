@@ -719,6 +719,42 @@ class ReportGenerator:
             background: rgba(6, 182, 212, 0.1);
         }}
         
+        .traj-controls {{
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }}
+        
+        .traj-buttons {{
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }}
+        
+        .traj-frame-info {{
+            margin-left: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }}
+        
+        #trajSlider {{
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--bg-hover);
+            border-radius: 3px;
+            cursor: pointer;
+        }}
+        
+        #trajSlider::-webkit-slider-thumb {{
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }}
+        
         /* Print Styles */
         @media print {{
             .theme-toggle, .toolbar, .btn {{ display: none !important; }}
@@ -945,6 +981,22 @@ class ReportGenerator:
                         <div class="modal-info-label">Rank</div>
                     </div>
                 </div>
+                
+                <!-- Trajectory Animation Controls -->
+                <div id="trajControls" class="traj-controls" style="display: none;">
+                    <div class="traj-buttons">
+                        <button class="viewer-btn" onclick="trajPrev()">⏪</button>
+                        <button class="viewer-btn" id="trajPlayBtn" onclick="trajPlayPause()">▶️ Play</button>
+                        <button class="viewer-btn" onclick="trajNext()">⏩</button>
+                        <span class="traj-frame-info">Frame: <span id="trajFrameNum">0</span>/<span id="trajFrameTotal">0</span></span>
+                        <input type="range" id="trajSlider" min="0" max="100" value="0" onchange="trajSeek(this.value)" style="flex:1; margin-left: 1rem;">
+                    </div>
+                </div>
+                
+                <!-- Energy Graph -->
+                <div id="energyGraphContainer" style="display: none; margin-top: 1rem;">
+                    <div id="modalEnergyGraph" style="height: 200px; background: var(--bg-card); border-radius: 8px;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -952,6 +1004,113 @@ class ReportGenerator:
     <script>
         // Data
         const resultsData = {results_json};
+        const trajectoryData = {trajectory_data_json};
+        
+        // Trajectory animation state
+        let trajFrames = [];
+        let trajEnergies = [];
+        let trajSteps = [];
+        let trajCurrentFrame = 0;
+        let trajPlaying = false;
+        let trajInterval = null;
+        let currentConfigName = '';
+        
+        function trajPlayPause() {{
+            if (trajPlaying) {{
+                trajPlaying = false;
+                clearInterval(trajInterval);
+                document.getElementById('trajPlayBtn').textContent = '▶️ Play';
+            }} else {{
+                trajPlaying = true;
+                document.getElementById('trajPlayBtn').textContent = '⏸️ Pause';
+                trajInterval = setInterval(() => {{
+                    trajNext();
+                    if (trajCurrentFrame >= trajFrames.length - 1) {{
+                        trajPlayPause(); // Stop at end
+                    }}
+                }}, 200);
+            }}
+        }}
+        
+        function trajPrev() {{
+            if (trajCurrentFrame > 0) {{
+                trajCurrentFrame--;
+                updateTrajFrame();
+            }}
+        }}
+        
+        function trajNext() {{
+            if (trajCurrentFrame < trajFrames.length - 1) {{
+                trajCurrentFrame++;
+                updateTrajFrame();
+            }}
+        }}
+        
+        function trajSeek(value) {{
+            trajCurrentFrame = parseInt(value);
+            updateTrajFrame();
+        }}
+        
+        function updateTrajFrame() {{
+            if (!modalViewer || trajFrames.length === 0) return;
+            
+            const xyz = trajFrames[trajCurrentFrame].replace(/\\\\n/g, '\\n');
+            modalViewer.removeAllModels();
+            modalViewer.addModel(xyz, 'xyz');
+            modalViewer.setStyle({{}}, {{
+                stick: {{ radius: 0.12, colorscheme: 'Jmol' }},
+                sphere: {{ scale: 0.25, colorscheme: 'Jmol' }}
+            }});
+            modalViewer.render();
+            
+            // Update UI
+            document.getElementById('trajFrameNum').textContent = trajCurrentFrame + 1;
+            document.getElementById('trajSlider').value = trajCurrentFrame;
+            
+            // Update energy display
+            if (trajEnergies[trajCurrentFrame]) {{
+                document.getElementById('modalEnergy').textContent = trajEnergies[trajCurrentFrame].toFixed(4);
+            }}
+            
+            // Highlight current point on graph
+            updateEnergyGraphMarker(trajCurrentFrame);
+        }}
+        
+        function showEnergyGraph(energies, steps) {{
+            if (!energies || energies.length === 0) return;
+            
+            Plotly.newPlot('modalEnergyGraph', [{{
+                x: steps,
+                y: energies,
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {{ color: '#06b6d4', width: 2 }},
+                marker: {{ size: 6 }}
+            }}], {{
+                title: {{ text: 'Energy vs Optimization Step', font: {{ color: '#9ca3af', size: 14 }} }},
+                xaxis: {{ title: 'Step', color: '#9ca3af', gridcolor: '#374151' }},
+                yaxis: {{ title: 'Energy (eV)', color: '#9ca3af', gridcolor: '#374151' }},
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                margin: {{ t: 40, r: 20, b: 50, l: 60 }}
+            }}, {{ responsive: true }});
+        }}
+        
+        function updateEnergyGraphMarker(frameIdx) {{
+            if (!trajSteps || trajSteps.length === 0) return;
+            
+            Plotly.relayout('modalEnergyGraph', {{
+                shapes: [{{
+                    type: 'line',
+                    x0: trajSteps[frameIdx],
+                    x1: trajSteps[frameIdx],
+                    y0: 0,
+                    y1: 1,
+                    yref: 'paper',
+                    line: {{ color: '#ef4444', width: 2, dash: 'dash' }}
+                }}]
+            }});
+        }}
         
         // Theme Toggle
         function toggleTheme() {{
@@ -1224,6 +1383,7 @@ class ReportGenerator:
             }}
             
             currentModalXyz = xyz;
+            currentConfigName = configName;
             
             // Update modal info
             document.getElementById('modalTitle').textContent = configName;
@@ -1231,6 +1391,36 @@ class ReportGenerator:
             document.getElementById('modalSite').textContent = data.site_type || 'unknown';
             document.getElementById('modalSteps').textContent = data.steps;
             document.getElementById('modalRank').textContent = '#' + rank;
+            
+            // Load trajectory data if available
+            const traj = trajectoryData[configName];
+            if (traj && traj.frames && traj.frames.length > 0) {{
+                trajFrames = traj.frames;
+                trajEnergies = traj.energies;
+                trajSteps = traj.steps;
+                trajCurrentFrame = 0;
+                trajPlaying = false;
+                clearInterval(trajInterval);
+                
+                // Show controls
+                document.getElementById('trajControls').style.display = 'block';
+                document.getElementById('energyGraphContainer').style.display = 'block';
+                document.getElementById('trajFrameNum').textContent = '1';
+                document.getElementById('trajFrameTotal').textContent = trajFrames.length;
+                document.getElementById('trajSlider').max = trajFrames.length - 1;
+                document.getElementById('trajSlider').value = 0;
+                document.getElementById('trajPlayBtn').textContent = '▶️ Play';
+                
+                // Delay graph creation for DOM
+                setTimeout(() => showEnergyGraph(trajEnergies, trajSteps), 200);
+            }} else {{
+                // Hide controls if no trajectory
+                trajFrames = [];
+                trajEnergies = [];
+                trajSteps = [];
+                document.getElementById('trajControls').style.display = 'none';
+                document.getElementById('energyGraphContainer').style.display = 'none';
+            }}
             
             // Show modal
             document.getElementById('structureModal').classList.add('active');
@@ -1521,6 +1711,13 @@ class ReportGenerator:
         for config_name in self.df["name"]:
             xyz_data[config_name] = self._read_xyz(config_name)
         
+        # Trajectory data for animation (only for configs with .traj files)
+        trajectory_data = {}
+        for config_name in self.df["name"]:
+            traj = self._read_trajectory(config_name)
+            if traj["frames"]:  # Only include if trajectory exists
+                trajectory_data[config_name] = traj
+        
         # Cell parameters (try to extract from best xyz)
         cell_params = self._get_cell_params(best_config)
         
@@ -1541,7 +1738,8 @@ class ReportGenerator:
             xyz_best=xyz_best,
             xyz_second=xyz_second,
             cell_params=json.dumps(cell_params),
-            xyz_data_json=json.dumps(xyz_data)
+            xyz_data_json=json.dumps(xyz_data),
+            trajectory_data_json=json.dumps(trajectory_data)
         )
         
         output_path = Path(output_path)
@@ -1606,3 +1804,54 @@ class ReportGenerator:
             pass
         
         return default_params
+    
+    def _read_trajectory(self, config_name: str, max_frames: int = 30) -> dict:
+        """Trajectory 파일에서 에너지와 프레임 추출 (샘플링 적용)"""
+        traj_path = self.results_dir / f"{config_name}.traj"
+        
+        if not traj_path.exists():
+            return {"energies": [], "frames": [], "steps": []}
+        
+        try:
+            from ase.io import read
+            traj = read(str(traj_path), index=":")
+            
+            total_frames = len(traj)
+            if total_frames == 0:
+                return {"energies": [], "frames": [], "steps": []}
+            
+            # 샘플링: max_frames 개수로 줄임
+            if total_frames <= max_frames:
+                indices = list(range(total_frames))
+            else:
+                step = total_frames / max_frames
+                indices = [int(i * step) for i in range(max_frames)]
+                # 마지막 프레임 항상 포함
+                if indices[-1] != total_frames - 1:
+                    indices[-1] = total_frames - 1
+            
+            energies = []
+            frames = []
+            steps = []
+            
+            for idx in indices:
+                atoms = traj[idx]
+                try:
+                    energy = atoms.get_potential_energy()
+                except:
+                    energy = 0.0
+                energies.append(energy)
+                steps.append(idx)
+                
+                # XYZ 형식으로 변환
+                xyz_lines = [str(len(atoms)), f"Frame {idx}"]
+                for atom in atoms:
+                    xyz_lines.append(f"{atom.symbol} {atom.position[0]:.6f} {atom.position[1]:.6f} {atom.position[2]:.6f}")
+                frames.append("\\n".join(xyz_lines))
+            
+            return {"energies": energies, "frames": frames, "steps": steps}
+            
+        except Exception as e:
+            print(f"Warning: Could not read trajectory {traj_path}: {e}")
+            return {"energies": [], "frames": [], "steps": []}
+
