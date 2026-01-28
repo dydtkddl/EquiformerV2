@@ -1,7 +1,8 @@
 #!/bin/bash
 # ============================================
-# DockOnSurf Screening 테스트
-# 표면 + 분자 흡착 사이트 탐색
+# DockOnSurf Screening 테스트 (2단계 워크플로우)
+# Step 1: Isolated → conformers 생성
+# Step 2: Screening → 표면에 배치
 # ============================================
 
 set -e
@@ -13,7 +14,7 @@ MOLECULE="${SCRIPT_DIR}/structures/molecules/methanol.xyz"
 MACE_MODEL="$HOME/.cache/mace/20231203mace128L1_epoch199model"
 
 echo "=========================================="
-echo "DockOnSurf Screening Test"
+echo "DockOnSurf Screening Test (2-Step)"
 echo "Surface: Cu(111)"
 echo "Molecule: Methanol"
 echo "Date: $(date)"
@@ -40,8 +41,81 @@ fmax: 0.05
 max_steps: 100
 EOF
 
-# DockOnSurf Screening 입력
-cat > dockonsurf.inp << EOF
+# ============================================
+# Step 1: Isolated (Conformer 생성)
+# ============================================
+echo ""
+echo "============================================"
+echo "Step 1: Running Isolated Mode (Conformers)"
+echo "============================================"
+
+cat > dockonsurf_isolated.inp << EOF
+[Global]
+project_name = cu111_methanol
+run_type = isolated
+code = mace
+model_mace = ${MACE_MODEL}
+batch_q_sys = slurm
+subm_script = sub_mace.sh
+pbc_cell = False
+
+[Isolated]
+isol_inp_file = mace_input.yaml
+molec_file = molecule.xyz
+num_conformers = 10
+pre_opt = MMFF
+EOF
+
+echo "=== dockonsurf_isolated.inp ==="
+cat dockonsurf_isolated.inp
+echo ""
+
+python -u << 'PYEOF'
+import sys
+import os
+import traceback
+
+dos_path = os.path.expanduser("~/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf")
+sys.path.insert(0, dos_path)
+sys.path.insert(0, os.path.join(dos_path, "src"))
+
+try:
+    from dockonsurf import dos_input, isolated
+    
+    print("Reading isolated input file...")
+    inp_vars = dos_input.read_input("dockonsurf_isolated.inp")
+    print(f"run_type: {inp_vars.get('run_type')}")
+    print(f"num_conformers: {inp_vars.get('num_conformers')}")
+    
+    print("\nRunning isolated stage...")
+    isolated.run_isolated(inp_vars)
+    print("Isolated stage completed!")
+    
+except Exception as e:
+    print(f"\n=== ERROR ===")
+    print(f"Type: {type(e).__name__}")
+    print(f"Message: {e}")
+    print("\n=== TRACEBACK ===")
+    traceback.print_exc()
+    sys.exit(1)
+PYEOF
+
+echo ""
+echo "Isolated results:"
+ls -la
+if [ -d "isolated" ]; then
+    echo "Conformers generated: $(find isolated -name "*.gen" -o -name "*.xyz" | wc -l)"
+fi
+
+# ============================================
+# Step 2: Screening (표면 흡착)
+# ============================================
+echo ""
+echo "============================================"
+echo "Step 2: Running Screening Mode (Adsorption)"
+echo "============================================"
+
+cat > dockonsurf_screening.inp << EOF
 [Global]
 project_name = cu111_methanol
 run_type = screening
@@ -59,19 +133,13 @@ set_angles = euler
 sites = 1 2 3
 max_structures = 20
 distance = 2.0
-num_conformers = 10
-pre_opt = MMFF
 molec_ctrs = 2
 EOF
 
-echo ""
-echo "=== dockonsurf.inp ==="
-cat dockonsurf.inp
+echo "=== dockonsurf_screening.inp ==="
+cat dockonsurf_screening.inp
 echo ""
 
-# DockOnSurf 실행
-echo ""
-echo "Running DockOnSurf Screening..."
 python -u << 'PYEOF'
 import sys
 import os
@@ -84,8 +152,8 @@ sys.path.insert(0, os.path.join(dos_path, "src"))
 try:
     from dockonsurf import dos_input, screening
     
-    print("Reading input file...")
-    inp_vars = dos_input.read_input("dockonsurf.inp")
+    print("Reading screening input file...")
+    inp_vars = dos_input.read_input("dockonsurf_screening.inp")
     print(f"run_type: {inp_vars.get('run_type')}")
     print(f"sites: {inp_vars.get('sites')}")
     print(f"max_structures: {inp_vars.get('max_structures')}")
@@ -104,7 +172,7 @@ PYEOF
 
 echo ""
 echo "=========================================="
-echo "Results:"
+echo "Final Results:"
 ls -la
 if [ -d "screening" ]; then
     echo ""
