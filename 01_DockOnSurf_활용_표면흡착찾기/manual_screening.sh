@@ -145,11 +145,7 @@ for site_idx, atom_idx in enumerate(top_atoms[:3]):  # 상위 3개 사이트
             
             print(f"  E_ads: {e_ads:.4f} eV")
             
-            # 구조 저장 (constraint 제거)
-            output_file = f"structures/{config_name}.xyz"
-            system.set_constraint()  # constraint 제거
-            write(output_file, system)
-            
+            # 결과 저장 (먼저)
             results.append({
                 'name': config_name,
                 'site_idx': site_idx,
@@ -158,6 +154,14 @@ for site_idx, atom_idx in enumerate(top_atoms[:3]):  # 상위 3개 사이트
                 'e_ads': e_ads,
                 'steps': opt.nsteps
             })
+            
+            # 구조 저장 (constraint 제거)
+            try:
+                system.set_constraint()  # constraint 제거
+                output_file = f"structures/{config_name}.xyz"
+                write(output_file, system)
+            except Exception as write_err:
+                print(f"  Write warning: {write_err}")
             
         except Exception as e:
             print(f"  Error: {e}")
