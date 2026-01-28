@@ -1,0 +1,30 @@
+#!/bin/bash
+# ============================================
+# Fake sbatch - DockOnSurf용 로컬 실행 래퍼
+# SLURM 없이 DockOnSurf를 사용하기 위한 스크립트
+# ============================================
+#
+# 사용법: 이 스크립트를 PATH에 추가하면 DockOnSurf가
+#        sbatch 대신 이 스크립트를 호출합니다.
+#
+# export PATH="$PWD/bin:$PATH"
+#
+
+SCRIPT="$1"
+shift
+
+# SLURM 형식의 출력 모방
+JOB_ID=$$
+echo "Submitted batch job $JOB_ID"
+
+# 스크립트에서 SLURM 지시문 제거 후 실행
+# (SLURM 지시문은 #SBATCH로 시작하는 주석)
+if [ -f "$SCRIPT" ]; then
+    # 백그라운드에서 실행
+    bash "$SCRIPT" &
+    wait $!
+    exit $?
+else
+    echo "Error: Script not found: $SCRIPT"
+    exit 1
+fi
