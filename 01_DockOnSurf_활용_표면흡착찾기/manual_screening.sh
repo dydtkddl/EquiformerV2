@@ -145,8 +145,9 @@ for site_idx, atom_idx in enumerate(top_atoms[:3]):  # 상위 3개 사이트
             
             print(f"  E_ads: {e_ads:.4f} eV")
             
-            # 구조 저장
+            # 구조 저장 (constraint 제거)
             output_file = f"structures/{config_name}.xyz"
+            system.set_constraint()  # constraint 제거
             write(output_file, system)
             
             results.append({
