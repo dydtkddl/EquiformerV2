@@ -49,7 +49,7 @@ subm_script = sub_mace.sh
 [Isolated]
 isol_inp_file = mace_input.yaml
 molec_file = molecule.xyz
-num_conformers = 3
+num_conformers = 10
 pre_opt = MMFF
 EOF
 
