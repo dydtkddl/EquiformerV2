@@ -1,0 +1,2335 @@
+ DBCSR| Multiplication driver                                               XSMM
+ DBCSR| Multrec recursion limit                                              512
+ DBCSR| Multiplication stack size                                           1000
+ DBCSR| Maximum elements for images                                    UNLIMITED
+ DBCSR| Multiplicative factor virtual images                                   1
+ DBCSR| Multiplication size stacks                                             3
+ DBCSR| Number of 3D layers                                               SINGLE
+ DBCSR| Use MPI memory allocation                                              T
+ DBCSR| Use RMA algorithm                                                      F
+ DBCSR| Use Communication thread                                               T
+ DBCSR| Communication thread load                                             87
+
+
+  **** **** ******  **  PROGRAM STARTED AT               2020-10-29 16:27:39.937
+ ***** ** ***  *** **   PROGRAM STARTED ON                             irene3817
+ **    ****   ******    PROGRAM STARTED BY                              marticar
+ ***** **    ** ** **   PROGRAM PROCESS ID                                211623
+  **** **  *******  **  PROGRAM STARTED IN /ccc/scratch/cont003/gen0609/marticar
+                                           /5723184
+
+ CP2K| version string:                                          CP2K version 6.1
+ CP2K| source code revision number:                                    svn:18464
+ CP2K| cp2kflags: libint fftw3 parallel mpi3 scalapack xsmm mkl                 
+ CP2K| is freely available from                            https://www.cp2k.org/
+ CP2K| Program compiled at                          Mon Dec 24 15:18:38 CET 2018
+ CP2K| Program compiled on                                             cobalt170
+ CP2K| Program compiled for                                   Linux-x86-64-iomkl
+ CP2K| Data directory path          /tmp/cp2k/6.1/iomkl-174196.202/cp2k-6.1/data
+ CP2K| Input file name                                             screening.inp
+ 
+ GLOBAL| Force Environment number                                              1
+ GLOBAL| Basis set file name            /ccc/work/cont003/gen0609/marticar/data/
+ GLOBAL| Potential file name            /ccc/work/cont003/gen0609/marticar/data/
+ GLOBAL| MM Potential file name                                     MM_POTENTIAL
+ GLOBAL| Coordinate file name                                          coord.xyz
+ GLOBAL| Method name                                                        CP2K
+ GLOBAL| Project name                                         sorbitol_screening
+ GLOBAL| Preferred FFT library                                             FFTW3
+ GLOBAL| Preferred diagonalization lib.                                       SL
+ GLOBAL| Run type                                                        GEO_OPT
+ GLOBAL| All-to-all communication in single precision                          F
+ GLOBAL| FFTs using library dependent lengths                                  F
+ GLOBAL| Global print level                                                  LOW
+ GLOBAL| Total number of message passing processes                            64
+ GLOBAL| Number of threads for this process                                    1
+ GLOBAL| This output is from process                                           0
+ GLOBAL| CPU model name :  Intel(R) Xeon Phi(TM) CPU 7250 @ 1.40GHz
+
+ MEMORY| system memory details [Kb]
+ MEMORY|                        rank 0           min           max       average
+ MEMORY| MemTotal             98253756      98253756      98253756      98253756
+ MEMORY| MemFree              69903208      69903208      69903208      69903208
+ MEMORY| Buffers                     0             0             0             0
+ MEMORY| Cached                1421136       1421136       1421136       1421136
+ MEMORY| Slab                   964472        964472        964472        964472
+ MEMORY| SReclaimable           116176        116176        116176        116176
+ MEMORY| MemLikelyFree        71440520      71440520      71440520      71440520
+
+ 
+ GENERATE|  Preliminary Number of Bonds generated:                             0
+ GENERATE|  Achieved consistency in connectivity generation.
+
+ *******************************************************************************
+ *******************************************************************************
+ **                                                                           **
+ **     #####                         ##              ##                      **
+ **    ##   ##            ##          ##              ##                      **
+ **   ##     ##                       ##            ######                    **
+ **   ##     ##  ##   ##  ##   #####  ##  ##   ####   ##    #####    #####    **
+ **   ##     ##  ##   ##  ##  ##      ## ##   ##      ##   ##   ##  ##   ##   **
+ **   ##  ## ##  ##   ##  ##  ##      ####     ###    ##   ######   ######    **
+ **    ##  ###   ##   ##  ##  ##      ## ##      ##   ##   ##       ##        **
+ **     #######   #####   ##   #####  ##  ##  ####    ##    #####   ##        **
+ **           ##                                                    ##        **
+ **                                                                           **
+ **                                                ... make the atoms dance   **
+ **                                                                           **
+ **            Copyright (C) by CP2K developers group (2000 - 2018)           **
+ **                                                                           **
+ *******************************************************************************
+
+
+ TOTAL NUMBERS AND MAXIMUM NUMBERS
+
+  Total number of            - Atomic kinds:                                   6
+                             - Atoms:                                        161
+                             - Shell sets:                                   161
+                             - Shells:                                       939
+                             - Primitive Cartesian functions:               1073
+                             - Cartesian basis functions:                   3046
+                             - Spherical basis functions:                   2683
+
+  Maximum angular momentum of- Orbital basis functions:                        3
+                             - Local part of the GTH pseudopotential:          2
+                             - Non-local part of the GTH pseudopotential:      3
+
+
+ SCF PARAMETERS         Density guess:                                   RESTART
+                        --------------------------------------------------------
+                        max_scf:                                             500
+                        max_scf_history:                                       0
+                        max_diis:                                              4
+                        --------------------------------------------------------
+                        eps_scf:                                        1.00E-05
+                        eps_scf_history:                                0.00E+00
+                        eps_diis:                                       1.00E-01
+                        eps_eigval:                                     1.00E-05
+                        --------------------------------------------------------
+                        level_shift [a.u.]:                                 0.00
+                        --------------------------------------------------------
+                        Outer loop SCF in use 
+                        No variables optimised in outer loop
+                        eps_scf                                         1.00E-05
+                        max_scf                                               10
+                        No outer loop optimization
+                        step_size                                       5.00E-01
+
+ BFGS| Use rational function optimization for step estimation:                NO
+ BFGS| Use model Hessian for initial guess:                                  YES
+ BFGS| Restart Hessian:                                                       NO
+ BFGS| Trust radius:                                                       0.472
+
+ *******************************************************************************
+ ***                     STARTING GEOMETRY OPTIMIZATION                      ***
+ ***                                   BFGS                                  ***
+ *******************************************************************************
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: initial_guess
+
+ *** WARNING in qs_initial_guess.F:263 :: User requested to restart the  ***
+ *** wavefunction from the file named: sorbitol_screening-RESTART.wfn.   ***
+ *** This file does not exist. Please check the existence of the file or ***
+ *** change properly the value of the keyword WFN_RESTART_FILE_NAME.     ***
+ *** Calculation continues using ATOMIC GUESS.                           ***
+
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   22.1     0.01891668     -7998.5806520293 -8.00E+03
+     2 OT LS       0.17E+00    9.9                    -8078.9546768569
+     3 OT LS       0.14E+00    9.9                    -8076.5844482797
+     4 OT CG       0.11E+00   18.8     0.00474750     -8079.1677314578 -8.06E+01
+     5 OT LS       0.15E+00    9.9                    -8086.7475800551
+     6 OT LS       0.30E+00    9.9                    -8088.8215142979
+     7 OT CG       0.24E+00   18.8     0.00323897     -8091.7636038368 -1.26E+01
+
+ *** WARNING in dft_plus_u.F:2007 :: DFT+U energy contibution is negative ***
+ *** possibly due to unphysical Mulliken charges. Check your input, if    ***
+ *** this warning persists or try a different method!                     ***
+
+     8 OT LS       0.34E+00    9.9                    -8097.3936110065
+
+ *** WARNING in dft_plus_u.F:2007 :: DFT+U energy contibution is negative ***
+ *** possibly due to unphysical Mulliken charges. Check your input, if    ***
+ *** this warning persists or try a different method!                     ***
+
+     9 OT LS       0.29E+00    9.9                    -8097.4743410571
+
+ *** WARNING in dft_plus_u.F:2007 :: DFT+U energy contibution is negative ***
+ *** possibly due to unphysical Mulliken charges. Check your input, if    ***
+ *** this warning persists or try a different method!                     ***
+
+    10 OT CG       0.24E+00   18.7     0.00246087     -8097.5877412137 -5.82E+00
+    11 OT LS       0.33E+00    9.9                    -8099.1454004515
+    12 OT LS       0.17E+00    9.9                    -8097.5912738900
+    13 OT CG       0.13E+00   18.8     0.00221555     -8099.4956399558 -1.91E+00
+    14 OT LS       0.18E+00    9.9                    -8101.1885650550
+    15 OT LS       0.21E+00    9.9                    -8101.4286673381
+    16 OT CG       0.17E+00   18.7     0.00172851     -8101.4554525027 -1.96E+00
+    17 OT LS       0.23E+00    9.9                    -8102.3097439121
+    18 OT LS       0.15E+00    9.9                    -8102.0539153707
+    19 OT CG       0.12E+00   18.7     0.00129571     -8102.3200306397 -8.65E-01
+    20 OT LS       0.17E+00    9.9                    -8102.8428154015
+    21 OT LS       0.18E+00    9.9                    -8102.9093792744
+    22 OT CG       0.15E+00   18.8     0.00103440     -8102.9132777018 -5.93E-01
+    23 OT LS       0.21E+00    9.9                    -8103.2367404210
+    24 OT LS       0.16E+00    9.9                    -8103.2097554791
+    25 OT CG       0.13E+00   18.8     0.00079943     -8103.2385381047 -3.25E-01
+    26 OT LS       0.18E+00    9.9                    -8103.4491658611
+    27 OT LS       0.20E+00    9.9                    -8103.4772132035
+    28 OT CG       0.16E+00   18.7     0.00073959     -8103.4794139272 -2.41E-01
+    29 OT LS       0.22E+00    9.9                    -8103.6601249450
+    30 OT LS       0.17E+00    9.9                    -8103.6490094764
+    31 OT CG       0.14E+00   18.7     0.00060564     -8103.6618409341 -1.82E-01
+    32 OT LS       0.20E+00    9.9                    -8103.7842858908
+    33 OT LS       0.19E+00    9.9                    -8103.7920894531
+    34 OT CG       0.15E+00   18.8     0.00054922     -8103.7924326251 -1.31E-01
+    35 OT LS       0.21E+00    9.9                    -8103.8929426204
+    36 OT LS       0.18E+00    9.9                    -8103.8931880814
+    37 OT CG       0.14E+00   18.8     0.00044991     -8103.8959427133 -1.04E-01
+    38 OT LS       0.20E+00    9.9                    -8103.9628630780
+    39 OT LS       0.18E+00    9.9                    -8103.9649359064
+    40 OT CG       0.14E+00   18.7     0.00040168     -8103.9658234863 -6.99E-02
+    41 OT LS       0.20E+00    9.9                    -8104.0210503513
+    42 OT LS       0.19E+00    9.9                    -8104.0241717780
+    43 OT CG       0.15E+00   18.8     0.00035896     -8104.0244205120 -5.86E-02
+    44 OT LS       0.21E+00    9.9                    -8104.0677467372
+    45 OT LS       0.18E+00    9.9                    -8104.0674095903
+    46 OT CG       0.14E+00   18.8     0.00031365     -8104.0688525276 -4.44E-02
+    47 OT LS       0.20E+00    9.9                    -8104.1033987972
+    48 OT LS       0.20E+00    9.9                    -8104.1061731868
+    49 OT CG       0.16E+00   18.8     0.00029549     -8104.1061856990 -3.73E-02
+    50 OT LS       0.22E+00    9.9                    -8104.1368583518
+    51 OT LS       0.19E+00    9.9                    -8104.1366115650
+    52 OT CG       0.15E+00   18.7     0.00026425     -8104.1376389374 -3.15E-02
+    53 OT LS       0.21E+00    9.9                    -8104.1624246116
+    54 OT LS       0.20E+00    9.9                    -8104.1636708049
+    55 OT CG       0.16E+00   18.7     0.00024986     -8104.1638268675 -2.62E-02
+    56 OT LS       0.22E+00    9.9                    -8104.1862951044
+    57 OT LS       0.20E+00    9.9                    -8104.1868835634
+    58 OT CG       0.16E+00   18.8     0.00022855     -8104.1872302337 -2.34E-02
+    59 OT LS       0.22E+00    9.9                    -8104.2056929665
+    60 OT LS       0.19E+00    9.9                    -8104.2058819707
+    61 OT CG       0.15E+00   18.8     0.00021315     -8104.2063094160 -1.91E-02
+    62 OT LS       0.21E+00    9.9                    -8104.2226229387
+    63 OT LS       0.20E+00    9.9                    -8104.2234253183
+    64 OT CG       0.16E+00   18.8     0.00019918     -8104.2235333499 -1.72E-02
+    65 OT LS       0.22E+00    9.9                    -8104.2377008874
+    66 OT LS       0.19E+00    9.9                    -8104.2378316323
+    67 OT CG       0.15E+00   18.8     0.00018586     -8104.2381667354 -1.46E-02
+    68 OT LS       0.22E+00    9.9                    -8104.2507092994
+    69 OT LS       0.20E+00    9.9                    -8104.2513309397
+    70 OT CG       0.16E+00   18.8     0.00017737     -8104.2514125663 -1.32E-02
+    71 OT LS       0.22E+00    9.9                    -8104.2628647773
+    72 OT LS       0.20E+00    9.9                    -8104.2630489923
+    73 OT CG       0.16E+00   18.8     0.00016626     -8104.2632800268 -1.19E-02
+    74 OT LS       0.22E+00    9.9                    -8104.2734957024
+    75 OT LS       0.20E+00    9.9                    -8104.2739605762
+    76 OT CG       0.16E+00   18.7     0.00016179     -8104.2740406273 -1.08E-02
+    77 OT LS       0.23E+00    9.9                    -8104.2837908895
+    78 OT LS       0.20E+00    9.9                    -8104.2840220409
+    79 OT CG       0.16E+00   18.8     0.00015438     -8104.2841833630 -1.01E-02
+    80 OT LS       0.23E+00    9.9                    -8104.2929206924
+    81 OT LS       0.20E+00    9.9                    -8104.2930368470
+    82 OT CG       0.16E+00   18.8     0.00014784     -8104.2932253077 -9.04E-03
+    83 OT LS       0.22E+00    9.9                    -8104.3014187481
+    84 OT LS       0.21E+00    9.9                    -8104.3018584244
+    85 OT CG       0.17E+00   18.8     0.00014509     -8104.3019018894 -8.68E-03
+    86 OT LS       0.23E+00    9.9                    -8104.3098320740
+    87 OT LS       0.20E+00    9.9                    -8104.3099566730
+    88 OT CG       0.16E+00   18.8     0.00013980     -8104.3101182144 -8.22E-03
+    89 OT LS       0.23E+00    9.9                    -8104.3174164076
+    90 OT LS       0.20E+00    9.9                    -8104.3175858378
+    91 OT CG       0.16E+00   18.8     0.00013545     -8104.3177082065 -7.59E-03
+    92 OT LS       0.23E+00    9.9                    -8104.3245715912
+    93 OT LS       0.20E+00    9.9                    -8104.3247783880
+    94 OT CG       0.16E+00   18.8     0.00013125     -8104.3248724472 -7.16E-03
+    95 OT LS       0.23E+00    9.9                    -8104.3313811635
+    96 OT LS       0.21E+00    9.9                    -8104.3316034376
+    97 OT CG       0.17E+00   18.8     0.00012978     -8104.3316818490 -6.81E-03
+    98 OT LS       0.23E+00    9.9                    -8104.3379991403
+    99 OT LS       0.20E+00    9.9                    -8104.3380961479
+   100 OT CG       0.16E+00   18.8     0.00012576     -8104.3382262441 -6.54E-03
+   101 OT LS       0.23E+00    9.9                    -8104.3441136494
+   102 OT LS       0.20E+00    9.9                    -8104.3442597365
+   103 OT CG       0.16E+00   18.8     0.00012292     -8104.3443543792 -6.13E-03
+   104 OT LS       0.23E+00    9.9                    -8104.3500663322
+   105 OT LS       0.21E+00    9.9                    -8104.3503053107
+   106 OT CG       0.17E+00   18.8     0.00012130     -8104.3503576974 -6.00E-03
+   107 OT LS       0.23E+00    9.9                    -8104.3559251183
+   108 OT LS       0.20E+00    9.9                    -8104.3560296883
+   109 OT CG       0.16E+00   18.8     0.00011805     -8104.3561353391 -5.78E-03
+   110 OT LS       0.23E+00    9.9                    -8104.3613586555
+   111 OT LS       0.20E+00    9.9                    -8104.3614688689
+   112 OT CG       0.16E+00   18.8     0.00011611     -8104.3615622208 -5.43E-03
+   113 OT LS       0.23E+00    9.9                    -8104.3665980808
+   114 OT LS       0.20E+00    9.9                    -8104.3667304388
+   115 OT CG       0.16E+00   18.8     0.00011259     -8104.3668084376 -5.25E-03
+   116 OT LS       0.23E+00    9.9                    -8104.3714957609
+   117 OT LS       0.20E+00    9.9                    -8104.3715810343
+   118 OT CG       0.16E+00   18.8     0.00010807     -8104.3716710898 -4.86E-03
+   119 OT LS       0.22E+00    9.9                    -8104.3760023185
+   120 OT LS       0.20E+00    9.9                    -8104.3761509104
+   121 OT CG       0.16E+00   18.8     0.00010445     -8104.3762028025 -4.53E-03
+   122 OT LS       0.23E+00    9.9                    -8104.3802207019
+   123 OT LS       0.20E+00    9.9                    -8104.3802861265
+   124 OT CG       0.16E+00   18.8     0.00009939     -8104.3803668199 -4.16E-03
+   125 OT LS       0.22E+00    9.9                    -8104.3840100654
+   126 OT LS       0.20E+00    9.9                    -8104.3841293349
+   127 OT CG       0.16E+00   18.8     0.00009572     -8104.3841752592 -3.81E-03
+   128 OT LS       0.23E+00    9.9                    -8104.3875436994
+   129 OT LS       0.20E+00    9.9                    -8104.3876135514
+   130 OT CG       0.16E+00   18.8     0.00009142     -8104.3876739038 -3.50E-03
+   131 OT LS       0.22E+00    9.9                    -8104.3907587489
+   132 OT LS       0.20E+00    9.9                    -8104.3908621306
+   133 OT CG       0.16E+00   18.8     0.00008763     -8104.3908999396 -3.23E-03
+   134 OT LS       0.23E+00    9.9                    -8104.3937384999
+   135 OT LS       0.20E+00    9.9                    -8104.3938100746
+   136 OT CG       0.16E+00   18.8     0.00008394     -8104.3938548416 -2.95E-03
+   137 OT LS       0.23E+00    9.9                    -8104.3964653710
+   138 OT LS       0.20E+00    9.9                    -8104.3965436540
+   139 OT CG       0.16E+00   18.8     0.00008028     -8104.3965793076 -2.72E-03
+   140 OT LS       0.23E+00    9.9                    -8104.3989499214
+   141 OT LS       0.20E+00    9.9                    -8104.3989930312
+   142 OT CG       0.16E+00   18.8     0.00007602     -8104.3990381579 -2.46E-03
+   143 OT LS       0.22E+00    9.9                    -8104.4011575294
+   144 OT LS       0.20E+00    9.9                    -8104.4012165561
+   145 OT CG       0.16E+00   18.8     0.00007250     -8104.4012474342 -2.21E-03
+   146 OT LS       0.22E+00    9.9                    -8104.4031803847
+   147 OT LS       0.20E+00    9.9                    -8104.4032358122
+   148 OT CG       0.16E+00   18.8     0.00006858     -8104.4032632694 -2.02E-03
+   149 OT LS       0.22E+00    9.9                    -8104.4049790985
+   150 OT LS       0.20E+00    9.9                    -8104.4050111189
+   151 OT CG       0.16E+00   18.8     0.00006458     -8104.4050433267 -1.78E-03
+   152 OT LS       0.22E+00    9.9                    -8104.4065624220
+   153 OT LS       0.20E+00    9.9                    -8104.4066066415
+   154 OT CG       0.16E+00   18.8     0.00006096     -8104.4066278743 -1.58E-03
+   155 OT LS       0.22E+00    9.9                    -8104.4079777534
+   156 OT LS       0.20E+00    9.9                    -8104.4080091224
+   157 OT CG       0.16E+00   18.8     0.00005722     -8104.4080315038 -1.40E-03
+   158 OT LS       0.22E+00    9.9                    -8104.4092213724
+   159 OT LS       0.20E+00    9.9                    -8104.4092555265
+   160 OT CG       0.16E+00   18.8     0.00005373     -8104.4092723529 -1.24E-03
+   161 OT LS       0.22E+00    9.9                    -8104.4103261719
+   162 OT LS       0.20E+00    9.9                    -8104.4103573098
+   163 OT CG       0.16E+00   18.8     0.00005075     -8104.4103718304 -1.10E-03
+   164 OT LS       0.22E+00    9.9                    -8104.4113134803
+   165 OT LS       0.20E+00    9.9                    -8104.4113388550
+   166 OT CG       0.16E+00   18.8     0.00004801     -8104.4113528908 -9.81E-04
+   167 OT LS       0.22E+00    9.9                    -8104.4121968444
+   168 OT LS       0.20E+00    9.9                    -8104.4122201440
+   169 OT CG       0.16E+00   18.8     0.00004533     -8104.4122324774 -8.80E-04
+   170 OT LS       0.22E+00    9.9                    -8104.4129882021
+   171 OT LS       0.20E+00    9.9                    -8104.4130112558
+   172 OT CG       0.16E+00   18.8     0.00004304     -8104.4130213577 -7.89E-04
+   173 OT LS       0.22E+00    9.9                    -8104.4137045550
+   174 OT LS       0.20E+00    9.9                    -8104.4137232058
+   175 OT CG       0.16E+00   18.8     0.00004084     -8104.4137332778 -7.12E-04
+   176 OT LS       0.23E+00    9.9                    -8104.4143471315
+   177 OT LS       0.20E+00    9.9                    -8104.4143621054
+   178 OT CG       0.16E+00   18.8     0.00003864     -8104.4143719502 -6.39E-04
+   179 OT LS       0.22E+00    9.9                    -8104.4149220780
+   180 OT LS       0.20E+00    9.9                    -8104.4149380734
+   181 OT CG       0.16E+00   18.8     0.00003674     -8104.4149457589 -5.74E-04
+   182 OT LS       0.23E+00    9.9                    -8104.4154419927
+   183 OT LS       0.20E+00    9.9                    -8104.4154533891
+   184 OT CG       0.16E+00   18.8     0.00003478     -8104.4154616738 -5.16E-04
+   185 OT LS       0.22E+00    9.9                    -8104.4159047562
+   186 OT LS       0.20E+00    9.9                    -8104.4159159759
+   187 OT CG       0.16E+00   18.8     0.00003291     -8104.4159228974 -4.61E-04
+   188 OT LS       0.22E+00    9.9                    -8104.4163203085
+   189 OT LS       0.20E+00    9.9                    -8104.4163318488
+   190 OT CG       0.16E+00   18.8     0.00003135     -8104.4163374063 -4.15E-04
+   191 OT LS       0.22E+00    9.9                    -8104.4166976950
+   192 OT LS       0.20E+00    9.9                    -8104.4167066683
+   193 OT CG       0.16E+00   18.8     0.00002965     -8104.4167123613 -3.75E-04
+   194 OT LS       0.22E+00    9.9                    -8104.4170354647
+   195 OT LS       0.20E+00    9.9                    -8104.4170450662
+   196 OT CG       0.16E+00   18.8     0.00002822     -8104.4170494900 -3.37E-04
+   197 OT LS       0.22E+00    9.9                    -8104.4173431154
+   198 OT LS       0.20E+00    9.9                    -8104.4173513940
+   199 OT CG       0.16E+00   18.8     0.00002675     -8104.4173556074 -3.06E-04
+   200 OT LS       0.23E+00    9.9                    -8104.4176189721
+   201 OT LS       0.20E+00    9.9                    -8104.4176252494
+   202 OT CG       0.16E+00   18.8     0.00002538     -8104.4176295406 -2.74E-04
+   203 OT LS       0.22E+00    9.9                    -8104.4178667084
+   204 OT LS       0.20E+00    9.9                    -8104.4178735190
+   205 OT CG       0.16E+00   18.8     0.00002404     -8104.4178768687 -2.47E-04
+   206 OT LS       0.23E+00    9.9                    -8104.4180888659
+   207 OT LS       0.20E+00    9.9                    -8104.4180934721
+   208 OT CG       0.16E+00   18.8     0.00002268     -8104.4180971320 -2.20E-04
+   209 OT LS       0.22E+00    9.9                    -8104.4182849535
+   210 OT LS       0.20E+00    9.9                    -8104.4182896248
+   211 OT CG       0.16E+00   18.8     0.00002139     -8104.4182925954 -1.95E-04
+   212 OT LS       0.22E+00    9.9                    -8104.4184593632
+   213 OT LS       0.20E+00    9.9                    -8104.4184636852
+   214 OT CG       0.16E+00   18.8     0.00002009     -8104.4184662446 -1.74E-04
+   215 OT LS       0.22E+00    9.9                    -8104.4186131220
+   216 OT LS       0.20E+00    9.9                    -8104.4186168920
+   217 OT CG       0.16E+00   18.8     0.00001887     -8104.4186191625 -1.53E-04
+   218 OT LS       0.22E+00    9.9                    -8104.4187489682
+   219 OT LS       0.20E+00    9.9                    -8104.4187526755
+   220 OT CG       0.16E+00   18.8     0.00001776     -8104.4187545168 -1.35E-04
+   221 OT LS       0.22E+00    9.9                    -8104.4188694850
+   222 OT LS       0.20E+00    9.9                    -8104.4188724490
+   223 OT CG       0.16E+00   18.8     0.00001667     -8104.4188742199 -1.20E-04
+   224 OT LS       0.22E+00    9.9                    -8104.4189751974
+   225 OT LS       0.20E+00    9.9                    -8104.4189776656
+   226 OT CG       0.16E+00   18.8     0.00001567     -8104.4189792816 -1.05E-04
+   227 OT LS       0.22E+00    9.9                    -8104.4190693123
+   228 OT LS       0.20E+00    9.9                    -8104.4190726042
+   229 OT CG       0.16E+00   18.8     0.00001484     -8104.4190735858 -9.43E-05
+   230 OT LS       0.23E+00    9.9                    -8104.4191544934
+   231 OT LS       0.20E+00    9.9                    -8104.4191563557
+   232 OT CG       0.16E+00   18.8     0.00001401     -8104.4191577033 -8.41E-05
+   233 OT LS       0.22E+00    9.9                    -8104.4192299134
+   234 OT LS       0.20E+00    9.9                    -8104.4192320571
+   235 OT CG       0.16E+00   18.8     0.00001328     -8104.4192330461 -7.53E-05
+   236 OT LS       0.23E+00    9.9                    -8104.4192979647
+   237 OT LS       0.20E+00    9.9                    -8104.4192995921
+   238 OT CG       0.16E+00   18.8     0.00001260     -8104.4193006125 -6.76E-05
+   239 OT LS       0.22E+00    9.9                    -8104.4193589740
+   240 OT LS       0.20E+00    9.9                    -8104.4193605244
+   241 OT CG       0.16E+00   18.8     0.00001191     -8104.4193614027 -6.08E-05
+   242 OT LS       0.22E+00    9.9                    -8104.4194133650
+   243 OT LS       0.20E+00    9.9                    -8104.4194146224
+   244 OT CG       0.16E+00   18.8     0.00001129     -8104.4194154596 -5.41E-05
+   245 OT LS       0.22E+00    9.9                    -8104.4194620452
+   246 OT LS       0.20E+00    9.9                    -8104.4194631887
+   247 OT CG       0.16E+00   18.8     0.00001065     -8104.4194639319 -4.85E-05
+   248 OT LS       0.22E+00    9.9                    -8104.4195054004
+   249 OT LS       0.20E+00    9.9                    -8104.4195066269
+   250 OT CG       0.16E+00   18.8     0.00001004     -8104.4195071967 -4.33E-05
+   251 OT LS       0.22E+00    9.9                    -8104.4195439537
+   252 OT LS       0.20E+00    9.9                    -8104.4195447711
+   253 OT CG       0.16E+00   18.8     0.00000947     -8104.4195453964 -3.82E-05
+
+  *** SCF run converged in   253 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923629        0.0000076371
+  Core density on regular grids:             1423.9999996427       -0.0000003573
+  Total charge density on r-space grids:        0.0000072799
+  Total charge density g-space grids:           0.0000072799
+
+  Overlap energy of the core charge distribution:               0.00000187483828
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4079.25850344186256
+  Hartree energy:                                            3394.57756071508993
+  Exchange-correlation energy:                              -1034.20194876994992
+  Dispersion energy:                                           -0.55509868996839
+
+  DFT+U energy:                                                 1.47813900632616
+
+  Total energy:                                             -8104.41954539638573
+
+  outer SCF iter =    1 RMS gradient =   0.95E-05 energy =      -8104.4195453964
+  outer SCF loop converged in   1 iterations or  253 steps
+
+
+  Integrated absolute spin density  :                             232.2994530428
+  Ideal and single determinant S**2 :                    0.000000     127.193466
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.419578323897440
+
+
+ --------  Informations at step =     0 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.4195783239
+  Used time                  =             3316.702
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      1
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.5     0.00019438     -8104.4496649833 -8.10E+03
+     2 OT LS       0.17E+00    9.0                    -8104.4643787151
+     3 OT LS       0.40E+00    9.0                    -8104.4688118933
+     4 OT CG       0.32E+00   18.0     0.00015105     -8104.4787434446 -2.91E-02
+     5 OT LS       0.16E+00    9.0                    -8104.4678822259
+     6 OT LS       0.12E+00    9.0                    -8104.4831702867
+     7 OT CG       0.93E-01   17.9     0.00005219     -8104.4839035691 -5.16E-03
+     8 OT LS       0.13E+00    8.9                    -8104.4845548454
+     9 OT LS       0.14E+00    8.9                    -8104.4846378753
+    10 OT CG       0.11E+00   17.8     0.00003764     -8104.4846431139 -7.40E-04
+    11 OT LS       0.16E+00    8.9                    -8104.4851247733
+    12 OT LS       0.26E+00    8.9                    -8104.4852426726
+    13 OT CG       0.21E+00   17.8     0.00004207     -8104.4853508398 -7.08E-04
+    14 OT LS       0.29E+00    8.9                    -8104.4860311118
+    15 OT LS       0.20E+00    8.9                    -8104.4858790356
+    16 OT CG       0.16E+00   17.8     0.00004163     -8104.4860325489 -6.82E-04
+    17 OT LS       0.22E+00    9.0                    -8104.4866580493
+    18 OT LS       0.20E+00    8.9                    -8104.4866718815
+    19 OT CG       0.16E+00   17.7     0.00003056     -8104.4866823839 -6.50E-04
+    20 OT LS       0.22E+00    8.9                    -8104.4869887757
+    21 OT LS       0.17E+00    9.0                    -8104.4869649878
+    22 OT CG       0.14E+00   17.8     0.00001701     -8104.4869908456 -3.08E-04
+    23 OT LS       0.19E+00    8.9                    -8104.4870710572
+    24 OT LS       0.15E+00    8.9                    -8104.4870630535
+    25 OT CG       0.12E+00   17.8     0.00001026     -8104.4870713180 -8.05E-05
+    26 OT LS       0.16E+00    8.9                    -8104.4870992681
+    27 OT LS       0.14E+00    8.9                    -8104.4870999559
+    28 OT CG       0.12E+00   17.8     0.00000738     -8104.4871004010 -2.91E-05
+
+  *** SCF run converged in    28 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923118        0.0000076882
+  Core density on regular grids:             1423.9999996430       -0.0000003570
+  Total charge density on r-space grids:        0.0000073312
+  Total charge density g-space grids:           0.0000073312
+
+  Overlap energy of the core charge distribution:               0.00000183882867
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.72511740623486
+  Hartree energy:                                            3394.93591472977414
+  Exchange-correlation energy:                              -1034.10168954245705
+  Dispersion energy:                                           -0.55502933364072
+
+  DFT+U energy:                                                 1.48528747482605
+
+  Total energy:                                             -8104.48710040101651
+
+  outer SCF iter =    1 RMS gradient =   0.74E-05 energy =      -8104.4871004010
+  outer SCF loop converged in   1 iterations or   28 steps
+
+
+  Integrated absolute spin density  :                             232.2012912417
+  Ideal and single determinant S**2 :                    0.000000     127.245936
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.487115988214100
+
+
+ --------  Informations at step =     1 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.4871159882
+  Real energy change         =        -0.0675376643
+  Predicted change in energy =        -0.0520562779
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.3222238352
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              393.205
+
+  Convergence check :
+  Max. step size             =         0.3222238352
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0290805294
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0487824095
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0044561121
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      2
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00034697     -8104.4718407907 -8.10E+03
+     2 OT LS       0.17E+00    8.9                    -8104.5010246165
+     3 OT LS       0.13E+00    8.9                    -8104.4986453600
+     4 OT CG       0.10E+00   17.7     0.00014964     -8104.5011720184 -2.93E-02
+     5 OT LS       0.15E+00    8.9                    -8104.5083977640
+     6 OT LS       0.28E+00    8.9                    -8104.5103773950
+     7 OT CG       0.23E+00   17.8     0.00010259     -8104.5132116625 -1.20E-02
+     8 OT LS       0.32E+00    8.9                    -8104.5154114126
+     9 OT LS       0.15E+00    8.9                    -8104.5124024747
+    10 OT CG       0.12E+00   18.2     0.00005328     -8104.5162140786 -3.00E-03
+    11 OT LS       0.17E+00    9.1                    -8104.5168608346
+    12 OT LS       0.12E+00    8.9                    -8104.5167579375
+    13 OT CG       0.95E-01   17.8     0.00003017     -8104.5168608346 -6.47E-04
+    14 OT LS       0.13E+00    8.9                    -8104.5170929149
+    15 OT LS       0.16E+00    8.9                    -8104.5171301822
+    16 OT CG       0.13E+00   17.8     0.00002315     -8104.5171373968 -2.77E-04
+    17 OT LS       0.18E+00    8.9                    -8104.5173232663
+    18 OT LS       0.22E+00    8.9                    -8104.5173557229
+    19 OT CG       0.18E+00   17.8     0.00002030     -8104.5173645007 -2.27E-04
+    20 OT LS       0.25E+00    8.9                    -8104.5175228694
+    21 OT LS       0.21E+00    8.9                    -8104.5175186569
+    22 OT CG       0.16E+00   17.8     0.00001416     -8104.5175258069 -1.61E-04
+    23 OT LS       0.23E+00    9.5                    -8104.5175817655
+    24 OT LS       0.15E+00    8.9                    -8104.5175651830
+    25 OT CG       0.12E+00   18.2     0.00001109     -8104.5175824411 -5.66E-05
+    26 OT LS       0.17E+00    9.3                    -8104.5176141134
+    27 OT LS       0.14E+00    9.3                    -8104.5176134035
+    28 OT CG       0.11E+00   18.2     0.00000496     -8104.5176147464 -3.23E-05
+
+  *** SCF run converged in    28 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923348        0.0000076652
+  Core density on regular grids:             1423.9999996428       -0.0000003572
+  Total charge density on r-space grids:        0.0000073080
+  Total charge density g-space grids:           0.0000073080
+
+  Overlap energy of the core charge distribution:               0.00000181967784
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.40436517073113
+  Hartree energy:                                            3395.15842882106563
+  Exchange-correlation energy:                              -1034.03085084149234
+  Dispersion energy:                                           -0.55566934157188
+
+  DFT+U energy:                                                 1.48281259972451
+
+  Total energy:                                             -8104.51761474644991
+
+  outer SCF iter =    1 RMS gradient =   0.50E-05 energy =      -8104.5176147464
+  outer SCF loop converged in   1 iterations or   28 steps
+
+
+  Integrated absolute spin density  :                             232.1957204813
+  Ideal and single determinant S**2 :                    0.000000     127.248988
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.517622049897909
+
+
+ --------  Informations at step =     2 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5176220499
+  Real energy change         =        -0.0305060617
+  Predicted change in energy =        -0.0304648968
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.3381237517
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              395.366
+
+  Convergence check :
+  Max. step size             =         0.3381237517
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0382454524
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0253988922
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0034048388
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      3
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.4     0.00035912     -8104.4487793414 -8.10E+03
+     2 OT LS       0.17E+00    8.9                    -8104.4863285815
+     3 OT LS       0.16E+00    8.9                    -8104.4886589453
+     4 OT CG       0.13E+00   17.7     0.00033486     -8104.4887980361 -4.00E-02
+     5 OT LS       0.18E+00    8.9                    -8104.5209281972
+     6 OT LS       0.16E+00    8.9                    -8104.5219673004
+     7 OT CG       0.13E+00   17.8     0.00016387     -8104.5223327756 -3.35E-02
+     8 OT LS       0.18E+00    8.9                    -8104.5290028137
+     9 OT LS       0.13E+00    8.9                    -8104.5279828100
+    10 OT CG       0.10E+00   17.7     0.00005628     -8104.5290031357 -6.67E-03
+    11 OT LS       0.15E+00    8.9                    -8104.5298083406
+    12 OT LS       0.14E+00    8.9                    -8104.5298791857
+    13 OT CG       0.12E+00   17.7     0.00002514     -8104.5298791876 -8.76E-04
+    14 OT LS       0.16E+00    8.9                    -8104.5300579102
+    15 OT LS       0.16E+00    8.9                    -8104.5300727401
+    16 OT CG       0.13E+00   17.7     0.00001334     -8104.5300727683 -1.94E-04
+    17 OT LS       0.18E+00    8.9                    -8104.5301258512
+    18 OT LS       0.16E+00    8.9                    -8104.5301279624
+    19 OT CG       0.13E+00   17.7     0.00000847     -8104.5301284782 -5.57E-05
+
+  *** SCF run converged in    19 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923368        0.0000076632
+  Core density on regular grids:             1423.9999996430       -0.0000003570
+  Total charge density on r-space grids:        0.0000073062
+  Total charge density g-space grids:           0.0000073062
+
+  Overlap energy of the core charge distribution:               0.00000175837418
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.16946825968989
+  Hartree energy:                                            3395.31546670059697
+  Exchange-correlation energy:                              -1033.97022370964169
+  Dispersion energy:                                           -0.55558371415256
+
+  DFT+U energy:                                                 1.48744520150952
+
+  Total energy:                                             -8104.53012847820719
+
+  outer SCF iter =    1 RMS gradient =   0.85E-05 energy =      -8104.5301284782
+  outer SCF loop converged in   1 iterations or   19 steps
+
+
+  Integrated absolute spin density  :                             232.2339534014
+  Ideal and single determinant S**2 :                    0.000000     127.272526
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.530146438506563
+
+
+ --------  Informations at step =     3 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5301464385
+  Real energy change         =        -0.0125243886
+  Predicted change in energy =        -0.0121627591
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.2290598641
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              285.072
+
+  Convergence check :
+  Max. step size             =         0.2290598641
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0273522348
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0249118979
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0031711139
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      4
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00022666     -8104.4900452034 -8.10E+03
+     2 OT LS       0.17E+00    8.9                    -8104.5088350349
+     3 OT LS       0.30E+00    8.9                    -8104.5136704269
+     4 OT CG       0.24E+00   17.8     0.00021538     -8104.5190153313 -2.90E-02
+     5 OT LS       0.33E+00    8.9                    -8104.5248030515
+     6 OT LS       0.14E+00    8.9                    -8104.5075816098
+     7 OT CG       0.11E+00   17.7     0.00007474     -8104.5310138699 -1.20E-02
+     8 OT LS       0.15E+00    8.9                    -8104.5319781919
+     9 OT LS       0.94E-01    8.9                    -8104.5315919899
+    10 OT CG       0.75E-01   17.7     0.00002895     -8104.5320090848 -9.95E-04
+    11 OT LS       0.10E+00    8.9                    -8104.5321698720
+    12 OT LS       0.11E+00    8.9                    -8104.5321897580
+    13 OT CG       0.91E-01   17.8     0.00001511     -8104.5321907777 -1.82E-04
+    14 OT LS       0.13E+00    8.9                    -8104.5322492154
+    15 OT LS       0.17E+00    8.9                    -8104.5322609746
+    16 OT CG       0.14E+00   17.7     0.00000885     -8104.5322663407 -7.56E-05
+
+  *** SCF run converged in    16 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923307        0.0000076693
+  Core density on regular grids:             1423.9999996423       -0.0000003577
+  Total charge density on r-space grids:        0.0000073116
+  Total charge density g-space grids:           0.0000073116
+
+  Overlap energy of the core charge distribution:               0.00000177241264
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4077.87560549966838
+  Hartree energy:                                            3395.52151026498041
+  Exchange-correlation energy:                              -1033.89133115717095
+  Dispersion energy:                                           -0.55610238965685
+
+  DFT+U energy:                                                 1.49475264364369
+
+  Total energy:                                             -8104.53226634070688
+
+  outer SCF iter =    1 RMS gradient =   0.89E-05 energy =      -8104.5322663407
+  outer SCF loop converged in   1 iterations or   16 steps
+
+
+  Integrated absolute spin density  :                             232.2691449764
+  Ideal and single determinant S**2 :                    0.000000     127.300221
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.532289921286065
+
+
+ --------  Informations at step =     4 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5322899213
+  Real energy change         =        -0.0021434828
+  Predicted change in energy =        -0.0140128421
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.2972892685
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              249.830
+
+  Convergence check :
+  Max. step size             =         0.2972892685
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0387649325
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0265643023
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0033761351
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      5
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00033122     -8104.4565474208 -8.10E+03
+     2 OT LS       0.17E+00    8.9                    -8104.4954758675
+     3 OT LS       0.27E+00    8.9                    -8104.5047116506
+     4 OT CG       0.21E+00   17.7     0.00030017     -8104.5124160281 -5.59E-02
+     5 OT LS       0.30E+00    9.3                    -8104.5354343160
+     6 OT LS       0.15E+00    8.9                    -8104.5159163285
+     7 OT CG       0.12E+00   17.7     0.00011548     -8104.5392717718 -2.69E-02
+     8 OT LS       0.17E+00    8.9                    -8104.5413855458
+     9 OT LS       0.93E-01    8.9                    -8104.5398576295
+    10 OT CG       0.74E-01   17.8     0.00004375     -8104.5416484069 -2.38E-03
+    11 OT LS       0.10E+00    8.9                    -8104.5420305464
+    12 OT LS       0.13E+00    8.9                    -8104.5420935768
+    13 OT CG       0.10E+00   17.7     0.00002421     -8104.5421072122 -4.59E-04
+    14 OT LS       0.14E+00    8.9                    -8104.5422602649
+    15 OT LS       0.16E+00    8.9                    -8104.5422815160
+    16 OT CG       0.13E+00   17.7     0.00001042     -8104.5422836294 -1.76E-04
+    17 OT LS       0.18E+00    8.9                    -8104.5423128839
+    18 OT LS       0.14E+00    8.9                    -8104.5423117020
+    19 OT CG       0.11E+00   17.7     0.00000606     -8104.5423133080 -2.97E-05
+
+  *** SCF run converged in    19 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923364        0.0000076636
+  Core density on regular grids:             1423.9999996423       -0.0000003577
+  Total charge density on r-space grids:        0.0000073060
+  Total charge density g-space grids:           0.0000073060
+
+  Overlap energy of the core charge distribution:               0.00000190082182
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4077.99244239863037
+  Hartree energy:                                            3395.43387322111084
+  Exchange-correlation energy:                              -1033.93092738286441
+  Dispersion energy:                                           -0.55597003799176
+
+  DFT+U energy:                                                 1.49496956685957
+
+  Total energy:                                             -8104.54231330801667
+
+  outer SCF iter =    1 RMS gradient =   0.61E-05 energy =      -8104.5423133080
+  outer SCF loop converged in   1 iterations or   19 steps
+
+
+  Integrated absolute spin density  :                             232.2662984880
+  Ideal and single determinant S**2 :                    0.000000     127.297144
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.542323470559495
+
+
+ --------  Informations at step =     5 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5423234706
+  Real energy change         =        -0.0100335493
+  Predicted change in energy =        -0.0089936532
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.0932232272
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              285.434
+
+  Convergence check :
+  Max. step size             =         0.0932232272
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0149652650
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0128466816
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0020219611
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      6
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00026692     -8104.4908756760 -8.10E+03
+     2 OT LS       0.17E+00    8.9                    -8104.5165630665
+     3 OT LS       0.28E+00    8.9                    -8104.5229640757
+     4 OT CG       0.23E+00   17.7     0.00024467     -8104.5294219985 -3.85E-02
+     5 OT LS       0.32E+00    9.3                    -8104.5415236540
+     6 OT LS       0.15E+00    8.9                    -8104.5235552756
+     7 OT CG       0.12E+00   17.7     0.00008337     -8104.5464748510 -1.71E-02
+     8 OT LS       0.16E+00    8.9                    -8104.5476370582
+     9 OT LS       0.94E-01    8.9                    -8104.5470059041
+    10 OT CG       0.75E-01   17.7     0.00003385     -8104.5477185445 -1.24E-03
+    11 OT LS       0.10E+00    8.9                    -8104.5479463563
+    12 OT LS       0.12E+00    8.9                    -8104.5479818425
+    13 OT CG       0.99E-01   17.7     0.00001800     -8104.5479878689 -2.69E-04
+    14 OT LS       0.14E+00    8.9                    -8104.5480699198
+    15 OT LS       0.15E+00    8.9                    -8104.5480804002
+    16 OT CG       0.12E+00   17.7     0.00000818     -8104.5480810583 -9.32E-05
+
+  *** SCF run converged in    16 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923403        0.0000076597
+  Core density on regular grids:             1423.9999996424       -0.0000003576
+  Total charge density on r-space grids:        0.0000073022
+  Total charge density g-space grids:           0.0000073022
+
+  Overlap energy of the core charge distribution:               0.00000195590043
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.06569533504535
+  Hartree energy:                                            3395.37790351828880
+  Exchange-correlation energy:                              -1033.95292233521104
+  Dispersion energy:                                           -0.55603669784675
+
+  DFT+U energy:                                                 1.49398014014291
+
+  Total energy:                                             -8104.54808105826214
+
+  outer SCF iter =    1 RMS gradient =   0.82E-05 energy =      -8104.5480810583
+  outer SCF loop converged in   1 iterations or   16 steps
+
+
+  Integrated absolute spin density  :                             232.2646345601
+  Ideal and single determinant S**2 :                    0.000000     127.292676
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.548097862277245
+
+
+ --------  Informations at step =     6 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5480978623
+  Real energy change         =        -0.0057743917
+  Predicted change in energy =        -0.0059592614
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.1102023325
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              249.707
+
+  Convergence check :
+  Max. step size             =         0.1102023325
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0180858183
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0111661908
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0016241447
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      7
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00014138     -8104.5390712704 -8.10E+03
+     2 OT LS       0.17E+00    8.9                    -8104.5458913551
+     3 OT LS       0.23E+00    8.9                    -8104.5473081261
+     4 OT CG       0.19E+00   17.6     0.00011976     -8104.5480347375 -8.96E-03
+     5 OT LS       0.26E+00    8.9                    -8104.5527889168
+     6 OT LS       0.17E+00    8.9                    -8104.5515816369
+     7 OT CG       0.14E+00   17.6     0.00005303     -8104.5528173732 -4.78E-03
+     8 OT LS       0.20E+00    8.9                    -8104.5532309647
+     9 OT LS       0.96E-01    8.9                    -8104.5527862655
+    10 OT CG       0.77E-01   17.6     0.00002251     -8104.5533353224 -5.18E-04
+    11 OT LS       0.11E+00    8.9                    -8104.5534401764
+    12 OT LS       0.13E+00    8.9                    -8104.5534573662
+    13 OT CG       0.10E+00   17.6     0.00001191     -8104.5534609902 -1.26E-04
+    14 OT LS       0.15E+00    8.9                    -8104.5534973276
+    15 OT LS       0.15E+00    8.9                    -8104.5535007197
+    16 OT CG       0.12E+00   17.6     0.00000529     -8104.5535007231 -3.97E-05
+
+  *** SCF run converged in    16 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923392        0.0000076608
+  Core density on regular grids:             1423.9999996431       -0.0000003569
+  Total charge density on r-space grids:        0.0000073039
+  Total charge density g-space grids:           0.0000073039
+
+  Overlap energy of the core charge distribution:               0.00000186223186
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.00713587105383
+  Hartree energy:                                            3395.41218086673234
+  Exchange-correlation energy:                              -1033.93683030731563
+  Dispersion energy:                                           -0.55592768879468
+
+  DFT+U energy:                                                 1.49664164755089
+
+  Total energy:                                             -8104.55350072312467
+
+  outer SCF iter =    1 RMS gradient =   0.53E-05 energy =      -8104.5535007231
+  outer SCF loop converged in   1 iterations or   16 steps
+
+
+  Integrated absolute spin density  :                             232.2888215204
+  Ideal and single determinant S**2 :                    0.000000     127.304385
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.553508128309659
+
+
+ --------  Informations at step =     7 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5535081283
+  Real energy change         =        -0.0054102660
+  Predicted change in energy =        -0.0039532620
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.1484545392
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              248.208
+
+  Convergence check :
+  Max. step size             =         0.1484545392
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0214336404
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0114564141
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0016832106
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      8
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.2     0.00009395     -8104.5451508664 -8.10E+03
+     2 OT LS       0.17E+00    8.7                    -8104.5482808527
+     3 OT LS       0.27E+00    8.7                    -8104.5490199943
+     4 OT CG       0.21E+00   17.4     0.00008596     -8104.5496203785 -4.47E-03
+     5 OT LS       0.30E+00    8.7                    -8104.5512735366
+     6 OT LS       0.15E+00    8.7                    -8104.5495060007
+     7 OT CG       0.12E+00   17.4     0.00003898     -8104.5516887864 -2.07E-03
+     8 OT LS       0.16E+00    8.7                    -8104.5519195359
+     9 OT LS       0.89E-01    8.7                    -8104.5517594185
+    10 OT CG       0.71E-01   17.4     0.00001416     -8104.5519462702 -2.57E-04
+    11 OT LS       0.99E-01    8.7                    -8104.5519853668
+    12 OT LS       0.13E+00    8.7                    -8104.5519924870
+    13 OT CG       0.10E+00   17.4     0.00000673     -8104.5519947442 -4.85E-05
+
+  *** SCF run converged in    13 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923281        0.0000076719
+  Core density on regular grids:             1423.9999996424       -0.0000003576
+  Total charge density on r-space grids:        0.0000073143
+  Total charge density g-space grids:           0.0000073143
+
+  Overlap energy of the core charge distribution:               0.00000170294588
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4077.93663816719982
+  Hartree energy:                                            3395.46213208236441
+  Exchange-correlation energy:                              -1033.92111491420064
+  Dispersion energy:                                           -0.55001344727738
+
+  DFT+U energy:                                                 1.49706463933715
+
+  Total energy:                                             -8104.55199474421624
+
+  outer SCF iter =    1 RMS gradient =   0.67E-05 energy =      -8104.5519947442
+  outer SCF loop converged in   1 iterations or   13 steps
+
+
+  Integrated absolute spin density  :                             232.3240061551
+  Ideal and single determinant S**2 :                    0.000000     127.325368
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.552006647249982
+
+
+ --------  Informations at step =     8 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5520066472
+  Real energy change         =         0.0015014811
+  Predicted change in energy =        -0.0054376350
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.2482590325
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                   NO
+  Used time                  =              210.762
+
+  Convergence check :
+  Max. step size             =         0.2482590325
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0379088249
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0375206669
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0046231527
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:      9
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.2     0.00017024     -8104.5269868793 -8.10E+03
+     2 OT LS       0.17E+00    8.8                    -8104.5366182280
+     3 OT LS       0.22E+00    8.8                    -8104.5384546465
+     4 OT CG       0.18E+00   17.5     0.00015584     -8104.5391711732 -1.22E-02
+     5 OT LS       0.25E+00    8.8                    -8104.5477416761
+     6 OT LS       0.18E+00    8.8                    -8104.5466420261
+     7 OT CG       0.15E+00   17.5     0.00004779     -8104.5477502193 -8.58E-03
+     8 OT LS       0.20E+00    8.8                    -8104.5480482444
+     9 OT LS       0.95E-01    8.8                    -8104.5476241075
+    10 OT CG       0.76E-01   17.5     0.00002203     -8104.5481651145 -4.15E-04
+    11 OT LS       0.11E+00    8.8                    -8104.5482638093
+    12 OT LS       0.13E+00    8.8                    -8104.5482797178
+    13 OT CG       0.10E+00   17.5     0.00001280     -8104.5482828408 -1.18E-04
+    14 OT LS       0.14E+00    8.8                    -8104.5483258048
+    15 OT LS       0.16E+00    8.8                    -8104.5483314035
+    16 OT CG       0.13E+00   17.5     0.00000630     -8104.5483317990 -4.90E-05
+
+  *** SCF run converged in    16 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923274        0.0000076726
+  Core density on regular grids:             1423.9999996428       -0.0000003572
+  Total charge density on r-space grids:        0.0000073154
+  Total charge density g-space grids:           0.0000073154
+
+  Overlap energy of the core charge distribution:               0.00000159954513
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.00568837350829
+  Hartree energy:                                            3395.41304091608617
+  Exchange-correlation energy:                              -1033.93383703081804
+  Dispersion energy:                                           -0.55073272457742
+
+  DFT+U energy:                                                 1.49421004179837
+
+  Total energy:                                             -8104.54833179904108
+
+  outer SCF iter =    1 RMS gradient =   0.63E-05 energy =      -8104.5483317990
+  outer SCF loop converged in   1 iterations or   16 steps
+
+
+  Integrated absolute spin density  :                             232.3408101220
+  Ideal and single determinant S**2 :                    0.000000     127.331903
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.548343525234486
+
+
+ --------  Informations at step =     9 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5483435252
+  Real energy change         =         0.0036631220
+  Predicted change in energy =        -0.0099058143
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.1758930627
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                   NO
+  Used time                  =              246.899
+
+  Convergence check :
+  Max. step size             =         0.1758930627
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0323854303
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0360085013
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0049621238
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:     10
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.2     0.00024405     -8104.5033441952 -8.10E+03
+     2 OT LS       0.17E+00    8.8                    -8104.5242832482
+     3 OT LS       0.26E+00    8.8                    -8104.5290733727
+     4 OT CG       0.20E+00   17.5     0.00022300     -8104.5324906172 -2.91E-02
+     5 OT LS       0.29E+00    8.8                    -8104.5464506915
+     6 OT LS       0.16E+00    8.8                    -8104.5384361364
+     7 OT CG       0.13E+00   17.6     0.00007585     -8104.5475866250 -1.51E-02
+     8 OT LS       0.18E+00    8.8                    -8104.5487853793
+     9 OT LS       0.11E+00    8.8                    -8104.5483508146
+    10 OT CG       0.90E-01   17.6     0.00002857     -8104.5488138669 -1.23E-03
+    11 OT LS       0.13E+00    8.8                    -8104.5489990485
+    12 OT LS       0.13E+00    8.8                    -8104.5490203181
+    13 OT CG       0.11E+00   17.6     0.00001840     -8104.5490209544 -2.07E-04
+    14 OT LS       0.15E+00    8.8                    -8104.5490996685
+    15 OT LS       0.12E+00    8.8                    -8104.5490982780
+    16 OT CG       0.99E-01   17.6     0.00000802     -8104.5491013737 -8.04E-05
+
+  *** SCF run converged in    16 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923316        0.0000076684
+  Core density on regular grids:             1423.9999996425       -0.0000003575
+  Total charge density on r-space grids:        0.0000073110
+  Total charge density g-space grids:           0.0000073110
+
+  Overlap energy of the core charge distribution:               0.00000184702818
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.40463064386768
+  Hartree energy:                                            3395.12230609169592
+  Exchange-correlation energy:                              -1034.03529580797613
+  Dispersion energy:                                           -0.55193806393677
+
+  DFT+U energy:                                                 1.48789689018269
+
+  Total energy:                                             -8104.54910137372372
+
+  outer SCF iter =    1 RMS gradient =   0.80E-05 energy =      -8104.5491013737
+  outer SCF loop converged in   1 iterations or   16 steps
+
+
+  Integrated absolute spin density  :                             232.2821754076
+  Ideal and single determinant S**2 :                    0.000000     127.298587
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.549117692264190
+
+
+ --------  Informations at step =    10 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5491176923
+  Real energy change         =        -0.0007741670
+  Predicted change in energy =        -0.0173873554
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.1458992365
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                   NO
+  Used time                  =              247.357
+
+  Convergence check :
+  Max. step size             =         0.1458992365
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0267263163
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0296100116
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0034262149
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:     11
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00035891     -8104.4556389864 -8.10E+03
+     2 OT LS       0.17E+00    8.8                    -8104.5013791531
+     3 OT LS       0.27E+00    8.8                    -8104.5123248755
+     4 OT CG       0.22E+00   17.7     0.00032123     -8104.5219629948 -6.63E-02
+     5 OT LS       0.30E+00    9.3                    -8104.5499524625
+     6 OT LS       0.16E+00    8.8                    -8104.5276792728
+     7 OT CG       0.13E+00   17.7     0.00010311     -8104.5540125033 -3.20E-02
+     8 OT LS       0.18E+00    8.8                    -8104.5562112641
+     9 OT LS       0.11E+00    8.8                    -8104.5554188373
+    10 OT CG       0.88E-01   17.7     0.00004350     -8104.5562628191 -2.25E-03
+    11 OT LS       0.12E+00    8.9                    -8104.5566584839
+    12 OT LS       0.12E+00    8.8                    -8104.5566827430
+    13 OT CG       0.93E-01   17.7     0.00002517     -8104.5566840213 -4.21E-04
+    14 OT LS       0.13E+00    8.8                    -8104.5568428173
+    15 OT LS       0.16E+00    8.8                    -8104.5568688864
+    16 OT CG       0.13E+00   17.7     0.00001063     -8104.5568744011 -1.90E-04
+    17 OT LS       0.18E+00    8.8                    -8104.5569063410
+    18 OT LS       0.15E+00    8.8                    -8104.5569065972
+    19 OT CG       0.12E+00   17.7     0.00000640     -8104.5569073683 -3.30E-05
+
+  *** SCF run converged in    19 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923365        0.0000076635
+  Core density on regular grids:             1423.9999996431       -0.0000003569
+  Total charge density on r-space grids:        0.0000073066
+  Total charge density g-space grids:           0.0000073066
+
+  Overlap energy of the core charge distribution:               0.00000196593784
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.09313223369190
+  Hartree energy:                                            3395.34715255215042
+  Exchange-correlation energy:                              -1033.95824875272774
+  Dispersion energy:                                           -0.55419252948002
+
+  DFT+U energy:                                                 1.49195013672093
+
+  Total energy:                                             -8104.55690736828819
+
+  outer SCF iter =    1 RMS gradient =   0.64E-05 energy =      -8104.5569073683
+  outer SCF loop converged in   1 iterations or   19 steps
+
+
+  Integrated absolute spin density  :                             232.2837314954
+  Ideal and single determinant S**2 :                    0.000000     127.306027
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.556921059886918
+
+
+ --------  Informations at step =    11 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5569210599
+  Real energy change         =        -0.0078033676
+  Predicted change in energy =        -0.0105311654
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.1318872879
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              284.171
+
+  Convergence check :
+  Max. step size             =         0.1318872879
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0251692029
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0321326113
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0031944308
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:     12
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00029249     -8104.4874137030 -8.10E+03
+     2 OT LS       0.17E+00    8.9                    -8104.5179466877
+     3 OT LS       0.27E+00    8.8                    -8104.5253156185
+     4 OT CG       0.22E+00   17.6     0.00025349     -8104.5318556868 -4.44E-02
+     5 OT LS       0.30E+00    8.9                    -8104.5484322863
+     6 OT LS       0.16E+00    8.9                    -8104.5340926627
+     7 OT CG       0.13E+00   17.7     0.00009351     -8104.5512991580 -1.94E-02
+     8 OT LS       0.18E+00    8.9                    -8104.5532288285
+     9 OT LS       0.12E+00    8.9                    -8104.5527257015
+    10 OT CG       0.93E-01   17.7     0.00003896     -8104.5532419973 -1.94E-03
+    11 OT LS       0.13E+00    8.9                    -8104.5535598694
+    12 OT LS       0.11E+00    8.9                    -8104.5535639046
+    13 OT CG       0.91E-01   17.7     0.00001980     -8104.5535707912 -3.29E-04
+    14 OT LS       0.13E+00    8.9                    -8104.5536584552
+    15 OT LS       0.13E+00    8.9                    -8104.5536665293
+    16 OT CG       0.10E+00   17.7     0.00000943     -8104.5536665334 -9.57E-05
+
+  *** SCF run converged in    16 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923221        0.0000076779
+  Core density on regular grids:             1423.9999996427       -0.0000003573
+  Total charge density on r-space grids:        0.0000073207
+  Total charge density g-space grids:           0.0000073207
+
+  Overlap energy of the core charge distribution:               0.00000196911126
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4077.94172404485016
+  Hartree energy:                                            3395.46230360822938
+  Exchange-correlation energy:                              -1033.92332322039579
+  Dispersion energy:                                           -0.55538805575506
+
+  DFT+U energy:                                                 1.49771809509849
+
+  Total energy:                                             -8104.55366653344481
+
+  outer SCF iter =    1 RMS gradient =   0.94E-05 energy =      -8104.5536665334
+  outer SCF loop converged in   1 iterations or   16 steps
+
+
+  Integrated absolute spin density  :                             232.2980871132
+  Ideal and single determinant S**2 :                    0.000000     127.311532
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.553690645486313
+
+
+ --------  Informations at step =    12 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5536906455
+  Real energy change         =         0.0032304144
+  Predicted change in energy =        -0.0074788070
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.3400120023
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                   NO
+  Used time                  =              248.856
+
+  Convergence check :
+  Max. step size             =         0.3400120023
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0247926308
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0236133891
+  Conv. limit for gradients  =         0.0100000000
+  Conv. for gradients        =                   NO
+  RMS gradient               =         0.0037910560
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ --------------------------
+ OPTIMIZATION STEP:     13
+ --------------------------
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00028761     -8104.5046575747 -8.10E+03
+     2 OT LS       0.17E+00    8.8                    -8104.5300203614
+     3 OT LS       0.19E+00    8.8                    -8104.5334463995
+     4 OT CG       0.15E+00   17.5     0.00023078     -8104.5337974878 -2.91E-02
+     5 OT LS       0.21E+00    8.8                    -8104.5546063121
+     6 OT LS       0.22E+00    8.8                    -8104.5571066067
+     7 OT CG       0.18E+00   17.6     0.00008531     -8104.5571892684 -2.34E-02
+     8 OT LS       0.25E+00    8.8                    -8104.5584957953
+     9 OT LS       0.12E+00    8.8                    -8104.5570040632
+    10 OT CG       0.98E-01   17.6     0.00003831     -8104.5588628185 -1.67E-03
+    11 OT LS       0.14E+00    8.8                    -8104.5591808548
+    12 OT LS       0.12E+00    8.8                    -8104.5591792579
+    13 OT CG       0.93E-01   17.6     0.00002473     -8104.5591892774 -3.26E-04
+    14 OT LS       0.13E+00    8.8                    -8104.5593454172
+    15 OT LS       0.16E+00    8.8                    -8104.5593732621
+    16 OT CG       0.13E+00   17.6     0.00001158     -8104.5593814046 -1.92E-04
+    17 OT LS       0.18E+00    8.8                    -8104.5594216728
+    18 OT LS       0.16E+00    8.8                    -8104.5594225530
+    19 OT CG       0.13E+00   17.6     0.00000877     -8104.5594232468 -4.18E-05
+
+  *** SCF run converged in    19 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923262        0.0000076738
+  Core density on regular grids:             1423.9999996426       -0.0000003574
+  Total charge density on r-space grids:        0.0000073164
+  Total charge density g-space grids:           0.0000073164
+
+  Overlap energy of the core charge distribution:               0.00000179754759
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4078.00330068087123
+  Hartree energy:                                            3395.40714897054568
+  Exchange-correlation energy:                              -1033.93458726059862
+  Dispersion energy:                                           -0.55613371877345
+
+  DFT+U energy:                                                 1.49754925814765
+
+  Total energy:                                             -8104.55942324684383
+
+  outer SCF iter =    1 RMS gradient =   0.88E-05 energy =      -8104.5594232468
+  outer SCF loop converged in   1 iterations or   19 steps
+
+
+  Integrated absolute spin density  :                             232.2906356645
+  Ideal and single determinant S**2 :                    0.000000     127.306133
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.559447935220305
+
+
+ --------  Informations at step =    13 ------------
+  Optimization Method        =                 BFGS
+  Total Energy               =     -8104.5594479352
+  Real energy change         =        -0.0057572897
+  Predicted change in energy =        -0.0112379759
+  Scaling factor             =         0.0000000000
+  Step size                  =         0.1354311749
+  Trust radius               =         0.4724315332
+  Decrease in energy         =                  YES
+  Used time                  =              282.638
+
+  Convergence check :
+  Max. step size             =         0.1354311749
+  Conv. limit for step size  =         1.0000000000
+  Convergence in step size   =                  YES
+  RMS step size              =         0.0247173430
+  Conv. limit for RMS step   =         1.0000000000
+  Convergence in RMS step    =                  YES
+  Max. gradient              =         0.0096055257
+  Conv. limit for gradients  =         0.0100000000
+  Conv. in gradients         =                  YES
+  RMS gradient               =         0.0019263888
+  Conv. limit for RMS grad.  =         1.0000000000
+  Conv. in RMS gradients     =                  YES
+ ---------------------------------------------------
+
+ *******************************************************************************
+ ***                    GEOMETRY OPTIMIZATION COMPLETED                      ***
+ *******************************************************************************
+
+                    Reevaluating energy at the minimum
+
+ Spin 1
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Spin 2
+
+ Number of electrons:                                                        712
+ Number of occupied orbitals:                                                712
+ Number of molecular orbitals:                                               712
+
+ Number of orbital functions:                                               2683
+ Number of independent orbital functions:                                   2683
+
+ Extrapolation method: PS Nth order
+
+
+ SCF WAVEFUNCTION OPTIMIZATION
+
+  ----------------------------------- OT ---------------------------------------
+  Minimizer      : CG                  : conjugate gradient
+  Preconditioner : FULL_ALL            : diagonalization, state selective
+  Precond_solver : DEFAULT
+  Line search    : 3PNT                : 3 energies
+  stepsize       :    0.15000000                  energy_gap     :    0.08000000
+  eps_taylor     :   0.10000E-15                  max_taylor     :             4
+  ----------------------------------- OT ---------------------------------------
+
+  Step     Update method      Time    Convergence         Total energy    Change
+  ------------------------------------------------------------------------------
+     1 OT CG       0.12E+00   20.3     0.00028295     -8104.4932792242 -8.10E+03
+     2 OT LS       0.17E+00    8.8                    -8104.5227798564
+     3 OT LS       0.31E+00    8.8                    -8104.5305561196
+     4 OT CG       0.25E+00   17.6     0.00025398     -8104.5401654378 -4.69E-02
+     5 OT LS       0.34E+00    9.3                    -8104.5484708887
+     6 OT LS       0.14E+00    8.8                    -8104.5221893870
+     7 OT CG       0.11E+00   17.7     0.00007775     -8104.5577756445 -1.76E-02
+     8 OT LS       0.16E+00    8.8                    -8104.5590980007
+     9 OT LS       0.11E+00    8.8                    -8104.5588959645
+    10 OT CG       0.91E-01   17.7     0.00003027     -8104.5590980581 -1.32E-03
+    11 OT LS       0.13E+00    8.8                    -8104.5593043101
+    12 OT LS       0.13E+00    8.8                    -8104.5593232661
+    13 OT CG       0.10E+00   17.7     0.00001943     -8104.5593232754 -2.25E-04
+    14 OT LS       0.14E+00    8.8                    -8104.5594122480
+    15 OT LS       0.13E+00    8.8                    -8104.5594145160
+    16 OT CG       0.10E+00   17.7     0.00000835     -8104.5594158984 -9.26E-05
+
+  *** SCF run converged in    16 steps ***
+
+
+  Electronic density on regular grids:      -1423.9999923261        0.0000076739
+  Core density on regular grids:             1423.9999996426       -0.0000003574
+  Total charge density on r-space grids:        0.0000073165
+  Total charge density g-space grids:           0.0000073165
+
+  Overlap energy of the core charge distribution:               0.00000179754759
+  Self energy of the core charge distribution:             -14544.97670297458353
+  Core Hamiltonian energy:                                   4077.99404441635897
+  Hartree energy:                                            3395.41586411571052
+  Exchange-correlation energy:                              -1033.93355388921191
+  Dispersion energy:                                           -0.55613371877345
+
+  DFT+U energy:                                                 1.49706435458253
+
+  Total energy:                                             -8104.55941589837039
+
+  outer SCF iter =    1 RMS gradient =   0.83E-05 energy =      -8104.5594158984
+  outer SCF loop converged in   1 iterations or   16 steps
+
+
+  Integrated absolute spin density  :                             232.2927118151
+  Ideal and single determinant S**2 :                    0.000000     127.308247
+
+ ENERGY| Total FORCE_EVAL ( QS ) energy (a.u.):            -8104.559415898370389
+
+
+ -------------------------------------------------------------------------------
+ -                                                                             -
+ -                                DBCSR STATISTICS                             -
+ -                                                                             -
+ -------------------------------------------------------------------------------
+ COUNTER                                    TOTAL       BLAS       SMM       ACC
+ flops     5 x     8 x     8               268800       0.0%    100.0%      0.0%
+ flops    13 x     8 x     8              4642560       0.0%    100.0%      0.0%
+ flops    26 x     8 x     8              5391360       0.0%    100.0%      0.0%
+ flops     5 x    32 x    32             94617600       0.0%    100.0%      0.0%
+ flops     5 x     8 x     5            129908800       0.0%    100.0%      0.0%
+ flops     5 x     5 x    64            362208000       0.0%    100.0%      0.0%
+ flops     5 x     5 x    72            407484000       0.0%    100.0%      0.0%
+ flops    13 x    32 x    32           1634181120       0.0%    100.0%      0.0%
+ flops    26 x    32 x    32           1897758720       0.0%    100.0%      0.0%
+ flops    64 x    64 x    64           2232418304       0.0%    100.0%      0.0%
+ flops     5 x     8 x    13           2243710560       0.0%    100.0%      0.0%
+ flops    13 x     8 x     5           2243710560       0.0%    100.0%      0.0%
+ flops    64 x    64 x    72           2511470592       0.0%    100.0%      0.0%
+ flops    64 x    72 x    64           2511470592       0.0%    100.0%      0.0%
+ flops    72 x    64 x    64           2511470592       0.0%    100.0%      0.0%
+ flops     5 x     8 x    26           2605599360       0.0%    100.0%      0.0%
+ flops    26 x     8 x     5           2605599360       0.0%    100.0%      0.0%
+ flops    64 x    72 x    72           2825404416       0.0%    100.0%      0.0%
+ flops    72 x    64 x    72           2825404416       0.0%    100.0%      0.0%
+ flops    72 x    72 x    64           2825404416       0.0%    100.0%      0.0%
+ flops    72 x    72 x    72           3178579968       0.0%    100.0%      0.0%
+ flops     5 x     5 x    96           3259872000       0.0%    100.0%      0.0%
+ flops     5 x    13 x    64           5802917120       0.0%    100.0%      0.0%
+ flops    13 x     5 x    64           5874668800       0.0%    100.0%      0.0%
+ flops    64 x    64 x   338           5897748480       0.0%    100.0%      0.0%
+ flops     5 x    13 x    72           6528281760       0.0%    100.0%      0.0%
+ flops    13 x     5 x    72           6609002400       0.0%    100.0%      0.0%
+ flops    64 x    72 x   338           6634967040       0.0%    100.0%      0.0%
+ flops    72 x    64 x   338           6634967040       0.0%    100.0%      0.0%
+ flops    26 x     5 x    64           6708782080       0.0%    100.0%      0.0%
+ flops     5 x    26 x    64           6852285440       0.0%    100.0%      0.0%
+ flops    72 x    72 x   338           7464337920       0.0%    100.0%      0.0%
+ flops    26 x     5 x    72           7547379840       0.0%    100.0%      0.0%
+ flops     5 x    26 x    72           7708821120       0.0%    100.0%      0.0%
+ flops   338 x    64 x    64           8638955520       0.0%    100.0%      0.0%
+ flops   338 x    64 x    72           9718824960       0.0%    100.0%      0.0%
+ flops   338 x    72 x    64           9718824960       0.0%    100.0%      0.0%
+ flops   338 x    72 x    72          10933678080       0.0%    100.0%      0.0%
+ flops   338 x    64 x   338          11406120960     100.0%      0.0%      0.0%
+ flops     5 x    32 x     5          11431974400       0.0%    100.0%      0.0%
+ flops   338 x    72 x   338          12831886080     100.0%      0.0%      0.0%
+ flops    64 x    64 x    96          20091764736       0.0%    100.0%      0.0%
+ flops    64 x    96 x    64          20091764736       0.0%    100.0%      0.0%
+ flops    96 x    64 x    64          20091764736       0.0%    100.0%      0.0%
+ flops    64 x    72 x    96          22603235328       0.0%    100.0%      0.0%
+ flops    64 x    96 x    72          22603235328       0.0%    100.0%      0.0%
+ flops    72 x    64 x    96          22603235328       0.0%    100.0%      0.0%
+ flops    72 x    96 x    64          22603235328       0.0%    100.0%      0.0%
+ flops    96 x    64 x    72          22603235328       0.0%    100.0%      0.0%
+ flops    96 x    72 x    64          22603235328       0.0%    100.0%      0.0%
+ flops    72 x    72 x    96          25428639744       0.0%    100.0%      0.0%
+ flops    72 x    96 x    72          25428639744       0.0%    100.0%      0.0%
+ flops    96 x    72 x    72          25428639744       0.0%    100.0%      0.0%
+ flops    13 x     8 x    13          38617670832       0.0%    100.0%      0.0%
+ flops    64 x    64 x   335          40917811200       0.0%    100.0%      0.0%
+ flops    26 x     8 x    13          44917550080       0.0%    100.0%      0.0%
+ flops    13 x     8 x    26          44917550080       0.0%    100.0%      0.0%
+ flops    64 x    72 x   335          46032537600       0.0%    100.0%      0.0%
+ flops    72 x    64 x   335          46032537600       0.0%    100.0%      0.0%
+ flops    72 x    72 x   335          51786604800       0.0%    100.0%      0.0%
+ flops     5 x    13 x    96          52226254080       0.0%    100.0%      0.0%
+ flops    26 x     8 x    26          52260878592       0.0%    100.0%      0.0%
+ flops    13 x     5 x    96          52872019200       0.0%    100.0%      0.0%
+ flops    64 x    96 x   338          53079736320       0.0%    100.0%      0.0%
+ flops    96 x    64 x   338          53079736320       0.0%    100.0%      0.0%
+ flops    72 x    96 x   338          59714703360     100.0%      0.0%      0.0%
+ flops    96 x    72 x   338          59714703360     100.0%      0.0%      0.0%
+ flops   335 x    64 x    64          59935948800       0.0%    100.0%      0.0%
+ flops    26 x     5 x    96          60379038720       0.0%    100.0%      0.0%
+ flops     5 x    26 x    96          61670568960       0.0%    100.0%      0.0%
+ flops   335 x    64 x    72          67427942400       0.0%    100.0%      0.0%
+ flops   335 x    72 x    64          67427942400       0.0%    100.0%      0.0%
+ flops   335 x    72 x    72          75856435200       0.0%    100.0%      0.0%
+ flops   338 x    64 x    96          77750599680       0.0%    100.0%      0.0%
+ flops   338 x    96 x    64          77750599680       0.0%    100.0%      0.0%
+ flops   335 x    64 x   338          79134182400     100.0%      0.0%      0.0%
+ flops   338 x    64 x   335          79134182400     100.0%      0.0%      0.0%
+ flops   338 x    72 x    96          87469424640     100.0%      0.0%      0.0%
+ flops   338 x    96 x    72          87469424640     100.0%      0.0%      0.0%
+ flops   335 x    72 x   338          89025955200     100.0%      0.0%      0.0%
+ flops   338 x    72 x   335          89025955200     100.0%      0.0%      0.0%
+ flops    13 x    13 x    64         101578853376       0.0%    100.0%      0.0%
+ flops   338 x    96 x   338         102655088640     100.0%      0.0%      0.0%
+ flops    13 x    13 x    72         114276210048       0.0%    100.0%      0.0%
+ flops    13 x    26 x    64         116652636672       0.0%    100.0%      0.0%
+ flops    26 x    13 x    64         117122137600       0.0%    100.0%      0.0%
+ flops    13 x    26 x    72         131234216256       0.0%    100.0%      0.0%
+ flops    26 x    13 x    72         131762404800       0.0%    100.0%      0.0%
+ flops    26 x    26 x    64         138516618240       0.0%    100.0%      0.0%
+ flops    26 x    26 x    72         155831195520       0.0%    100.0%      0.0%
+ flops    96 x    96 x    64         180825882624       0.0%    100.0%      0.0%
+ flops    64 x    96 x    96         180825882624       0.0%    100.0%      0.0%
+ flops    96 x    64 x    96         180825882624       0.0%    100.0%      0.0%
+ flops     5 x    32 x    13         197446529280       0.0%    100.0%      0.0%
+ flops    13 x    32 x     5         197446529280       0.0%    100.0%      0.0%
+ flops    96 x    96 x    72         203429117952       0.0%    100.0%      0.0%
+ flops    72 x    96 x    96         203429117952       0.0%    100.0%      0.0%
+ flops    96 x    72 x    96         203429117952       0.0%    100.0%      0.0%
+ flops     5 x    32 x    26         229292743680       0.0%    100.0%      0.0%
+ flops    26 x    32 x     5         229292743680       0.0%    100.0%      0.0%
+ flops    64 x    96 x   335         368260300800       0.0%    100.0%      0.0%
+ flops    96 x    64 x   335         368260300800       0.0%    100.0%      0.0%
+ flops    72 x    96 x   335         414292838400     100.0%      0.0%      0.0%
+ flops    96 x    72 x   335         414292838400     100.0%      0.0%      0.0%
+ flops    96 x    96 x   338         477717626880     100.0%      0.0%      0.0%
+ flops   335 x    96 x    64         539423539200       0.0%    100.0%      0.0%
+ flops   335 x    64 x    96         539423539200       0.0%    100.0%      0.0%
+ flops   335 x    64 x   335         549022656000     100.0%      0.0%      0.0%
+ flops   335 x    96 x    72         606851481600     100.0%      0.0%      0.0%
+ flops   335 x    72 x    96         606851481600     100.0%      0.0%      0.0%
+ flops   335 x    72 x   335         617650488000     100.0%      0.0%      0.0%
+ flops   338 x    96 x    96         699755397120     100.0%      0.0%      0.0%
+ flops   335 x    96 x   338         712207641600     100.0%      0.0%      0.0%
+ flops   338 x    96 x   335         712207641600     100.0%      0.0%      0.0%
+ flops    13 x    13 x    96         914209680384       0.0%    100.0%      0.0%
+ flops    13 x    26 x    96        1049873730048       0.0%    100.0%      0.0%
+ flops    26 x    13 x    96        1054099238400       0.0%    100.0%      0.0%
+ flops    26 x    26 x    96        1246649564160       0.0%    100.0%      0.0%
+ flops    96 x    96 x    96        1627432943616       0.0%    100.0%      0.0%
+ flops    96 x    96 x   335        3314342707200     100.0%      0.0%      0.0%
+ flops    13 x    32 x    13        3398355033216       0.0%    100.0%      0.0%
+ flops    26 x    32 x    13        3952744407040       0.0%    100.0%      0.0%
+ flops    13 x    32 x    26        3952744407040       0.0%    100.0%      0.0%
+ flops    26 x    32 x    26        4598957316096       0.0%    100.0%      0.0%
+ flops   335 x    96 x    96        4854811852800     100.0%      0.0%      0.0%
+ flops   335 x    96 x   335        4941203904000     100.0%      0.0%      0.0%
+ flops inhomo. stacks                           0       0.0%      0.0%      0.0%
+ flops total                        47.869186E+12      41.1%     58.9%      0.0%
+ flops max/rank                    865.171716E+09      43.0%     57.0%      0.0%
+ matmuls inhomo. stacks                         0       0.0%      0.0%      0.0%
+ matmuls total                         1103642603       0.2%     99.8%      0.0%
+ number of processed stacks              17724739      13.6%     86.4%      0.0%
+ average stack size                                     1.0      71.9       0.0
+ marketing flops                    53.550936E+12
+ -------------------------------------------------------------------------------
+ # multiplications                          13083
+ max memory usage/rank             812.195840E+06
+ # max total images/rank                        1
+ # max 3D layers                                1
+ # MPI messages exchanged                11722368
+ MPI messages size (bytes):
+  total size                         2.595653E+12
+  min size                           0.000000E+00
+  max size                         913.952000E+03
+  average size                     221.427375E+03
+ MPI breakdown and total messages size (bytes):
+             size <=      128               38640                        0
+       128 < size <=     8192                   0                        0
+      8192 < size <=    32768               83132               2706973696
+     32768 < size <=   131072             5131476             327663802368
+    131072 < size <=  4194304             6469120            2265367465032
+   4194304 < size <= 16777216                   0                        0
+  16777216 < size                               0                        0
+ -------------------------------------------------------------------------------
+ 
+ MEMORY| Estimated peak process memory [MiB]                                 777
+
+ -------------------------------------------------------------------------------
+ -                                                                             -
+ -                         MESSAGE PASSING PERFORMANCE                         -
+ -                                                                             -
+ -------------------------------------------------------------------------------
+
+ ROUTINE             CALLS      AVE VOLUME [Bytes]
+ MP_Group              978
+ MP_Bcast            36053                  31612.
+ MP_Allreduce       162269                    424.
+ MP_Sync               624
+ MP_Alltoall         58241                 820988.
+ MP_SendRecv         15016                 423744.
+ MP_ISendRecv       271782                  29184.
+ MP_Wait           1542020
+ MP_comm_split         619
+ MP_ISend           627638                 125059.
+ MP_IRecv           627638                 123876.
+ MP_Recv               195                 123648.
+ MP_Memory          527100
+ -------------------------------------------------------------------------------
+
+
+ -------------------------------------------------------------------------------
+ -                                                                             -
+ -                           R E F E R E N C E S                               -
+ -                                                                             -
+ -------------------------------------------------------------------------------
+ 
+ CP2K version 6.1, the CP2K developers group (2018).
+ CP2K is freely available from https://www.cp2k.org/ .
+
+ Schuett, Ole; Messmer, Peter; Hutter, Juerg; VandeVondele, Joost. 
+ Electronic Structure Calculations on Graphics Processing Units, John Wiley & Sons, Ltd, 173-190 (2016). 
+ GPU-Accelerated Sparse Matrix-Matrix Multiplication for Linear Scaling Density Functional Theory.
+ http://dx.doi.org/10.1002/9781118670712.ch8
+
+
+ Borstnik, U; VandeVondele, J; Weber, V; Hutter, J. 
+ PARALLEL COMPUTING, 40 (5-6), 47-58 (2014). 
+ Sparse matrix multiplication: The distributed block-compressed sparse
+ row library.
+ http://dx.doi.org/10.1016/j.parco.2014.03.012
+
+
+ Hutter, J; Iannuzzi, M; Schiffmann, F; VandeVondele, J. 
+ WILEY INTERDISCIPLINARY REVIEWS-COMPUTATIONAL MOLECULAR SCIENCE, 4 (1), 15-25 (2014). 
+ CP2K: atomistic simulations of condensed matter systems.
+ http://dx.doi.org/10.1002/wcms.1159
+
+
+ Grimme, S; Ehrlich, S; Goerigk, L. 
+ JOURNAL OF COMPUTATIONAL CHEMISTRY, 32, 1456 (2011). 
+ Effect of the damping function in dispersion corrected density functional theory.
+ http://dx.doi.org/10.1002/jcc.21759
+
+
+ Grimme, S; Antony, J; Ehrlich, S; Krieg, H. 
+ JOURNAL OF CHEMICAL PHYSICS, 132 (15), 154104 (2010). 
+ A consistent and accurate ab initio parametrization of density
+ functional dispersion correction (DFT-D) for the 94 elements H-Pu.
+ http://dx.doi.org/10.1063/1.3382344
+
+
+ VandeVondele, J; Hutter, J. 
+ JOURNAL OF CHEMICAL PHYSICS, 127 (11), 114105 (2007). 
+ Gaussian basis sets for accurate calculations on molecular systems in
+ gas and condensed phases.
+ http://dx.doi.org/10.1063/1.2770708
+
+
+ Krack, M. 
+ THEORETICAL CHEMISTRY ACCOUNTS, 114 (1-3), 145-152 (2005). 
+ Pseudopotentials for H to Kr optimized for gradient-corrected
+ exchange-correlation functionals.
+ http://dx.doi.org/10.1007/s00214-005-0655-y
+
+
+ VandeVondele, J; Krack, M; Mohamed, F; Parrinello, M; Chassaing, T;
+ Hutter, J. COMPUTER PHYSICS COMMUNICATIONS, 167 (2), 103-128 (2005). 
+ QUICKSTEP: Fast and accurate density functional calculations using a
+ mixed Gaussian and plane waves approach.
+ http://dx.doi.org/10.1016/j.cpc.2004.12.014
+
+
+ Frigo, M; Johnson, SG. 
+ PROCEEDINGS OF THE IEEE, 93 (2), 216-231 (2005). 
+ The design and implementation of FFTW3.
+ http://dx.doi.org/10.1109/JPROC.2004.840301
+
+
+ VandeVondele, J; Hutter, J. 
+ JOURNAL OF CHEMICAL PHYSICS, 118 (10), 4365-4369 (2003). 
+ An efficient orbital transformation method for electronic structure
+ calculations.
+ http://dx.doi.org/10.1063/1.1543154
+
+
+ Hartwigsen, C; Goedecker, S; Hutter, J. 
+ PHYSICAL REVIEW B, 58 (7), 3641-3662 (1998). 
+ Relativistic separable dual-space Gaussian pseudopotentials from H to Rn.
+ http://dx.doi.org/10.1103/PhysRevB.58.3641
+
+
+ Dudarev, SL; Botton, GA; Savrasov, SY; Humphreys, CJ; Sutton, AP. 
+ PHYSICAL REVIEW B, 57 (3), 1505-1509 (1998). 
+ Electron-energy-loss spectra and the structural stability of
+ nickel oxide: An LSDA+U study.
+ http://dx.doi.org/10.1103/PhysRevB.57.1505
+
+
+ Lippert, G; Hutter, J; Parrinello, M. 
+ MOLECULAR PHYSICS, 92 (3), 477-487 (1997). 
+ A hybrid Gaussian and plane wave density functional scheme.
+ http://dx.doi.org/10.1080/002689797170220
+
+
+ Dudarev, SL; Manh, DN; Sutton, AP. 
+ PHILOSOPHICAL MAGAZINE B, 75 (5), 613-628 (1997). 
+ Effect of Mott-Hubbard correlations on the electronic
+ structure and structural stability of uranium dioxide.
+ http://dx.doi.org/10.1080/13642819708202343
+
+
+ Perdew, JP; Burke, K; Ernzerhof, M. 
+ PHYSICAL REVIEW LETTERS, 77 (18), 3865-3868 (1996). 
+ Generalized gradient approximation made simple.
+ http://dx.doi.org/10.1103/PhysRevLett.77.3865
+
+
+ Goedecker, S; Teter, M; Hutter, J. 
+ PHYSICAL REVIEW B, 54 (3), 1703-1710 (1996). 
+ Separable dual-space Gaussian pseudopotentials.
+ http://dx.doi.org/10.1103/PhysRevB.54.1703
+
+
+ -------------------------------------------------------------------------------
+ -                                                                             -
+ -                                T I M I N G                                  -
+ -                                                                             -
+ -------------------------------------------------------------------------------
+ SUBROUTINE                       CALLS  ASD         SELF TIME        TOTAL TIME
+                                MAXIMUM       AVERAGE  MAXIMUM  AVERAGE  MAXIMUM
+ CP2K                                 1  1.0    0.288    0.344 7163.013 7163.157
+ cp_geo_opt                           1  2.0    0.012    0.012 7159.450 7159.594
+ geoopt_bfgs                          1  3.0    0.116    0.162 7159.439 7159.582
+ cp_eval_at                          15  4.0    0.024    0.030 7154.251 7154.343
+ qs_forces                           14  5.0    0.030    0.033 6939.049 6939.189
+ qs_energies                         15  5.9    0.030    0.033 6776.932 6777.019
+ scf_env_do_scf                      15  6.9    0.012    0.015 6535.567 6535.694
+ scf_env_do_scf_inner_loop          510  8.0    0.106    0.241 6241.127 6241.254
+ qs_rho_update_rho                  525  9.0    0.021    0.024 4112.752 4112.841
+ calculate_rho_elec                1050 10.0 3452.947 3845.587 4112.731 4112.819
+ rebuild_ks_matrix                  524  9.9    0.025    0.028 2282.487 2282.643
+ qs_ks_build_kohn_sham_matrix       524 10.9    0.277    0.295 2282.462 2282.617
+ qs_ks_update_qs_env                525  9.0    0.034    0.040 1941.244 1941.388
+ sum_up_and_integrate               194 11.8    2.114    2.122 1703.308 1703.447
+ integrate_v_rspace                 388 12.8 1388.053 1601.028 1701.192 1701.330
+ density_rs2pw                     1050 11.0    0.194    0.207  634.009 1256.588
+ rs_pw_transfer                    7219 12.7    0.268    0.301  612.365 1234.392
+ rs_pw_transfer_RS2PW_200          1065 13.0   43.504   52.340  455.453 1077.338
+ mp_waitany                      209102 14.7  448.554 1066.834  448.554 1066.834
+ qs_vxc_create                      524 11.9    0.025    0.029  544.609  544.652
+ rs_distribute_matrix              1466 11.7    4.913    9.192  232.049  517.945
+ mp_alltoall_d11v                 11702 15.6  226.339  514.896  226.339  514.896
+ qs_scf_new_mos                     510  9.0    0.013    0.014  441.312  441.899
+ qs_scf_loop_do_ot                  510 10.0    0.016    0.018  441.299  441.886
+ xc_rho_set_and_dset_create         524 13.9   15.252   15.306  428.044  433.610
+ ot_scf_mini                        510 11.0    0.114    0.120  419.728  420.750
+ qs_ks_update_qs_env_forces          14  6.0    0.001    0.001  342.140  342.151
+ cp_fm_syevd                        619 14.4    0.020    0.029  334.888  335.165
+ cp_fm_redistribute_end             619 15.4  222.706  331.101  223.275  331.323
+ cp_fm_syevd_base                   619 15.0  107.758  328.282  107.758  328.282
+ pw_nn_compose_r                   5744 14.6  284.380  287.071  293.706  296.893
+ init_scf_loop                       15  7.9    0.006    0.008  294.243  294.250
+ xc_exc_calc                        330 13.0    1.256    1.259  273.110  273.119
+ qs_ot_get_p                       1050 11.9    0.028    0.030  269.798  272.370
+ xc_vxc_pw_create                   194 12.8   24.863   25.060  271.474  271.514
+ cp_dbcsr_syevd                     575 13.7    0.237    0.257  250.880  250.953
+ qs_ot_p2m_diag                     515 13.0    1.916    2.268  236.048  236.533
+ dbcsr_multiply_generic           13083 13.7    2.860    2.917  222.676  226.129
+ xc_functional_eval                 524 14.9    0.012    0.013  193.253  199.834
+ pbe_lsd_eval                       524 15.9  193.241  199.823  193.241  199.823
+ multiply_cannon                  13083 14.7   10.810   11.201  148.668  159.478
+ prepare_preconditioner              15  8.9    0.002    0.003  154.827  154.869
+ -------------------------------------------------------------------------------
+
+ The number of warnings for this run is : 4
+ 
+ -------------------------------------------------------------------------------
+  **** **** ******  **  PROGRAM ENDED AT                 2020-10-29 18:27:35.643
+ ***** ** ***  *** **   PROGRAM RAN ON                                 irene3817
+ **    ****   ******    PROGRAM RAN BY                                  marticar
+ ***** **    ** ** **   PROGRAM PROCESS ID                                211623
+  **** **  *******  **  PROGRAM STOPPED IN /ccc/scratch/cont003/gen0609/marticar
+                                           /5723184

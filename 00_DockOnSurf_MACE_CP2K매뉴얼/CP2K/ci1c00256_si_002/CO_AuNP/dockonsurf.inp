@@ -1,0 +1,44 @@
+# Sample of DockOnSurf input file. The file format must be an INI file. 
+# Input format on http://forge.cbp.ens-lyon.fr/redmine/projects/dockonsurf/wiki
+
+[Global]
+project_name = CO@AuNP
+run_type = adsorption
+code = CP2K
+batch_q_sys = irene
+subm_script = cp2k.sub
+# max_jobs = 5q
+# special_atoms = (Fe1 Fe) (Fe2 Fe) (O1 O)
+
+[Isolated]
+isol_inp_file = molecule.inp
+molec_file = co.xyz
+num_conformers = 10
+pre_opt = MMFF
+
+[Screening]
+screen_inp_file = screening.inp
+surf_file = au38_non-crys.xyz
+set_angles = euler
+sites = 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37
+# surf_ctrs2 = 132
+molec_ctrs = 0 # 9 10 33 43 45
+# molec_ctrs2 = 6 6 30 41 41 
+# molec_ctrs3 = 10 9 29 1 1
+# max_helic_angle = 180
+select_magns = energy moi
+confs_per_magn = 1
+surf_norm_vect = auto
+sample_points_per_angle = 1
+# pbc_cell = (30 0 0) (0 30 0) (0 0 30)
+min_coll_height = False
+collision_threshold = 1.1
+exclude_ads_ctr = true
+h_donor = False # 34 40 44
+h_acceptor = all
+max_structures = False # 100
+
+[Refinement]
+refine_inp_file = refinement.inp
+energy_cutoff = 1000000.0
+

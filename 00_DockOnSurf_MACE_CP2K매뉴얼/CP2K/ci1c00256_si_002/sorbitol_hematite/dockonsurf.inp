@@ -1,0 +1,42 @@
+# Sample of DockOnSurf input file. The file format must be an INI file. 
+# # Input format on http://forge.cbp.ens-lyon.fr/redmine/projects/dockonsurf/wiki
+
+[Global]
+project_name = sorbitol
+run_type = adsorption
+code = CP2K
+batch_q_sys = irene
+subm_script = cp2k.knl.sub
+max_jobs = 20rq
+special_atoms = (Fe1 Fe) (Fe2 Fe) (O1 O)
+
+[Isolated]
+isol_inp_file = molecule.inp
+molec_file = sorbitol.xyz
+num_conformers = 500
+pre_opt = MMFF
+
+[Screening]
+screen_inp_file = screening.inp
+surf_file = /ccc/work/cont003/gen0609/marticar/data/surf/hematite.xyz
+set_angles = internal
+sites = 130
+surf_ctrs2 = 127
+molec_ctrs = 16 13 23
+molec_ctrs2 = 12 9 1
+molec_ctrs3 = 9 6 0
+max_helic_angle = 120
+select_magns = energy moi
+confs_per_magn = 3
+surf_norm_vect = z
+sample_points_per_angle = 2
+pbc_cell = (15.3822 0 0) (-7.6911 13.32138 0) (0 0 26.93789)
+h_donor = O
+h_acceptor = O1
+min_coll_height = 7
+collision_threshold = False
+max_structures = False
+
+[Refinement]
+refine_inp_file = refinement.inp
+energy_cutoff = 1.0 # eV

@@ -1,0 +1,57 @@
+# ============================================
+# DockOnSurf Pipeline Configuration
+# ============================================
+
+# 기본 설정
+project:
+  name: "adsorption_screening"
+  output_dir: "./results"
+
+# Calculator 선택: "mace" | "cp2k" | "both"
+calculator: "mace"
+
+# 환경 설정
+environment:
+  dockonsurf_conda: "dockonsurf"
+  mace_conda: "mace"
+  cp2k_command: "cp2k.psmp"
+  cp2k_data_dir: "${HOME}/cp2k/data"
+  use_gpu: true
+  n_cpu: 16
+
+# MACE 설정
+mace:
+  model_path: "/path/to/mace-mpa-0-medium.model"
+  device: "cuda"
+  default_dtype: "float32"
+
+# CP2K 설정
+cp2k:
+  basis_set_file: "${CP2K_DATA_DIR}/BASIS_MOLOPT"
+  potential_file: "${CP2K_DATA_DIR}/GTH_POTENTIALS"
+  dftd3_file: "${CP2K_DATA_DIR}/dftd3.dat"
+  xc_functional: "PBE"
+  cutoff: 400
+  scf_eps: 1.0E-6
+
+# 분자/표면 입력
+inputs:
+  molecule_file: "molecule.xyz"
+  surface_file: "surface.xyz"
+
+# DockOnSurf 파라미터
+dockonsurf:
+  num_conformers: 30
+  pre_opt: "MMFF"
+  sample_points_per_angle: 6
+  adsorption_height: 2.5
+  collision_threshold: 0.9
+  max_structures: 100
+  energy_cutoff: 0.5
+
+# 셀 파라미터 (표면에 맞게 수정)
+cell:
+  a: [15.0, 0.0, 0.0]
+  b: [0.0, 15.0, 0.0]
+  c: [0.0, 0.0, 25.0]
+  periodic: "XYZ"

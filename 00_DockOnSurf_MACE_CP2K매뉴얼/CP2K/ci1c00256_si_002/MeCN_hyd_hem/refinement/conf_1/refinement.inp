@@ -1,0 +1,169 @@
+&GLOBAL
+  PRINT_LEVEL LOW
+  PROJECT_NAME MeCN@hydrated-hematite_refinement
+  RUN_TYPE GEO_OPT
+&END GLOBAL
+&MOTION
+  &CONSTRAINT
+    &FIXED_ATOMS
+      LIST 1..54
+    &END FIXED_ATOMS
+  &END CONSTRAINT
+  &GEO_OPT
+    OPTIMIZER BFGS
+    MAX_ITER 500
+  &END GEO_OPT
+&END MOTION
+&FORCE_EVAL
+  METHOD QS
+  STRESS_TENSOR ANALYTICAL
+  &SUBSYS
+    &CELL
+      B -7.6911000000000014E+00    1.3321380000000000E+01    0.0000000000000000E+00
+      A 1.5382200000000003E+01    0.0000000000000000E+00    0.0000000000000000E+00
+      C 0.0000000000000000E+00    0.0000000000000000E+00    2.6937889999999999E+01
+    &END CELL
+    &TOPOLOGY
+      COORD_FILE_FORMAT XYZ
+      COORD_FILE_NAME coord.xyz
+    &END TOPOLOGY
+    &KIND O1
+      POTENTIAL GTH-PBE-q6
+      ELEMENT O
+      BASIS_SET DZVP-MOLOPT-GTH-q6
+      &BS
+        &BETA
+          N 2
+          NEL +2
+          L 1
+        &END BETA
+        &ALPHA
+          N 2
+          NEL +2
+          L 1
+        &END ALPHA
+      &END BS
+    &END KIND
+    &KIND Fe1
+      POTENTIAL GTH-PBE-q16
+      ELEMENT Fe
+      BASIS_SET DZVP-MOLOPT-SR-GTH-q16
+      &BS
+        &BETA
+          N 3 4
+          NEL -6 -2
+          L 2 0
+        &END BETA
+        &ALPHA
+          N 3 4
+          NEL +4 -2
+          L 2 0
+        &END ALPHA
+      &END BS
+      &DFT_PLUS_U
+        L 2
+        U_MINUS_J [eV] 5.0
+      &END DFT_PLUS_U
+    &END KIND
+    &KIND Fe2
+      POTENTIAL GTH-PBE-q16
+      ELEMENT Fe
+      BASIS_SET DZVP-MOLOPT-SR-GTH-q16
+      &BS
+        &BETA
+          N 3 4
+          NEL +4 -2
+          L 2 0
+        &END BETA
+        &ALPHA
+          N 3 4
+          NEL -6 -2
+          L 2 0
+        &END ALPHA
+      &END BS
+      &DFT_PLUS_U
+        L 2
+        U_MINUS_J [eV] 5.0
+      &END DFT_PLUS_U
+    &END KIND
+    &KIND N
+      POTENTIAL GTH-PBE-q5
+      BASIS_SET DZVP-MOLOPT-GTH-q5
+    &END KIND
+    &KIND H
+      POTENTIAL GTH-PBE-q1
+      BASIS_SET DZVP-MOLOPT-GTH-q1
+    &END KIND
+    &KIND O
+      POTENTIAL GTH-PBE-q6
+      BASIS_SET DZVP-MOLOPT-GTH-q6
+    &END KIND
+    &KIND C
+      POTENTIAL GTH-PBE-q4
+      BASIS_SET DZVP-MOLOPT-GTH-q4
+    &END KIND
+    &KIND S
+      POTENTIAL GTH-PBE-q6
+      BASIS_SET DZVP-MOLOPT-GTH-q6
+    &END KIND
+    &KIND P
+      POTENTIAL GTH-PBE-q5
+      BASIS_SET DZVP-MOLOPT-GTH-q5
+    &END KIND
+    &KIND Cl
+      POTENTIAL GTH-PBE-q7
+      BASIS_SET DZVP-MOLOPT-GTH-q7
+    &END KIND
+  &END SUBSYS
+  &DFT
+    POTENTIAL_FILE_NAME /ccc/work/cont003/gen0609/marticar/data/cp2k/GTH_POTENTIALS
+    PLUS_U_METHOD MULLIKEN_CHARGES
+    UKS 
+    CHARGE 0
+    BASIS_SET_FILE_NAME /ccc/work/cont003/gen0609/marticar/data/cp2k/BASIS_MOLOPT
+    &MGRID
+      REL_CUTOFF 50
+      NGRIDS 5
+      CUTOFF 400
+    &END MGRID
+    &QS
+      EXTRAPOLATION_ORDER 2
+      MAP_CONSISTENT 
+      EXTRAPOLATION PS
+      EPS_DEFAULT 1.0E-09
+    &END QS
+    &XC
+      &VDW_POTENTIAL
+        POTENTIAL_TYPE PAIR_POTENTIAL
+        &PAIR_POTENTIAL
+          REFERENCE_FUNCTIONAL PBE
+          R_CUTOFF 10
+          PARAMETER_FILE_NAME /ccc/work/cont003/gen0609/marticar/data/cp2k/dftd3.dat
+          CALCULATE_C9_TERM T
+          TYPE DFTD3
+        &END PAIR_POTENTIAL
+      &END VDW_POTENTIAL
+      &XC_FUNCTIONAL PBE
+      &END XC_FUNCTIONAL
+      &XC_GRID
+        XC_DERIV NN50_SMOOTH
+        XC_SMOOTH_RHO NN50
+      &END XC_GRID
+    &END XC
+    &SCF
+      EPS_SCF 1E-07
+      CHOLESKY INVERSE
+      MAX_SCF 500
+      SCF_GUESS RESTART
+      &OUTER_SCF
+        EPS_SCF 1.0E-7
+        MAX_SCF 10
+      &END OUTER_SCF
+      &OT
+        LINESEARCH 3PNT
+        PRECONDITIONER FULL_ALL
+        MINIMIZER CG
+      &END OT
+    &END SCF
+  &END DFT
+&END FORCE_EVAL

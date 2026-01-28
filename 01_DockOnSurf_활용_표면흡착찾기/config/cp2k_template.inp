@@ -1,0 +1,103 @@
+! ============================================
+! CP2K Template for Surface Adsorption
+! 변수: ${VAR} 형식으로 pipeline_config.yaml에서 대체
+! ============================================
+
+&GLOBAL
+  PRINT_LEVEL LOW
+  PROJECT_NAME ${PROJECT_NAME}
+  RUN_TYPE GEO_OPT
+&END GLOBAL
+
+&MOTION
+  &GEO_OPT
+    OPTIMIZER BFGS
+    MAX_ITER 200
+    MAX_FORCE 0.01
+  &END GEO_OPT
+&END MOTION
+
+&FORCE_EVAL
+  METHOD QS
+  &DFT
+    BASIS_SET_FILE_NAME ${BASIS_SET_FILE}
+    POTENTIAL_FILE_NAME ${POTENTIAL_FILE}
+    CHARGE 0
+    
+    &SCF
+      MAX_SCF 200
+      EPS_SCF ${SCF_EPS}
+      SCF_GUESS RESTART
+      &MIXING
+        METHOD BROYDEN_MIXING
+        ALPHA 0.2
+      &END MIXING
+    &END SCF
+    
+    &MGRID
+      CUTOFF ${CUTOFF}
+      REL_CUTOFF 50
+    &END MGRID
+    
+    &XC
+      &XC_FUNCTIONAL ${XC_FUNCTIONAL}
+      &END XC_FUNCTIONAL
+      &VDW_POTENTIAL
+        POTENTIAL_TYPE PAIR_POTENTIAL
+        &PAIR_POTENTIAL
+          TYPE DFTD3
+          PARAMETER_FILE_NAME ${DFTD3_FILE}
+          REFERENCE_FUNCTIONAL ${XC_FUNCTIONAL}
+        &END PAIR_POTENTIAL
+      &END VDW_POTENTIAL
+    &END XC
+  &END DFT
+  
+  &SUBSYS
+    &CELL
+      A ${CELL_A}
+      B ${CELL_B}
+      C ${CELL_C}
+      PERIODIC ${PERIODIC}
+    &END CELL
+    &TOPOLOGY
+      COORD_FILE_NAME coord.xyz
+      COORD_FILE_FORMAT XYZ
+    &END TOPOLOGY
+    
+    ! === 원소별 Basis Set ===
+    &KIND C
+      BASIS_SET DZVP-MOLOPT-GTH-q4
+      POTENTIAL GTH-PBE-q4
+    &END KIND
+    &KIND H
+      BASIS_SET DZVP-MOLOPT-GTH-q1
+      POTENTIAL GTH-PBE-q1
+    &END KIND
+    &KIND O
+      BASIS_SET DZVP-MOLOPT-GTH-q6
+      POTENTIAL GTH-PBE-q6
+    &END KIND
+    &KIND N
+      BASIS_SET DZVP-MOLOPT-GTH-q5
+      POTENTIAL GTH-PBE-q5
+    &END KIND
+    &KIND S
+      BASIS_SET DZVP-MOLOPT-GTH-q6
+      POTENTIAL GTH-PBE-q6
+    &END KIND
+    ! === 금속 (필요시 주석 해제) ===
+    ! &KIND Au
+    !   BASIS_SET DZVP-MOLOPT-SR-GTH
+    !   POTENTIAL GTH-PBE-q11
+    ! &END KIND
+    ! &KIND Pt
+    !   BASIS_SET DZVP-MOLOPT-SR-GTH
+    !   POTENTIAL GTH-PBE-q18
+    ! &END KIND
+    ! &KIND Fe
+    !   BASIS_SET DZVP-MOLOPT-SR-GTH
+    !   POTENTIAL GTH-PBE-q16
+    ! &END KIND
+  &END SUBSYS
+&END FORCE_EVAL

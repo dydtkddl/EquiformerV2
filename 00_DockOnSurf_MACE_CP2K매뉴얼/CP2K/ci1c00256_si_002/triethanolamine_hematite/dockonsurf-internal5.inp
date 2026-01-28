@@ -1,0 +1,44 @@
+# Sample of DockOnSurf input file. The file format must be an INI file. 
+# Input format on http://forge.cbp.ens-lyon.fr/redmine/projects/dockonsurf/wiki
+
+[Global]
+project_name = triethanolamine
+run_type = screening
+code = CP2K
+batch_q_sys = no # sge 
+# max_jobs = 10r
+# subm_script = cp2k.sub
+pbc_cell = (15.3822 0 0) (-7.6911 13.32138 0) (0 0 26.93789)
+special_atoms = (Fe1 Fe) (Fe2 Fe) (O1 O)
+# potcar_dir = /home/cmarti/potcars
+
+# [Isolated]
+# isol_inp_file = isolated.inp
+# molec_file = triethanolamine.xyz
+# num_conformers = 1000
+# pre_opt = MMFF
+
+[Screening]
+use_molec_file = triethanolamine.xyz
+screen_inp_file = screening.inp
+surf_file = hematite.xyz
+set_angles = internal
+sites = 130
+surf_ctrs2 = 127
+molec_ctrs = 17
+molec_ctrs2 = 6 
+molec_ctrs3 = 5
+max_helic_angle = 120
+# select_magns = moi
+# confs_per_magn = 1
+surf_norm_vect = z
+sample_points_per_angle = 5
+min_coll_height = 0.5
+collision_threshold = no
+h_donor = no # 34 40 44
+# max_structures = 100
+
+# [Refinement]
+# refine_inp_file = refinement.inp
+# energy_cutoff = 1.0
+

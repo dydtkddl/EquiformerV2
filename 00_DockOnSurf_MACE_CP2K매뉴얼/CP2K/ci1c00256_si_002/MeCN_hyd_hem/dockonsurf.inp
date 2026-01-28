@@ -1,0 +1,45 @@
+# Sample of DockOnSurf input file. The file format must be an INI file. 
+# Input format on http://forge.cbp.ens-lyon.fr/redmine/projects/dockonsurf/wiki
+
+[Global]
+project_name = MeCN@hydrated-hematite
+run_type = full
+code = CP2K
+batch_q_sys = irene
+subm_script = cp2k.sub
+# max_jobs = 5q
+special_atoms = (Fe1 Fe) (Fe2 Fe) (O1 O)
+
+[Isolated]
+isol_inp_file = isolated.inp
+molec_file = MeCN.xyz
+num_conformers = 10
+pre_opt = MMFF
+
+[Screening]
+screen_inp_file = screening.inp
+surf_file = /ccc/work/cont003/gen0609/marticar/data/surf/hydrated-hematite.xyz
+set_angles = euler
+sites = 148 149 98 86 122 113 (103 113 122)
+# surf_ctrs2 = 132
+molec_ctrs = 5
+# molec_ctrs2 = 6 6 30 41 41 
+# molec_ctrs3 = 10 9 29 1 1
+# max_helic_angle = 180
+select_magns = energy
+confs_per_magn = 1
+surf_norm_vect = z
+adsorption_height = 1.5
+sample_points_per_angle = 3
+pbc_cell = (15.3822 0 0) (-7.6911 13.32138 0) (0 0 26.93789)
+min_coll_height = 6
+collision_threshold = 1.2
+exclude_ads_ctr = true
+h_donor = False 
+# h_acceptor = False
+max_structures = False
+
+[Refinement]
+refine_inp_file = refinement.inp
+energy_cutoff = 1.0 # eV
+

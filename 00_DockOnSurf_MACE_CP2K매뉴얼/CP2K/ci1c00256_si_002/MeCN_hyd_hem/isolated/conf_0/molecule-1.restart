@@ -1,0 +1,213 @@
+ # Version information for this restart file 
+ # current date 2020-09-17 15:49:29.452
+ # current working dir /ccc/scratch/cont003/gen0609/marticar/604959
+ # Program compiled at                              Thu Dec 12 15:40:57 CET 2019
+ # Program compiled on                                                 cobalt175
+ # Program compiled for                                       Linux-x86-64-iomkl
+ # Source code revision number                                         svn:18464
+ &GLOBAL
+   PRINT_LEVEL  LOW
+   PROJECT_NAME molecule
+   RUN_TYPE  GEO_OPT
+ &END GLOBAL
+ &MOTION
+   &GEO_OPT
+     OPTIMIZER  BFGS
+     MAX_ITER  500
+     STEP_START_VAL  3
+   &END GEO_OPT
+ &END MOTION
+ &FORCE_EVAL
+   METHOD  QS
+   STRESS_TENSOR  ANALYTICAL
+   &DFT
+     BASIS_SET_FILE_NAME /ccc/work/cont003/gen0609/marticar/data/cp2k/BASIS_MOLOPT
+     POTENTIAL_FILE_NAME /ccc/work/cont003/gen0609/marticar/data/cp2k/GTH_POTENTIALS
+     UKS  T
+     CHARGE  0
+     PLUS_U_METHOD  MULLIKEN_CHARGES
+     &SCF
+       MAX_SCF  500
+       EPS_SCF     9.9999999999999995E-08
+       CHOLESKY  INVERSE
+       SCF_GUESS  RESTART
+       &OT  T
+         MINIMIZER  CG
+         LINESEARCH  3PNT
+         PRECONDITIONER  FULL_ALL
+       &END OT
+       &OUTER_SCF  T
+         EPS_SCF     9.9999999999999995E-08
+         MAX_SCF  10
+       &END OUTER_SCF
+     &END SCF
+     &QS
+       EPS_DEFAULT     1.0000000000000001E-09
+       MAP_CONSISTENT  T
+       EXTRAPOLATION  PS
+       EXTRAPOLATION_ORDER  2
+     &END QS
+     &MGRID
+       NGRIDS  5
+       CUTOFF     4.0000000000000000E+02
+       REL_CUTOFF     5.0000000000000000E+01
+     &END MGRID
+     &XC
+       DENSITY_CUTOFF     1.0000000000000000E-10
+       GRADIENT_CUTOFF     1.0000000000000000E-10
+       TAU_CUTOFF     1.0000000000000000E-10
+       &XC_GRID
+         XC_SMOOTH_RHO  NN50
+         XC_DERIV  NN50_SMOOTH
+       &END XC_GRID
+       &XC_FUNCTIONAL  NO_SHORTCUT
+         &PBE  T
+         &END PBE
+       &END XC_FUNCTIONAL
+       &VDW_POTENTIAL
+         POTENTIAL_TYPE  PAIR_POTENTIAL
+         &PAIR_POTENTIAL
+           R_CUTOFF     1.0000000000000002E+01
+           TYPE  DFTD3
+           PARAMETER_FILE_NAME /ccc/work/cont003/gen0609/marticar/data/cp2k/dftd3.dat
+           REFERENCE_FUNCTIONAL PBE
+           CALCULATE_C9_TERM  T
+         &END PAIR_POTENTIAL
+       &END VDW_POTENTIAL
+     &END XC
+   &END DFT
+   &SUBSYS
+     &CELL
+       A     1.5382200000000003E+01    0.0000000000000000E+00    0.0000000000000000E+00
+       B    -7.6911000000000014E+00    1.3321380000000000E+01    0.0000000000000000E+00
+       C     0.0000000000000000E+00    0.0000000000000000E+00    2.6937889999999999E+01
+       MULTIPLE_UNIT_CELL  1 1 1
+     &END CELL
+     &COORD
+C   -4.8662345345029090E-01    4.9323666696198662E-03   -8.0353564198975009E-03
+C    9.6592143214414861E-01   -9.0744490662622891E-03    1.6163188815476504E-02
+H   -8.8811943322702436E-01   -1.1706335224580038E-01    1.0077536070723747E+00
+H   -8.5404447092024427E-01    9.5672435628923003E-01   -4.1674796606995701E-01
+H   -8.6675349047376071E-01   -8.1407473003297470E-01   -6.3477372464509429E-01
+N    2.1333630803789334E+00   -2.1207191047621372E-02    3.5386166495881784E-02
+     &END COORD
+     &KIND O1
+       BASIS_SET DZVP-MOLOPT-GTH-q6
+       ELEMENT O
+       POTENTIAL GTH-PBE-q6
+       &BS  T
+         &ALPHA
+           NEL  2
+           L  1
+           N  2
+         &END ALPHA
+         &BETA
+           NEL  2
+           L  1
+           N  2
+         &END BETA
+       &END BS
+     &END KIND
+     &KIND Fe1
+       BASIS_SET DZVP-MOLOPT-SR-GTH-q16
+       ELEMENT Fe
+       POTENTIAL GTH-PBE-q16
+       &DFT_PLUS_U  T
+         L  2
+         U_MINUS_J     1.8374662701306543E-01
+       &END DFT_PLUS_U
+       &BS  T
+         &ALPHA
+           NEL  4 -2
+           L  2 0
+           N  3 4
+         &END ALPHA
+         &BETA
+           NEL  -6 -2
+           L  2 0
+           N  3 4
+         &END BETA
+       &END BS
+     &END KIND
+     &KIND Fe2
+       BASIS_SET DZVP-MOLOPT-SR-GTH-q16
+       ELEMENT Fe
+       POTENTIAL GTH-PBE-q16
+       &DFT_PLUS_U  T
+         L  2
+         U_MINUS_J     1.8374662701306543E-01
+       &END DFT_PLUS_U
+       &BS  T
+         &ALPHA
+           NEL  -6 -2
+           L  2 0
+           N  3 4
+         &END ALPHA
+         &BETA
+           NEL  4 -2
+           L  2 0
+           N  3 4
+         &END BETA
+       &END BS
+     &END KIND
+     &KIND N
+       BASIS_SET DZVP-MOLOPT-GTH-q5
+       POTENTIAL GTH-PBE-q5
+       &POTENTIAL
+ 2 3
+  0.2837905100000000E+00 2 -0.1241522559000000E+02  0.1868095920000000E+01
+ 2
+  0.2554050000000000E+00 1  0.1363026257000000E+02
+  0.2454945300000000E+00 0
+         # Potential name:  GTH-PBE-Q5  for symbol:  N
+         # Potential read from the potential filename: /ccc/work/cont003/gen0609/marticar/data/cp2k/GTH_POTENTIALS
+       &END POTENTIAL
+     &END KIND
+     &KIND H
+       BASIS_SET DZVP-MOLOPT-GTH-q1
+       POTENTIAL GTH-PBE-q1
+       &POTENTIAL
+ 1
+  0.2000000000000000E+00 2 -0.4178900440000000E+01  0.7244633100000000E+00
+ 0
+         # Potential name:  GTH-PBE-Q1  for symbol:  H
+         # Potential read from the potential filename: /ccc/work/cont003/gen0609/marticar/data/cp2k/GTH_POTENTIALS
+       &END POTENTIAL
+     &END KIND
+     &KIND O
+       BASIS_SET DZVP-MOLOPT-GTH-q6
+       POTENTIAL GTH-PBE-q6
+     &END KIND
+     &KIND C
+       BASIS_SET DZVP-MOLOPT-GTH-q4
+       POTENTIAL GTH-PBE-q4
+       &POTENTIAL
+ 2 2
+  0.3384712400000000E+00 2 -0.8803673979999999E+01  0.1339210850000000E+01
+ 2
+  0.3025757500000000E+00 1  0.9622486650000001E+01
+  0.2915069400000000E+00 0
+         # Potential name:  GTH-PBE-Q4  for symbol:  C
+         # Potential read from the potential filename: /ccc/work/cont003/gen0609/marticar/data/cp2k/GTH_POTENTIALS
+       &END POTENTIAL
+     &END KIND
+     &KIND S
+       BASIS_SET DZVP-MOLOPT-GTH-q6
+       POTENTIAL GTH-PBE-q6
+     &END KIND
+     &KIND P
+       BASIS_SET DZVP-MOLOPT-GTH-q5
+       POTENTIAL GTH-PBE-q5
+     &END KIND
+     &KIND Cl
+       BASIS_SET DZVP-MOLOPT-GTH-q7
+       POTENTIAL GTH-PBE-q7
+     &END KIND
+     &TOPOLOGY
+       COORD_FILE_NAME coord.xyz
+       COORD_FILE_FORMAT  XYZ
+       NUMBER_OF_ATOMS  6
+       MULTIPLE_UNIT_CELL  1 1 1
+     &END TOPOLOGY
+   &END SUBSYS
+ &END FORCE_EVAL
