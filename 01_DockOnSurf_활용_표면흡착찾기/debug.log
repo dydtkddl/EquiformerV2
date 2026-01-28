@@ -1,0 +1,46 @@
+==========================================
+DockOnSurf Debug Mode
+Date: Thu Jan 29 04:12:08 KST 2026
+==========================================
+
+Running DockOnSurf with full Python traceback...
+
+Importing DockOnSurf modules...
+Imports successful!
+
+Reading input file...
+Input variables: ['isolated', 'screening', 'refinement', 'code', 'batch_q_sys', 'max_jobs', 'subm_script', 'model_mace', 'pbc_cell', 'project_name', 'special_atoms', 'isol_inp_file', 'molec_file', 'num_conformers', 'pre_opt']
+run_type: None
+code: mace
+batch_q_sys: slurm
+molec_file: molecule.xyz
+num_conformers: 10
+
+Running isolated stage...
+/bin/sh: squeue: command not found
+No opt_log.out file found in isolated/conf_0/.
+
+=== ERROR ===
+Type: IndexError
+Message: list index out of range
+
+=== TRACEBACK ===
+Traceback (most recent call last):
+  File "<stdin>", line 25, in <module>
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/isolated.py", line 178, in run_isolated
+    most_stable_conf = select_stable_confs(conf_list, 0)[0]
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/refinement.py", line 19, in select_stable_confs
+    lowest_e = sorted_list[0].info['energy']
+IndexError: list index out of range
+
+==========================================
+Results:
+total 28
+drwxrwxr-x 3 yongsang yongsang 4096 Jan 29 04:12 .
+drwxrwxr-x 7 yongsang yongsang 4096 Jan 29 04:12 ..
+-rw-rw-r-- 1 yongsang yongsang  289 Jan 29 04:12 dockonsurf.inp
+drwxrwxr-x 3 yongsang yongsang 4096 Jan 29 04:12 isolated
+-rw-rw-r-- 1 yongsang yongsang   42 Jan 29 04:12 mace_input.yaml
+-rw-rw-r-- 1 yongsang yongsang  257 Jan 29 04:12 molecule.xyz
+-rwxrwxr-x 1 yongsang yongsang 1614 Jan 29 04:12 sub_mace.sh
+==========================================

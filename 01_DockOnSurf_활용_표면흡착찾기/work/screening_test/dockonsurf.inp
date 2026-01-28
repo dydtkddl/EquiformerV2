@@ -1,0 +1,19 @@
+[Global]
+project_name = cu111_methanol
+run_type = screening
+code = mace
+model_mace = /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+batch_q_sys = slurm
+subm_script = sub_mace.sh
+pbc_cell = (10.0 0.0 0.0) (0.0 10.0 0.0) (0.0 0.0 25.0)
+
+[Screening]
+screen_inp_file = mace_input.yaml
+molec_file = molecule.xyz
+surf_file = surface.xyz
+set_angles = auto
+sites = top, bridge, hollow
+max_structures = 20
+distance = 2.0
+num_conformers = 10
+pre_opt = MMFF

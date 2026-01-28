@@ -1,0 +1,44 @@
+29-Jan-26 04:10:03-INFO: DockOnSurf started on /home/yongsang/20260129_Equiformer/01_DockOnSurf_활용_표면흡착찾기/work/dockonsurf_slurm.
+29-Jan-26 04:10:03-INFO: To kill DockOnSurf execution type: `$ kill 1319110`.
+29-Jan-26 04:10:03-INFO: Using 'dockonsurf.inp' as input.
+29-Jan-26 04:10:03-INFO: Correctly read dockonsurf.inp parameters: 
+
+	isolated: True
+	screening: False
+	refinement: False
+	code: mace
+	batch_q_sys: slurm
+	max_jobs: {'r': inf, 'p': inf, 'rp': inf}
+	subm_script: sub_mace.sh
+	model_mace: /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+	pbc_cell: False
+	project_name: mace_test
+	special_atoms: []
+	isol_inp_file: mace_input.yaml
+	molec_file: molecule.xyz
+	num_conformers: 3
+	pre_opt: mmff
+
+29-Jan-26 04:10:03-INFO: Carrying out procedures for the isolated molecule.
+29-Jan-26 04:10:03-INFO: Generated 3 conformers.
+29-Jan-26 04:10:03-INFO: Pre-optimized conformers with mmff.
+29-Jan-26 04:10:03-INFO: Clustering using affinity matrix.
+29-Jan-26 04:10:03-ERROR: 
+Traceback (most recent call last):
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/dockonsurf.py", line 50, in <module>
+    dockonsurf()
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/dockonsurf.py", line 25, in dockonsurf
+    run_isolated(inp_vars)
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/isolated.py", line 162, in run_isolated
+    exemplars = clustering(rmsd_mtx)
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/clustering.py", line 221, in clustering
+    labels = get_labels_affty(data)
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/clustering.py", line 88, in get_labels_affty
+    return hdbs.fit_predict(affty_mtx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/hdbscan/hdbscan_.py", line 1291, in fit_predict
+    self.fit(X)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/hdbscan/hdbscan_.py", line 1251, in fit
+    ) = hdbscan(clean_data, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/hdbscan/hdbscan_.py", line 716, in hdbscan
+    raise ValueError("Min cluster size must be greater than one")
+ValueError: Min cluster size must be greater than one

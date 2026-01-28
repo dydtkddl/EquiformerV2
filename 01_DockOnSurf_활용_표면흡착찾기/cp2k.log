@@ -1,0 +1,100 @@
+==========================================
+CP2K Podman Integration Test
+Date: Thu Jan 29 04:27:04 KST 2026
+==========================================
+
+[1] Checking CP2K container...
+Podman: NOT FOUND
+
+[2] Checking existing CP2K runner...
+Found: /home/yongsang/PSID_SIMULATION_TOOLS/cp2k/run_cp2k.new.docker.sh (Docker)
+=== Runner script (first 30 lines) ===
+#!/usr/bin/env bash
+#
+# run_cp2k.sh
+# Usage: ./run_cp2k.sh <RESTART_FILE> [KILL_INTERVAL_SECONDS]
+# Example: ./run_cp2k.sh MIL125_DISSOCIATED_GEOOPT-1.restart 1800
+
+set -uo pipefail
+set +e   # watchdog failures shouldn’t kill the script
+
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 <restart_file> [kill_interval_seconds]"
+  exit 1
+fi
+
+RESTART_FILE="$1"
+KILL_INTERVAL="${2:-1800}"   # default 1800 seconds (30 min)
+PASSWORD="9582"
+ITER=0
+
+# Ensure any naked Ctrl+C also kills leftover watchdogs
+cleanup() {
+  [[ -n "${WD_PID:-}" ]] && kill "${WD_PID}" &>/dev/null || true
+}
+trap cleanup EXIT
+
+while true; do
+  ITER=$((ITER+1))
+  CONTAINER_NAME="cp2k_run_${ITER}"
+
+  echo "============================================================"
+
+[3] Checking CP2K data...
+Found: ~/cp2k/data
+AcPP1_POTENTIALS
+AcPP2_POTENTIALS
+ALL_BASIS_SETS
+Allegro
+ALL_POTENTIALS
+BASIS_ADMM
+BASIS_ADMM_ae
+BASIS_ADMM_MOLOPT
+BASIS_ADMM_UZH
+BASIS_ccGRB_UZH
+
+[4] CP2K input file created:
+total 16
+drwxrwxr-x  2 yongsang yongsang 4096 Jan 29 04:27 .
+drwxrwxr-x 10 yongsang yongsang 4096 Jan 29 04:27 ..
+-rw-rw-r--  1 yongsang yongsang  257 Jan 29 04:27 coord.xyz
+-rw-rw-r--  1 yongsang yongsang 1394 Jan 29 04:27 cp2k.inp
+
+[5] Testing CP2K execution...
+Running: /home/yongsang/PSID_SIMULATION_TOOLS/cp2k/run_cp2k.new.docker.sh cp2k.inp
+============================================================
+▶ [#1] START  at 2026-01-29 04:27:04
+▶ Restart file: cp2k.inp
+▶ Kill interval: 1800s
+▶ Container name: cp2k_run_1
+============================================================
+▶ [#1] END    at 2026-01-29 04:28:08 (exit code: 0)
+----- Last 5 lines of simulation.input.log -----
+[6c4f7821cb65:00007] SET MKL_DYNAMIC=FALSE
+[6c4f7821cb65:00007] SET OMP_DYNAMIC=FALSE
+[6c4f7821cb65:00007] SET OMP_PROC_BIND=true
+[6c4f7821cb65:00007] SET OMP_PLACES=cores
+SIRIUS 7.7.0, git hash: https://api.github.com/repos/electronic-structure/SIRIUS/git/ref/tags/v7.7.0
+/home/yongsang/PSID_SIMULATION_TOOLS/cp2k/run_cp2k.new.docker.sh: line 87: 1330612 Terminated              ( while true; do
+    sleep "${KILL_INTERVAL}"; echo "▶ [watchdog] $(date '+%H:%M:%S') → docker kill ${CONTAINER_NAME}"; echo "$PASSWORD" | sudo -S docker kill "${CONTAINER_NAME}" &> /dev/null;
+done ) &> /dev/null
+-----------------------------------------------
+▶ [#1] Warning 메시지 발견 – 루프 종료
+✅ 전체 완료. 총 반복 횟수: 1
+
+==========================================
+Results:
+total 220
+drwxrwxr-x  2 yongsang yongsang   4096 Jan 29 04:28 .
+drwxrwxr-x 10 yongsang yongsang   4096 Jan 29 04:27 ..
+-rw-rw-r--  1 yongsang yongsang    257 Jan 29 04:27 coord.xyz
+-rw-rw-r--  1 yongsang yongsang   1394 Jan 29 04:27 cp2k.inp
+-rw-r--r--  1 root     root       4098 Jan 29 04:28 methanol_opt-1.restart
+-rw-r--r--  1 root     root       4098 Jan 29 04:28 methanol_opt-1.restart.bak-1
+-rw-r--r--  1 root     root       2736 Jan 29 04:28 methanol_opt-BFGS.Hessian
+-rw-r--r--  1 root     root       5707 Jan 29 04:28 methanol_opt-pos-1.xyz
+-rw-r--r--  1 root     root       2996 Jan 29 04:28 methanol_opt-RESTART.wfn
+-rw-r--r--  1 root     root       2996 Jan 29 04:28 methanol_opt-RESTART.wfn.bak-1
+-rw-rw-r--  1 yongsang yongsang    401 Jan 29 04:27 simulation.input.log
+-rw-r--r--  1 root     root     167068 Jan 29 04:28 simulation.input.out
+==========================================

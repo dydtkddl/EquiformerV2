@@ -1,0 +1,89 @@
+=== Check calculation.py local handling ===
+    elif inp_vars['batch_q_sys'] == 'local':
+        pass  # TODO: Implement local execution
+    elif not inp_vars['batch_q_sys']:
+        pass  # Dry run, do nothing
+    else:
+        err_msg = f"Unknown batch queue system: {inp_vars['batch_q_sys']}."
+        logger.error(err_msg)
+        raise ValueError(err_msg)
+
+
+=== Check molecule file parsing in formats.py ===
+        from src.dockonsurf.xyz2mol import xyz2mol
+        if filetype(coord_file) == 'xyz':  # TODO Include detection of charges.
+            ase_atms = ase.io.read(coord_file)
+            atomic_nums = ase_atms.get_atomic_numbers().tolist()
+            xyz_coordinates = ase_atms.positions.tolist()
+            rd_mol_obj = xyz2mol(atomic_nums, xyz_coordinates)
+            logger.debug(conv_info)
+            return Chem.AddHs(rd_mol_obj)
+        elif filetype(coord_file) == 'mol':
+            logger.debug(conv_info)
+            return Chem.AddHs(Chem.MolFromMolFile(coord_file, removeHs=False))
+--
+def read_coords_cp2k(file, spec_atoms=tuple()):
+    """Reads the coordinates from a CP2K restart file and returns an ase.Atoms
+     object.
+
+    @param file: The file to read containing the coordinates.
+    @param spec_atoms: List of tuples containing the pairs of chemical symbols.
+    @return: ase.Atoms object of the coordinates in the file.
+    """
+    import numpy as np
+    from ase import Atoms
+    from pycp2k import CP2K
+--
+def read_coords_vasp(file, spec_atoms=tuple()):
+    """Reads the coordinates from VASP OUTCAR and returns an ase.Atoms object.
+
+    @param file: The file to read containing the coordinates.
+    @param spec_atoms: List of tuples containing the pairs of chemical symbols.
+    @return: ase.Atoms object of the coordinates in the file.
+    """
+    import os
+    import ase.io
+    if not os.path.isfile(file):
+        err_msg = f"File {file} not found."
+--
+def read_energy_cp2k(file):
+    """Reads the CP2K output file and returns its final energy.
+
+    @param file: The file from which the energy should be read.
+    @return: The last energy on the out file in eV.
+    """
+    out_fh = open(file, 'r')
+    energy = None
+    for line in out_fh:
+        if "ENERGY| Total FORCE_EVAL ( QS ) energy" in line:
+            energy = float(line.strip().split(':')[1]) * 27.2113845  # Ha to eV
+--
+def read_coords_dftb(file, spec_atoms=tuple()):
+    """
+
+=== Test reading molecule with RDKit ===
+Reading: work/dockonsurf_test2/molecule.xyz
+Error: module 'rdkit.Chem' has no attribute 'MolFromXYZFile'
+
+=== Try from SMILES instead ===
+Methanol from SMILES: 6 atoms
+
+=== Check if .xyz is supported in DockOnSurf ===
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/ASANN.py:            'supported format: XYZ, POSCAR, CIF, ...)',
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/calculation.py:                       "'coord.xyz'. A new CP2K input file with "
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/calculation.py:        force_eval.SUBSYS.TOPOLOGY.Coord_file_name = 'coord.xyz'
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/calculation.py:write("optimized_structure.xyz", atoms)
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:        from src.dockonsurf.xyz2mol import xyz2mol
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:    Reads the coordinates from a DFTB+ .xyz file and returns an ase.Atoms object.
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:    @param file: The .xyz file to read containing the coordinates.
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:    # Use ASE to read the .xyz file
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:            xyz_file = glob(f"{conf_path}/*.xyz")
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:            if not xyz_file:
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:                raise FileNotFoundError(f"No .xyz file found in {conf_path}")
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:            ase_atms = read_coords_dftb(xyz_file[0], spec_atms)
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:            xyz_file = f"{conf_path}/optimized_structure.xyz"
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:            elif os.path.isfile(xyz_file):
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/formats.py:                ase_atms = read(xyz_file)
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/xyz2mol.py:def read_xyz_file(filename, look_for_charge=True):
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/xyz2mol.py:    parser = argparse.ArgumentParser() # usage='%(prog)s [options] molecule.xyz')
+/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/xyz2mol.py:    atoms, charge, xyz_coordinates = read_xyz_file(filename)

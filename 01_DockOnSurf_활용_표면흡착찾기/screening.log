@@ -1,0 +1,55 @@
+==========================================
+DockOnSurf Screening Test
+Surface: Cu(111)
+Molecule: Methanol
+Date: Thu Jan 29 04:27:00 KST 2026
+==========================================
+
+=== dockonsurf.inp ===
+[Global]
+project_name = cu111_methanol
+run_type = screening
+code = mace
+model_mace = /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+batch_q_sys = slurm
+subm_script = sub_mace.sh
+pbc_cell = (10.0 0.0 0.0) (0.0 10.0 0.0) (0.0 0.0 25.0)
+
+[Screening]
+screen_inp_file = mace_input.yaml
+molec_file = molecule.xyz
+surf_file = surface.xyz
+set_angles = auto
+sites = top, bridge, hollow
+max_structures = 20
+distance = 2.0
+num_conformers = 10
+pre_opt = MMFF
+
+
+Running DockOnSurf Screening...
+Reading input file...
+Option 'molec_ctrs' not found on section 'Screening'
+
+=== ERROR ===
+Type: NoOptionError
+Message: No option 'molec_ctrs' in section: 'Screening'
+
+=== TRACEBACK ===
+Traceback (most recent call last):
+  File "<stdin>", line 13, in <module>
+  File "/home/yongsang/PSID_SIMULATION_TOOLS/DockOnSurf/dockonsurf/src/dockonsurf/dos_input.py", line 1057, in read_input
+    raise NoOptionError(opt, 'Screening')
+configparser.NoOptionError: No option 'molec_ctrs' in section: 'Screening'
+
+==========================================
+Results:
+total 28
+drwxrwxr-x  2 yongsang yongsang 4096 Jan 29 04:27 .
+drwxrwxr-x 10 yongsang yongsang 4096 Jan 29 04:27 ..
+-rw-rw-r--  1 yongsang yongsang  459 Jan 29 04:27 dockonsurf.inp
+-rw-rw-r--  1 yongsang yongsang   42 Jan 29 04:27 mace_input.yaml
+-rw-rw-r--  1 yongsang yongsang  257 Jan 29 04:27 molecule.xyz
+-rwxrwxr-x  1 yongsang yongsang 1614 Jan 29 04:27 sub_mace.sh
+-rw-rw-r--  1 yongsang yongsang  201 Jan 29 04:27 surface.xyz
+==========================================
