@@ -669,6 +669,8 @@ class ReportGenerator:
         
         .modal-body {{
             padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 80px);
         }}
         
         .modal-viewer {{
