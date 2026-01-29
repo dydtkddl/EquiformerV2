@@ -1800,7 +1800,8 @@ class ReportGenerator:
         return ""
     
     def _get_cell_params(self, config_name: str) -> dict:
-        """XYZ 파일에서 셀 파라미터 추출 (또는 기본값 사용)"""
+        """셀 파라미터 추출 - trajectory 파일 우선 (cell 정보 보존)"""
+        traj_path = self.results_dir / f"{config_name}.traj"
         xyz_path = self.results_dir / f"{config_name}.xyz"
         
         # 기본값 (Cu(111) 3x3 slab 근사치)
@@ -1811,15 +1812,20 @@ class ReportGenerator:
             "zmin": 0.0
         }
         
-        if not xyz_path.exists():
-            return default_params
-        
         try:
-            # ASE로 읽어서 cell 정보 추출
             from ase.io import read
-            atoms = read(str(xyz_path))
+            atoms = None
             
-            # 실제 cell 사용 (cell이 있으면)
+            # 1. Trajectory 파일 우선 (cell 정보 있음)
+            if traj_path.exists():
+                atoms = read(str(traj_path), index=-1)  # 마지막 프레임
+            elif xyz_path.exists():
+                atoms = read(str(xyz_path))
+            
+            if atoms is None:
+                return default_params
+            
+            # cell 정보 확인
             cell = atoms.get_cell()
             if cell.any():
                 a_vec = cell[0][:2]  # x, y 성분
@@ -1833,18 +1839,14 @@ class ReportGenerator:
                     "zmin": float(zmin)
                 }
             
-            # cell이 없으면 원자 위치에서 추정
-            # XYZ doesn't store cell info, so estimate from atom positions
-            # Add typical nearest-neighbor distance to get full unit cell
+            # cell이 없으면 원자 위치에서 추정 (fallback)
             positions = atoms.positions
             x_coords = positions[:, 0]
             y_coords = positions[:, 1]
             z_coords = positions[:, 2]
             
-            # Estimate nearest-neighbor distance (typical: ~2.5 Å for metals)
-            # This accounts for atoms at cell edges
-            nn_dist = 2.55  # Cu nearest-neighbor ~2.55 Å
-            
+            # Nearest-neighbor 거리 추가 (cell 경계 보정)
+            nn_dist = 2.55
             x_range = (x_coords.max() - x_coords.min() + nn_dist) if len(x_coords) else 7.67
             y_range = (y_coords.max() - y_coords.min() + nn_dist) if len(y_coords) else 6.65
             
