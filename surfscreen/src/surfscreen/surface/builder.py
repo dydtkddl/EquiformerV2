@@ -86,8 +86,8 @@ class Surface:
             properties=self.properties.copy()
         )
     
-    def save(self, path: str, format: str = "xyz") -> None:
-        """표면을 파일로 저장"""
+    def save(self, path: str, format: str = "extxyz") -> None:
+        """표면을 파일로 저장 (extxyz로 cell 정보 보존)"""
         write(path, self.atoms, format=format)
         
     def get_surface_atoms(self) -> List[int]:

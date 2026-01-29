@@ -199,7 +199,7 @@ def surface_create(element, miller, layers, supercell, vacuum, fix, output):
             fixed_layers=fix
         )
     
-    out_path = output or f"{surf.name}.xyz"
+    out_path = output or f"{surf.name}.extxyz"
     surf.save(out_path)
     
     console.print(f"[green]✓[/green] Surface: {surf.name}")
