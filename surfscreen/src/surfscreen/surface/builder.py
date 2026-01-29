@@ -389,6 +389,26 @@ class SurfaceBuilder:
         """
         atoms = read(path)
         
+        # cell이 없으면 원자 위치에서 자동 생성
+        cell = atoms.get_cell()
+        if not cell.any():
+            positions = atoms.get_positions()
+            x_min, y_min, z_min = positions.min(axis=0)
+            x_max, y_max, z_max = positions.max(axis=0)
+            
+            # Cu nearest-neighbor distance ~2.55Å 기준으로 cell 경계 확장
+            padding = 2.55 / 2  # 반경만큼 확장
+            cell_a = x_max - x_min + 2 * padding
+            cell_b = y_max - y_min + 2 * padding
+            cell_c = z_max - z_min + 15.0  # vacuum 포함
+            
+            atoms.set_cell([cell_a, cell_b, cell_c])
+            atoms.set_pbc([True, True, True])
+            
+            # 원점 이동 (원자가 cell 중앙에 오도록)
+            atoms.positions[:, 0] -= x_min - padding
+            atoms.positions[:, 1] -= y_min - padding
+        
         # 하단 레이어 고정
         fixed_atoms = []
         if fixed_layers > 0:

@@ -182,6 +182,10 @@ class AdsorptionSystem:
         # 결합
         system = surface + molecule
         
+        # surface의 cell과 pbc를 system에 복사 (중요: PBC 계산 및 시각화용)
+        system.set_cell(surface.get_cell())
+        system.set_pbc(surface.get_pbc())
+        
         # 표면 원자 고정 유지
         if self.surface.fixed_atoms:
             system.set_constraint(FixAtoms(indices=self.surface.fixed_atoms))
