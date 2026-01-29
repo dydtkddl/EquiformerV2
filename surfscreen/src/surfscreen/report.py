@@ -1058,7 +1058,7 @@ class ReportGenerator:
         function updateTrajFrame() {{
             if (!modalViewer || trajFrames.length === 0) return;
             
-            const xyz = trajFrames[trajCurrentFrame].replace(/\\\\n/g, '\\n');
+            const xyz = trajFrames[trajCurrentFrame];
             modalViewer.removeAllModels();
             modalViewer.removeAllShapes();
             
@@ -1905,11 +1905,10 @@ class ReportGenerator:
                 xyz_lines = [str(len(atoms)), f"Frame {idx}"]
                 for atom in atoms:
                     xyz_lines.append(f"{atom.symbol} {atom.position[0]:.6f} {atom.position[1]:.6f} {atom.position[2]:.6f}")
-                frames.append("\\n".join(xyz_lines))
+                frames.append("\n".join(xyz_lines))
             
             return {"energies": energies, "frames": frames, "steps": steps}
             
         except Exception as e:
             print(f"Warning: Could not read trajectory {traj_path}: {e}")
             return {"energies": [], "frames": [], "steps": []}
-
