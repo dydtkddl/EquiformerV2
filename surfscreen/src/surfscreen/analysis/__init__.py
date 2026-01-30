@@ -18,6 +18,8 @@ from .thermodynamic import (
     FreeEnergyResult,
     calculate_coverage_energy
 )
+from .phonon import PhononAnalyzer, PhononResult, ThermoResult, calculate_zpe, calculate_gibbs
+from .coverage import CoverageAnalyzer, CoverageResult, calculate_coverage
 
 __all__ = [
     # Structural
@@ -37,4 +39,17 @@ __all__ = [
     "BoltzmannResult",
     "FreeEnergyResult",
     "calculate_coverage_energy",
+    
+    # Phonon
+    "PhononAnalyzer",
+    "PhononResult",
+    "ThermoResult",
+    "calculate_zpe",
+    "calculate_gibbs",
+    
+    # Coverage
+    "CoverageAnalyzer",
+    "CoverageResult",
+    "calculate_coverage",
 ]
+

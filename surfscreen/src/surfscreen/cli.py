@@ -849,5 +849,283 @@ def plot_correlation(results_dir, x_prop, y_prop, output):
     console.print("[dim]Requires structural analysis data[/dim]")
 
 
+# ============ Export Commands ============
+
+@main.group()
+def export():
+    """Export results to various formats"""
+    pass
+
+
+@export.command("csv")
+@click.argument("results_dir")
+@click.option("--output", "-o", default="results.csv", help="Output file")
+def export_csv(results_dir, output):
+    """Export results to CSV"""
+    from surfscreen.export import ExportManager
+    
+    manager = ExportManager(results_dir)
+    manager.to_csv(output)
+    console.print(f"[green]✓[/green] Exported to: {output}")
+
+
+@export.command("json")
+@click.argument("results_dir")
+@click.option("--output", "-o", default="results_export.json", help="Output file")
+def export_json(results_dir, output):
+    """Export results to JSON"""
+    from surfscreen.export import ExportManager
+    
+    manager = ExportManager(results_dir)
+    manager.to_json(output)
+    console.print(f"[green]✓[/green] Exported to: {output}")
+
+
+@export.command("excel")
+@click.argument("results_dir")
+@click.option("--output", "-o", default="results.xlsx", help="Output file")
+def export_excel(results_dir, output):
+    """Export results to Excel (requires pandas, openpyxl)"""
+    from surfscreen.export import ExportManager
+    
+    manager = ExportManager(results_dir)
+    manager.to_excel(output)
+    console.print(f"[green]✓[/green] Exported to: {output}")
+
+
+@export.command("zip")
+@click.argument("results_dir")
+@click.option("--output", "-o", default="results.zip", help="Output file")
+@click.option("--structures/--no-structures", default=True, help="Include structure files")
+@click.option("--trajectories/--no-trajectories", default=True, help="Include trajectory files")
+def export_zip(results_dir, output, structures, trajectories):
+    """Export all results as ZIP archive"""
+    from surfscreen.export import ExportManager, ExportConfig
+    
+    config = ExportConfig(
+        include_structures=structures,
+        include_trajectories=trajectories
+    )
+    manager = ExportManager(results_dir, config)
+    manager.to_zip(output)
+    console.print(f"[green]✓[/green] Exported to: {output}")
+
+
+# ============ Template Commands ============
+
+@main.group()
+def template():
+    """Workflow template management"""
+    pass
+
+
+@template.command("list")
+def template_list():
+    """List available templates"""
+    from surfscreen.templates import TemplateEngine
+    
+    engine = TemplateEngine()
+    templates = engine.list_templates()
+    
+    if not templates:
+        console.print("[yellow]No templates found. Run 'surfscreen template install-defaults' first.[/yellow]")
+        return
+        
+    table = Table(title="Available Templates")
+    table.add_column("Name")
+    table.add_column("Description")
+    table.add_column("Version")
+    
+    for t in templates:
+        table.add_row(t["name"], t["description"], t["version"])
+        
+    console.print(table)
+
+
+@template.command("install-defaults")
+def template_install_defaults():
+    """Install default workflow templates"""
+    from surfscreen.templates import install_default_templates
+    
+    console.print("[bold]Installing default templates...[/bold]")
+    install_default_templates()
+    console.print("[green]✓[/green] Default templates installed")
+
+
+@template.command("run")
+@click.argument("template_name")
+@click.option("--var", "-v", multiple=True, help="Variable override (key=value)")
+@click.option("--dry-run", is_flag=True, help="Show commands without executing")
+@click.option("--output-dir", "-o", default=".", help="Working directory")
+def template_run(template_name, var, dry_run, output_dir):
+    """Run a workflow template"""
+    from surfscreen.templates import TemplateEngine
+    
+    variables = {}
+    for v in var:
+        if "=" in v:
+            key, value = v.split("=", 1)
+            variables[key] = value
+            
+    engine = TemplateEngine()
+    result = engine.run_template(template_name, variables, dry_run=dry_run, output_dir=output_dir)
+    
+    if result["success"]:
+        console.print("[green]✓[/green] Template completed successfully")
+    else:
+        console.print("[red]✗[/red] Template failed")
+
+
+# ============ Coverage Analysis ============
+
+@analysis.command("coverage")
+@click.argument("structure")
+@click.option("--n-surface", default=0, help="Number of surface atoms (0=auto)")
+@click.option("--mol-area", default=10.0, help="Molecular footprint area (Å²)")
+def analysis_coverage(structure, n_surface, mol_area):
+    """Calculate surface coverage"""
+    from ase.io import read
+    from surfscreen.analysis import CoverageAnalyzer
+    
+    atoms = read(structure)
+    analyzer = CoverageAnalyzer(atoms, n_surface)
+    result = analyzer.calculate_coverage(mol_area)
+    
+    console.print(f"\n[bold]Coverage Analysis: {structure}[/bold]")
+    console.print(f"Surface area: {result.surface_area:.2f} Å²")
+    console.print(f"Adsorbates: {result.n_adsorbates}")
+    console.print(f"Coverage (abs): {result.coverage_abs:.4f} mol/Å²")
+    console.print(f"Coverage (ML): {result.coverage_ml:.2%}")
+
+
+# ============ Phonon Analysis ============
+
+@analysis.command("phonon")
+@click.argument("structure")
+@click.option("--engine", default="mace", type=click.Choice(["mace", "xtb"]))
+@click.option("--delta", default=0.01, help="Displacement (Å)")
+def analysis_phonon(structure, engine, delta):
+    """Calculate vibrational frequencies"""
+    from ase.io import read
+    from surfscreen.analysis import PhononAnalyzer
+    
+    console.print(f"\n[bold]Phonon Analysis: {structure}[/bold]")
+    
+    atoms = read(structure)
+    
+    # Calculator setup
+    if engine == "mace":
+        from mace.calculators import mace_mp
+        calc = mace_mp(model="medium", device="cpu", default_dtype="float64")
+    else:
+        from xtb.ase.calculator import XTB
+        calc = XTB(method="GFN2-xTB")
+        
+    analyzer = PhononAnalyzer(atoms, calc, delta)
+    result = analyzer.calculate_vibrations()
+    
+    console.print(f"Frequencies: {len(result.frequencies_cm1)} modes")
+    console.print(f"ZPE: {result.zpe:.4f} eV")
+    console.print(f"Imaginary modes: {result.n_imaginary}")
+    
+    if len(result.frequencies_cm1) > 0:
+        console.print(f"Min freq: {result.frequencies_cm1.min():.1f} cm⁻¹")
+        console.print(f"Max freq: {result.frequencies_cm1.max():.1f} cm⁻¹")
+
+
+@analysis.command("gibbs")
+@click.argument("structure")
+@click.option("--temperature", "-T", default=298.15, help="Temperature (K)")
+@click.option("--engine", default="mace", type=click.Choice(["mace", "xtb"]))
+def analysis_gibbs(structure, temperature, engine):
+    """Calculate Gibbs free energy"""
+    from ase.io import read
+    from surfscreen.analysis import PhononAnalyzer
+    
+    console.print(f"\n[bold]Gibbs Free Energy: {structure}[/bold]")
+    
+    atoms = read(structure)
+    
+    if engine == "mace":
+        from mace.calculators import mace_mp
+        calc = mace_mp(model="medium", device="cpu", default_dtype="float64")
+    else:
+        from xtb.ase.calculator import XTB
+        calc = XTB(method="GFN2-xTB")
+        
+    analyzer = PhononAnalyzer(atoms, calc)
+    result = analyzer.calculate_thermodynamics(temperature)
+    
+    console.print(f"Temperature: {temperature} K")
+    console.print(f"E_pot: {result.E_pot:.4f} eV")
+    console.print(f"ZPE: {result.ZPE:.4f} eV")
+    console.print(f"H: {result.H:.4f} eV")
+    console.print(f"G: {result.G:.4f} eV")
+
+
+# ============ Materials Project ============
+
+@surface.command("from-mp")
+@click.argument("material_id")
+@click.option("--miller", default="111", help="Miller indices")
+@click.option("--layers", default=4, help="Number of layers")
+@click.option("--vacuum", default=15.0, help="Vacuum (Å)")
+@click.option("--output", "-o", required=True, help="Output file")
+def surface_from_mp(material_id, miller, layers, vacuum, output):
+    """Create surface from Materials Project structure"""
+    from surfscreen.integrations import MPIntegration
+    from ase.io import write
+    
+    console.print(f"\n[bold]Creating surface from MP: {material_id}[/bold]")
+    
+    miller_tuple = tuple(int(x) for x in miller)
+    
+    try:
+        mp = MPIntegration()
+        slab = mp.create_surface(material_id, miller_tuple, layers, vacuum)
+        write(output, slab, format="extxyz")
+        console.print(f"[green]✓[/green] Surface saved: {output}")
+        console.print(f"  Atoms: {len(slab)}")
+    except ImportError as e:
+        console.print(f"[red]{e}[/red]")
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+
+
+@surface.command("search-mp")
+@click.argument("formula")
+@click.option("--limit", default=10, help="Max results")
+def surface_search_mp(formula, limit):
+    """Search materials in Materials Project"""
+    from surfscreen.integrations import MPIntegration
+    
+    console.print(f"\n[bold]Searching MP: {formula}[/bold]")
+    
+    try:
+        mp = MPIntegration()
+        results = mp.search_materials(formula=formula, max_results=limit)
+        
+        table = Table(title=f"Materials Project: {formula}")
+        table.add_column("ID")
+        table.add_column("Formula")
+        table.add_column("Spacegroup")
+        table.add_column("E_hull (eV)")
+        
+        for r in results:
+            table.add_row(
+                r["material_id"],
+                r["formula"],
+                str(r["spacegroup"] or ""),
+                f"{r['energy_above_hull']:.3f}" if r['energy_above_hull'] else ""
+            )
+            
+        console.print(table)
+    except ImportError as e:
+        console.print(f"[red]{e}[/red]")
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+
+
 if __name__ == "__main__":
     main()
+
