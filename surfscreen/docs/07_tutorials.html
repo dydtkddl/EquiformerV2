@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7. 튜토리얼 - SurfScreen Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">Surf<span>Screen</span></a>
+            <nav>
+                <a href="01_introduction.html">소개</a>
+                <a href="02_installation.html">설치</a>
+                <a href="03_quickstart.html">빠른 시작</a>
+                <a href="05_cli_reference.html">CLI</a>
+                <a href="06_api_reference.html">API</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="doc-container">
+        <aside class="sidebar">
+            <h3>튜토리얼</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#tutorial1">7.1 Cu(111)-CO 흡착</a></li>
+                <li><a href="#tutorial2">7.2 배치 스크리닝</a></li>
+                <li><a href="#tutorial3">7.3 MD 시뮬레이션</a></li>
+                <li><a href="#tutorial4">7.4 이온전도도 분석</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="breadcrumb">
+                <a href="index.html">홈</a> / <span>7. 튜토리얼</span>
+            </div>
+
+            <h1>7. 튜토리얼</h1>
+            <p>실제 사례를 통한 단계별 가이드입니다.</p>
+
+            <section id="tutorial1">
+                <h2>7.1 Cu(111) 표면에 CO 분자 흡착</h2>
+                <p>가장 기본적인 표면 흡착 스크리닝 예제입니다.</p>
+
+                <h3>목표</h3>
+                <ul>
+                    <li>Cu(111) 표면 생성</li>
+                    <li>CO 분자 준비</li>
+                    <li>흡착 에너지 계산</li>
+                    <li>최적 흡착 구조 찾기</li>
+                </ul>
+
+                <h3>Step 1: 표면 생성</h3>
+                <div class="code-block">
+# CLI 사용
+surfscreen surface create Cu --miller 111 --supercell 3x3x1 --layers 4 -o Cu111.extxyz
+
+# Python API
+from surfscreen import SurfaceBuilder
+
+surf = SurfaceBuilder.create(
+    element="Cu",
+    miller=(1, 1, 1),
+    supercell=(3, 3, 1),
+    layers=4,
+    vacuum=15.0
+)
+surf.fix_bottom_layers(2)
+surf.save("Cu111.extxyz")
+                </div>
+
+                <h3>Step 2: 분자 준비</h3>
+                <div class="code-block">
+# CLI 사용
+surfscreen molecule from-pubchem CO -o co.xyz
+
+# Python API
+from surfscreen import MoleculeBuilder
+
+mol = MoleculeBuilder.from_pubchem("carbon monoxide")
+mol.optimize(engine="xtb")
+mol.save("co.xyz")
+                </div>
+
+                <h3>Step 3: 스크리닝 실행</h3>
+                <div class="code-block">
+surfscreen screen run \
+    -s Cu111.extxyz \
+    -m co.xyz \
+    --engine mace \
+    --model medium \
+    --rotations 8 \
+    --heights 1.8,2.0,2.2 \
+    -o results/cu_co/
+                </div>
+
+                <h3>Step 4: 결과 분석</h3>
+                <div class="code-block">
+# 결과 조회
+surfscreen screen results results/cu_co/ --top 5
+
+# 리포트 생성
+surfscreen screen report results/cu_co/ -o cu_co_report.html
+                </div>
+
+                <h3>예상 결과</h3>
+                <table>
+                    <thead>
+                        <tr><th>사이트</th><th>E_ads (eV)</th><th>높이 (Å)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>top</td><td>-0.52</td><td>1.85</td></tr>
+                        <tr><td>bridge</td><td>-0.48</td><td>1.92</td></tr>
+                        <tr><td>hollow (fcc)</td><td>-0.45</td><td>2.01</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="tutorial2">
+                <h2>7.2 다중 분자 배치 스크리닝</h2>
+                <p>여러 분자를 한 번에 스크리닝하는 고급 워크플로우입니다.</p>
+
+                <h3>시나리오</h3>
+                <p>Pt(111) 표면에서 알코올 계열 분자들(메탄올, 에탄올, 프로판올)의 흡착 특성 비교</p>
+
+                <h3>배치 스크립트</h3>
+                <div class="code-block">
+#!/bin/bash
+# batch_screen.sh
+
+SURFACE="Pt111.extxyz"
+MOLECULES=("methanol" "ethanol" "propanol")
+
+# 표면 생성
+surfscreen surface create Pt --miller 111 --supercell 4x4x1 -o $SURFACE
+
+# 각 분자에 대해 스크리닝
+for mol in "${MOLECULES[@]}"; do
+    echo "Processing $mol..."
+    
+    # 분자 다운로드
+    surfscreen molecule from-pubchem "$mol" -o "${mol}.xyz"
+    
+    # 스크리닝 실행
+    surfscreen screen run \
+        -s $SURFACE \
+        -m "${mol}.xyz" \
+        --engine mace \
+        --rotations 12 \
+        -o "results/${mol}/"
+done
+
+echo "All screening complete!"
+                </div>
+
+                <h3>결과 비교</h3>
+                <div class="code-block">
+# Python으로 결과 비교
+import json
+from pathlib import Path
+
+molecules = ["methanol", "ethanol", "propanol"]
+results = {}
+
+for mol in molecules:
+    with open(f"results/{mol}/results.json") as f:
+        data = json.load(f)
+        results[mol] = min(data["configurations"], key=lambda x: x["energy"])
+
+for mol, best in results.items():
+    print(f"{mol}: E_ads = {best['energy']:.3f} eV")
+                </div>
+            </section>
+
+            <section id="tutorial3">
+                <h2>7.3 분자 동역학 시뮬레이션</h2>
+                <p>MACE를 사용한 NVT MD 시뮬레이션입니다.</p>
+
+                <h3>목표</h3>
+                <ul>
+                    <li>최적화된 구조에서 MD 시작</li>
+                    <li>300K에서 10ps 시뮬레이션</li>
+                    <li>트라젝토리 분석</li>
+                </ul>
+
+                <h3>Step 1: MD 실행</h3>
+                <div class="code-block">
+# 최적화된 구조에서 MD 시작
+surfscreen md run optimized.xyz \
+    --ensemble nvt \
+    --temperature 300 \
+    --timestep 1.0 \
+    --steps 10000 \
+    --thermostat langevin \
+    --engine mace \
+    --device cuda \
+    -o md_300K/
+                </div>
+
+                <h3>Step 2: 상태 모니터링</h3>
+                <div class="code-block">
+# MD 진행 상태 확인
+surfscreen md status md_300K/
+
+# 출력 예시:
+# Step: 5000/10000 (50%)
+# Time: 5.0 ps
+# Temperature: 298.5 K
+# Energy: -123.456 eV
+                </div>
+
+                <h3>Step 3: 트라젝토리 분석</h3>
+                <div class="code-block">
+# MSD 계산
+surfscreen analysis msd md_300K/trajectory.traj -s Li -o msd.html
+
+# RDF 계산
+surfscreen analysis rdf md_300K/trajectory.traj -p Li-O -o rdf.html
+                </div>
+            </section>
+
+            <section id="tutorial4">
+                <h2>7.4 고체 전해질 이온전도도 분석</h2>
+                <p>MD 시뮬레이션에서 이온전도도를 계산하는 워크플로우입니다.</p>
+
+                <h3>워크플로우</h3>
+                <ol>
+                    <li>다양한 온도에서 MD 실행 (300K, 400K, 500K, 600K)</li>
+                    <li>각 온도에서 MSD 계산</li>
+                    <li>확산 계수 추출</li>
+                    <li>Arrhenius 플롯으로 활성화 에너지 계산</li>
+                </ol>
+
+                <h3>Python 스크립트</h3>
+                <div class="code-block">
+from surfscreen.md import MDEngine, MDConfig
+from surfscreen.analysis import DynamicsAnalyzer
+from surfscreen.visualization import create_arrhenius_plot
+from ase.io import read
+import numpy as np
+
+# 온도 범위
+temperatures = [300, 400, 500, 600]
+diffusion_data = []
+
+atoms = read("solid_electrolyte.xyz")
+
+for T in temperatures:
+    # MD 설정
+    config = MDConfig(
+        ensemble="nvt",
+        temperature=float(T),
+        timestep=1.0,
+        steps=50000,  # 50 ps
+        engine="mace",
+        device="cuda"
+    )
+    
+    # MD 실행
+    md = MDEngine(atoms.copy(), config, output_dir=f"md_{T}K")
+    md.run()
+    
+    # 확산 계수 계산
+    analyzer = DynamicsAnalyzer(f"md_{T}K/trajectory.traj", timestep=1.0)
+    result = analyzer.calculate_diffusion("Li")
+    
+    diffusion_data.append({
+        "temperature": T,
+        "diffusion": result.D,
+        "error": result.D_error
+    })
+    print(f"{T}K: D = {result.D:.2e} cm²/s")
+
+# Arrhenius 플롯
+create_arrhenius_plot(
+    temperatures=[d["temperature"] for d in diffusion_data],
+    diffusion_coefficients=[d["diffusion"] for d in diffusion_data],
+    output_path="arrhenius.html"
+)
+                </div>
+
+                <h3>결과 해석</h3>
+                <p>Arrhenius 플롯에서 기울기로 활성화 에너지(Ea)를 계산합니다:</p>
+                <div class="code-block">
+# Ea = -slope × kB × ln(10)
+# 예: slope = -5000 K → Ea ≈ 0.43 eV
+                </div>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="06_api_reference.html" class="btn-nav">← 이전: API 참조</a>
+                <a href="08_faq.html" class="btn-nav btn-next">다음: FAQ →</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>SurfScreen v0.2.0 Documentation</p>
+    </footer>
+</body>
+</html>

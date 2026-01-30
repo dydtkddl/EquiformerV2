@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6. API 참조 - SurfScreen Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">Surf<span>Screen</span></a>
+            <nav>
+                <a href="01_introduction.html">소개</a>
+                <a href="02_installation.html">설치</a>
+                <a href="03_quickstart.html">빠른 시작</a>
+                <a href="05_cli_reference.html">CLI</a>
+                <a href="06_api_reference.html" class="active">API</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="doc-container">
+        <aside class="sidebar">
+            <h3>클래스</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#moleculebuilder">MoleculeBuilder</a></li>
+                <li><a href="#surfacebuilder">SurfaceBuilder</a></li>
+                <li><a href="#adsorptionsystem">AdsorptionSystem</a></li>
+                <li><a href="#adsorptiongenerator">AdsorptionGenerator</a></li>
+                <li><a href="#calculator">CalculatorFactory</a></li>
+                <li><a href="#mdconfig">MDConfig</a></li>
+                <li><a href="#mdengine">MDEngine</a></li>
+                <li><a href="#structuralanalyzer">StructuralAnalyzer</a></li>
+                <li><a href="#dynamicsanalyzer">DynamicsAnalyzer</a></li>
+                <li><a href="#thermodynamicanalyzer">ThermodynamicAnalyzer</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="breadcrumb">
+                <a href="index.html">홈</a> / <span>6. API 참조</span>
+            </div>
+
+            <h1>6. API 참조</h1>
+            <p>SurfScreen Python API의 클래스와 메서드 참조입니다.</p>
+
+            <section id="moleculebuilder">
+                <h2>MoleculeBuilder</h2>
+                <p>분자 구조를 생성하고 조작하는 클래스입니다.</p>
+
+                <h3>class surfscreen.MoleculeBuilder</h3>
+                <div class="code-block">
+from surfscreen import MoleculeBuilder
+                </div>
+
+                <h4>클래스 메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th><th>반환</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>from_pubchem(name: str)</code></td>
+                            <td>PubChem에서 분자 다운로드</td>
+                            <td>MoleculeBuilder</td>
+                        </tr>
+                        <tr>
+                            <td><code>from_file(path: str)</code></td>
+                            <td>파일에서 분자 로드</td>
+                            <td>MoleculeBuilder</td>
+                        </tr>
+                        <tr>
+                            <td><code>from_smiles(smiles: str)</code></td>
+                            <td>SMILES에서 분자 생성</td>
+                            <td>MoleculeBuilder</td>
+                        </tr>
+                        <tr>
+                            <td><code>from_atoms(atoms: Atoms)</code></td>
+                            <td>ASE Atoms에서 생성</td>
+                            <td>MoleculeBuilder</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>인스턴스 속성</h4>
+                <table>
+                    <thead>
+                        <tr><th>속성</th><th>타입</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>atoms</code></td><td>ase.Atoms</td><td>ASE Atoms 객체</td></tr>
+                        <tr><td><code>n_atoms</code></td><td>int</td><td>원자 수</td></tr>
+                        <tr><td><code>formula</code></td><td>str</td><td>화학식</td></tr>
+                        <tr><td><code>mass</code></td><td>float</td><td>분자량 (amu)</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>인스턴스 메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>optimize(engine: str, fmax: float = 0.05)</code></td>
+                            <td>기하 구조 최적화</td>
+                        </tr>
+                        <tr>
+                            <td><code>save(path: str)</code></td>
+                            <td>파일로 저장</td>
+                        </tr>
+                        <tr>
+                            <td><code>center()</code></td>
+                            <td>질량 중심을 원점으로 이동</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="surfacebuilder">
+                <h2>SurfaceBuilder</h2>
+                <p>표면 슬랩을 생성하는 클래스입니다.</p>
+
+                <h3>class surfscreen.SurfaceBuilder</h3>
+
+                <h4>클래스 메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>create(element, miller, supercell, layers, vacuum)</code></td>
+                            <td>표면 슬랩 생성</td>
+                        </tr>
+                        <tr>
+                            <td><code>from_file(path: str)</code></td>
+                            <td>파일에서 표면 로드</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>create() 파라미터</h4>
+                <div class="code-block">
+SurfaceBuilder.create(
+    element: str,         # 원소 기호 (Cu, Au, ...)
+    miller: tuple,        # 밀러 지수 (1, 1, 1)
+    supercell: tuple,     # 슈퍼셀 크기 (3, 3, 1)
+    layers: int = 4,      # 원자층 수
+    vacuum: float = 15.0  # 진공 두께 (Å)
+) -> SurfaceBuilder
+                </div>
+
+                <h4>인스턴스 메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>fix_bottom_layers(n: int)</code></td>
+                            <td>하층 n개 고정 (FixAtoms constraint)</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_surface_atoms()</code></td>
+                            <td>표면 원자 인덱스 반환</td>
+                        </tr>
+                        <tr>
+                            <td><code>save(path: str)</code></td>
+                            <td>파일로 저장</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="adsorptionsystem">
+                <h2>AdsorptionSystem</h2>
+                <p>표면-분자 흡착 시스템을 관리합니다.</p>
+
+                <div class="code-block">
+from surfscreen.adsorption import AdsorptionSystem
+
+ads = AdsorptionSystem(surface, molecule)
+                </div>
+
+                <h4>생성자</h4>
+                <div class="code-block">
+AdsorptionSystem(
+    surface: SurfaceBuilder | Atoms,
+    molecule: MoleculeBuilder | Atoms
+)
+                </div>
+
+                <h4>주요 메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th><th>반환</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>detect_sites()</code></td>
+                            <td>흡착 사이트 감지</td>
+                            <td>List[Dict]</td>
+                        </tr>
+                        <tr>
+                            <td><code>place_molecule(position, rotation)</code></td>
+                            <td>분자 배치</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>optimize(engine, fmax)</code></td>
+                            <td>기하 최적화</td>
+                            <td>Dict</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_adsorption_energy()</code></td>
+                            <td>흡착 에너지 계산</td>
+                            <td>float (eV)</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_combined_atoms()</code></td>
+                            <td>결합된 ASE Atoms 반환</td>
+                            <td>Atoms</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="adsorptiongenerator">
+                <h2>AdsorptionGenerator</h2>
+                <p>흡착 구성을 자동 생성합니다.</p>
+
+                <div class="code-block">
+from surfscreen.adsorption import AdsorptionGenerator, AdsorptionConfig
+
+gen = AdsorptionGenerator(surface, molecule)
+                </div>
+
+                <h4>주요 메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>detect_adsorption_sites()</code></td>
+                            <td>표면 사이트 자동 감지</td>
+                        </tr>
+                        <tr>
+                            <td><code>detect_molecule_centers()</code></td>
+                            <td>분자 중심 원자 감지</td>
+                        </tr>
+                        <tr>
+                            <td><code>generate_configurations(rotations, heights, max_configs)</code></td>
+                            <td>구성 생성</td>
+                        </tr>
+                        <tr>
+                            <td><code>filter_overlapping(min_distance)</code></td>
+                            <td>겹침 필터링</td>
+                        </tr>
+                        <tr>
+                            <td><code>save_configs(output_dir, format)</code></td>
+                            <td>구성 저장</td>
+                        </tr>
+                        <tr>
+                            <td><code>visualize_html(output_path)</code></td>
+                            <td>HTML 미리보기 생성</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="calculator">
+                <h2>CalculatorFactory</h2>
+                <p>계산 엔진 팩토리입니다.</p>
+
+                <div class="code-block">
+from surfscreen import CalculatorFactory
+
+calc = CalculatorFactory.create(engine="mace", model="medium", device="cuda")
+                </div>
+
+                <h4>create() 파라미터</h4>
+                <table>
+                    <thead>
+                        <tr><th>파라미터</th><th>타입</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>engine</code></td><td>str</td><td>"mace", "xtb", "cp2k"</td></tr>
+                        <tr><td><code>model</code></td><td>str</td><td>MACE: "small", "medium", "large"</td></tr>
+                        <tr><td><code>device</code></td><td>str</td><td>"cuda" 또는 "cpu"</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="mdconfig">
+                <h2>MDConfig</h2>
+                <p>MD 시뮬레이션 설정 데이터클래스입니다.</p>
+
+                <div class="code-block">
+from surfscreen.md import MDConfig
+
+config = MDConfig(
+    ensemble="nvt",
+    temperature=300.0,
+    timestep=1.0,
+    steps=10000,
+    thermostat="langevin",
+    engine="mace",
+    device="cuda"
+)
+                </div>
+
+                <h4>속성</h4>
+                <table>
+                    <thead>
+                        <tr><th>속성</th><th>타입</th><th>기본값</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>ensemble</code></td><td>str</td><td>"nvt"</td><td>nvt, npt, nve</td></tr>
+                        <tr><td><code>temperature</code></td><td>float</td><td>300.0</td><td>온도 (K)</td></tr>
+                        <tr><td><code>pressure</code></td><td>float</td><td>1.0</td><td>압력 (bar)</td></tr>
+                        <tr><td><code>timestep</code></td><td>float</td><td>1.0</td><td>시간 간격 (fs)</td></tr>
+                        <tr><td><code>steps</code></td><td>int</td><td>10000</td><td>총 스텝 수</td></tr>
+                        <tr><td><code>thermostat</code></td><td>str</td><td>"langevin"</td><td>langevin, berendsen</td></tr>
+                        <tr><td><code>barostat</code></td><td>str</td><td>"berendsen"</td><td>berendsen, pr</td></tr>
+                        <tr><td><code>log_interval</code></td><td>int</td><td>100</td><td>로그 간격</td></tr>
+                        <tr><td><code>checkpoint_interval</code></td><td>int</td><td>1000</td><td>체크포인트 간격</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="mdengine">
+                <h2>MDEngine</h2>
+                <p>MD 시뮬레이션 실행 클래스입니다.</p>
+
+                <div class="code-block">
+from surfscreen.md import MDEngine, MDConfig
+
+md = MDEngine(atoms, config, output_dir="md_output")
+summary = md.run()
+                </div>
+
+                <h4>메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th><th>반환</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>run()</code></td><td>MD 시뮬레이션 실행</td><td>Dict (summary)</td></tr>
+                        <tr><td><code>continue_from_checkpoint(path, steps)</code></td><td>체크포인트에서 재개</td><td>Dict</td></tr>
+                        <tr><td><code>get_status()</code></td><td>현재 상태 조회</td><td>Dict</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="structuralanalyzer">
+                <h2>StructuralAnalyzer</h2>
+                <p>흡착 구조 분석 클래스입니다.</p>
+
+                <div class="code-block">
+from surfscreen.analysis import StructuralAnalyzer
+
+analyzer = StructuralAnalyzer(atoms, n_surface_atoms=64)
+                </div>
+
+                <h4>메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th><th>반환</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>calculate_adsorption_height()</code></td><td>흡착 높이</td><td>float (Å)</td></tr>
+                        <tr><td><code>calculate_min_distance()</code></td><td>최소 원자간 거리</td><td>float (Å)</td></tr>
+                        <tr><td><code>calculate_tilt_angle()</code></td><td>분자 기울기</td><td>float (°)</td></tr>
+                        <tr><td><code>calculate_bond_lengths(cutoff)</code></td><td>결합 길이</td><td>Dict</td></tr>
+                        <tr><td><code>calculate_coordination(cutoff)</code></td><td>배위수</td><td>Dict</td></tr>
+                        <tr><td><code>classify_site_type()</code></td><td>사이트 분류</td><td>str</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="dynamicsanalyzer">
+                <h2>DynamicsAnalyzer</h2>
+                <p>MD 트라젝토리 분석 클래스입니다.</p>
+
+                <div class="code-block">
+from surfscreen.analysis import DynamicsAnalyzer
+
+analyzer = DynamicsAnalyzer("trajectory.traj", timestep=1.0)
+                </div>
+
+                <h4>메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th><th>반환</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>calculate_msd(species)</code></td><td>MSD 계산</td><td>MSDResult</td></tr>
+                        <tr><td><code>calculate_diffusion(species)</code></td><td>확산 계수</td><td>DiffusionResult</td></tr>
+                        <tr><td><code>calculate_conductivity(species, charge, temperature)</code></td><td>이온 전도도</td><td>ConductivityResult</td></tr>
+                        <tr><td><code>calculate_rdf(pair, r_max, n_bins)</code></td><td>RDF</td><td>RDFResult</td></tr>
+                        <tr><td><code>calculate_vaf(species)</code></td><td>속도 자기상관</td><td>Dict</td></tr>
+                        <tr><td><code>calculate_density_profile(species, axis)</code></td><td>밀도 프로파일</td><td>Dict</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="thermodynamicanalyzer">
+                <h2>ThermodynamicAnalyzer</h2>
+                <p>열역학 분석 클래스입니다.</p>
+
+                <div class="code-block">
+from surfscreen.analysis import ThermodynamicAnalyzer
+
+thermo = ThermodynamicAnalyzer()
+thermo.load_from_directory("results/")
+                </div>
+
+                <h4>메서드</h4>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>설명</th><th>반환</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>add_configuration(name, energy)</code></td><td>구성 추가</td><td>None</td></tr>
+                        <tr><td><code>load_from_directory(path)</code></td><td>디렉토리에서 로드</td><td>int</td></tr>
+                        <tr><td><code>calculate_boltzmann(temperature)</code></td><td>Boltzmann 분포</td><td>BoltzmannDistribution</td></tr>
+                        <tr><td><code>calculate_free_energy(atoms, name, temperature)</code></td><td>자유 에너지</td><td>FreeEnergyResult</td></tr>
+                        <tr><td><code>get_ranking(by, top_n)</code></td><td>순위 반환</td><td>List[Tuple]</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="05_cli_reference.html" class="btn-nav">← 이전: CLI 참조</a>
+                <a href="07_tutorials.html" class="btn-nav btn-next">다음: 튜토리얼 →</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>SurfScreen v0.2.0 Documentation</p>
+    </footer>
+</body>
+</html>

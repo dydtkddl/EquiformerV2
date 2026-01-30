@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4. 핵심 모듈 - SurfScreen Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">Surf<span>Screen</span></a>
+            <nav>
+                <a href="01_introduction.html">소개</a>
+                <a href="02_installation.html">설치</a>
+                <a href="03_quickstart.html">빠른 시작</a>
+                <a href="05_cli_reference.html">CLI</a>
+                <a href="06_api_reference.html">API</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="doc-container">
+        <aside class="sidebar">
+            <h3>목차</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#molecule">4.1 Molecule</a></li>
+                <li><a href="#surface">4.2 Surface</a></li>
+                <li><a href="#adsorption">4.3 Adsorption</a></li>
+                <li><a href="#calculator">4.4 Calculator</a></li>
+                <li><a href="#md">4.5 MD Engine</a></li>
+                <li><a href="#analysis">4.6 Analysis</a></li>
+                <li><a href="#visualization">4.7 Visualization</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="breadcrumb">
+                <a href="index.html">홈</a> / <span>4. 핵심 모듈</span>
+            </div>
+
+            <h1>4. 핵심 모듈 (Core Modules)</h1>
+            <p>SurfScreen의 모듈별 상세 기능과 사용법을 설명합니다.</p>
+
+            <section id="molecule">
+                <h2>4.1 Molecule 모듈</h2>
+                <p>분자 구조를 생성, 로드, 조작하는 모듈입니다.</p>
+
+                <h3>주요 클래스</h3>
+                <div class="code-block">
+from surfscreen import MoleculeBuilder
+
+# PubChem에서 분자 다운로드
+mol = MoleculeBuilder.from_pubchem("acetone")
+
+# 파일에서 로드
+mol = MoleculeBuilder.from_file("molecule.xyz")
+
+# SMILES에서 생성
+mol = MoleculeBuilder.from_smiles("CC(=O)C")
+
+# 분자 정보 조회
+print(f"원자 수: {mol.n_atoms}")
+print(f"질량: {mol.mass} amu")
+print(f"화학식: {mol.formula}")
+
+# 기하 최적화
+mol.optimize(engine="xtb")
+
+# 저장
+mol.save("optimized.xyz")
+                </div>
+
+                <h3>지원 입력 소스</h3>
+                <table>
+                    <thead>
+                        <tr><th>소스</th><th>메서드</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>PubChem</td><td><code>from_pubchem(name)</code></td><td>이름으로 검색 후 3D 구조 다운로드</td></tr>
+                        <tr><td>파일</td><td><code>from_file(path)</code></td><td>XYZ, CIF, MOL 등 지원</td></tr>
+                        <tr><td>SMILES</td><td><code>from_smiles(smiles)</code></td><td>RDKit으로 3D 구조 생성</td></tr>
+                        <tr><td>ASE Atoms</td><td><code>from_atoms(atoms)</code></td><td>ASE 객체에서 직접 생성</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="surface">
+                <h2>4.2 Surface 모듈</h2>
+                <p>금속/산화물 표면 슬랩을 생성하는 모듈입니다.</p>
+
+                <div class="code-block">
+from surfscreen import SurfaceBuilder
+
+# 표면 생성
+surf = SurfaceBuilder.create(
+    element="Cu",
+    miller=[1, 1, 1],
+    supercell=(3, 3, 1),
+    layers=4,
+    vacuum=15.0  # Å
+)
+
+# 표면 정보
+print(f"밀러 지수: {surf.miller}")
+print(f"원자 수: {surf.n_atoms}")
+print(f"표면적: {surf.area} Å²")
+
+# 하층 고정
+surf.fix_bottom_layers(2)
+
+# 저장
+surf.save("surface.extxyz")
+                </div>
+
+                <h3>지원 원소</h3>
+                <p>FCC: Cu, Au, Ag, Pt, Pd, Ni, Al, Rh, Ir</p>
+                <p>BCC: Fe, W, Mo, Ta, Cr, V</p>
+                <p>HCP: Ti, Zr, Hf, Mg, Zn, Co</p>
+            </section>
+
+            <section id="adsorption">
+                <h2>4.3 Adsorption 모듈</h2>
+                <p>흡착 시스템 및 구성 생성을 담당합니다.</p>
+
+                <h3>AdsorptionSystem</h3>
+                <div class="code-block">
+from surfscreen.adsorption import AdsorptionSystem
+
+# 흡착 시스템 생성
+ads = AdsorptionSystem(surface, molecule)
+
+# 사이트 감지
+sites = ads.detect_sites()
+print(f"감지된 사이트: {len(sites)}")
+# top: 4, bridge: 4, hollow: 4
+
+# 특정 위치에 분자 배치
+ads.place_molecule(
+    position=[5.0, 5.0, 12.0],
+    rotation=[0, 0, 45]  # degrees
+)
+
+# 최적화
+ads.optimize(engine="mace", fmax=0.05)
+
+# 흡착 에너지 계산
+E_ads = ads.get_adsorption_energy()
+print(f"E_ads = {E_ads:.3f} eV")
+                </div>
+
+                <h3>AdsorptionGenerator</h3>
+                <div class="code-block">
+from surfscreen.adsorption import AdsorptionGenerator
+
+# 구성 생성기
+gen = AdsorptionGenerator(surface, molecule)
+
+# 구성 생성
+configs = gen.generate_configurations(
+    rotations=[0, 45, 90, 135],
+    heights=[2.0, 2.5],
+    max_configs=100
+)
+
+# 겹침 필터링
+valid = gen.filter_overlapping(min_distance=1.5)
+print(f"유효 구성: {len(valid)}")
+
+# 저장
+gen.save_configs("configs/")
+
+# HTML 미리보기
+gen.visualize_html("preview.html")
+                </div>
+            </section>
+
+            <section id="calculator">
+                <h2>4.4 Calculator 모듈</h2>
+                <p>다양한 계산 엔진을 통합 인터페이스로 제공합니다.</p>
+
+                <div class="code-block">
+from surfscreen import CalculatorFactory
+
+# 사용 가능한 엔진 확인
+print(CalculatorFactory.available())
+# ['mace', 'xtb', 'cp2k']
+
+# MACE 계산기 생성
+calc = CalculatorFactory.create(
+    engine="mace",
+    model="medium",
+    device="cuda"  # 또는 "cpu"
+)
+
+# xTB 계산기
+calc = CalculatorFactory.create(
+    engine="xtb",
+    method="GFN2-xTB"
+)
+
+# ASE Atoms에 연결
+atoms.calc = calc.get_ase_calculator()
+energy = atoms.get_potential_energy()
+                </div>
+
+                <h3>엔진 비교</h3>
+                <table>
+                    <thead>
+                        <tr><th>엔진</th><th>속도</th><th>정확도</th><th>GPU</th><th>용도</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>MACE</td><td>⚡⚡⚡</td><td>★★★★</td><td>✅</td><td>금속/유기물</td></tr>
+                        <tr><td>xTB</td><td>⚡⚡</td><td>★★★</td><td>❌</td><td>유기 분자</td></tr>
+                        <tr><td>CP2K</td><td>⚡</td><td>★★★★★</td><td>❌</td><td>DFT 검증</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="md">
+                <h2>4.5 MD Engine 모듈</h2>
+                <p>분자 동역학 시뮬레이션을 실행합니다.</p>
+
+                <div class="code-block">
+from surfscreen.md import MDEngine, MDConfig
+
+# 설정
+config = MDConfig(
+    ensemble="nvt",       # nvt, npt, nve
+    temperature=300.0,    # K
+    timestep=1.0,         # fs
+    steps=10000,
+    thermostat="langevin",
+    engine="mace",
+    device="cuda"
+)
+
+# MD 실행
+md = MDEngine(atoms, config, output_dir="md_output")
+summary = md.run()
+
+# 결과
+print(f"총 시간: {summary['total_time_fs']} fs")
+print(f"평균 온도: {summary['avg_temperature_K']:.1f} K")
+                </div>
+
+                <h3>앙상블 옵션</h3>
+                <table>
+                    <thead>
+                        <tr><th>앙상블</th><th>열조절기</th><th>기압조절기</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>NVT</td><td>Langevin, Berendsen</td><td>-</td></tr>
+                        <tr><td>NPT</td><td>Berendsen</td><td>Berendsen, PR</td></tr>
+                        <tr><td>NVE</td><td>-</td><td>-</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="analysis">
+                <h2>4.6 Analysis 모듈</h2>
+                <p>구조, 동역학, 열역학 분석 도구입니다.</p>
+
+                <h3>구조 분석</h3>
+                <div class="code-block">
+from surfscreen.analysis import StructuralAnalyzer
+
+analyzer = StructuralAnalyzer(atoms, n_surface_atoms=64)
+
+height = analyzer.calculate_adsorption_height()  # Å
+tilt = analyzer.calculate_tilt_angle()           # degrees
+site = analyzer.classify_site_type()             # "top"/"bridge"/"hollow"
+                </div>
+
+                <h3>동역학 분석</h3>
+                <div class="code-block">
+from surfscreen.analysis import DynamicsAnalyzer
+
+analyzer = DynamicsAnalyzer("trajectory.traj", timestep=1.0)
+
+# MSD 및 확산계수
+msd = analyzer.calculate_msd("Li")
+diffusion = analyzer.calculate_diffusion("Li")
+print(f"D = {diffusion.D:.2e} cm²/s")
+
+# RDF
+rdf = analyzer.calculate_rdf(("Li", "O"))
+
+# 이온전도도
+cond = analyzer.calculate_conductivity("Li", charge=1, temperature=300)
+print(f"σ = {cond.sigma:.2e} S/cm")
+                </div>
+
+                <h3>열역학 분석</h3>
+                <div class="code-block">
+from surfscreen.analysis import ThermodynamicAnalyzer
+
+thermo = ThermodynamicAnalyzer()
+thermo.load_from_directory("results/")
+
+boltzmann = thermo.calculate_boltzmann(temperature=300)
+print(f"최고 확률 구성: {boltzmann.names[0]}")
+                </div>
+            </section>
+
+            <section id="visualization">
+                <h2>4.7 Visualization 모듈</h2>
+                <p>인터랙티브 HTML 플롯 생성 도구입니다.</p>
+
+                <div class="code-block">
+from surfscreen.visualization import (
+    create_energy_distribution_plot,
+    create_msd_plot,
+    create_rdf_plot,
+    create_boltzmann_plot,
+    create_arrhenius_plot
+)
+
+# 에너지 분포
+create_energy_distribution_plot(
+    energies=[-1.2, -1.0, -0.8, ...],
+    names=["config1", "config2", ...],
+    output_path="energy_dist.html"
+)
+
+# MSD 플롯
+create_msd_plot(
+    time=[0, 1, 2, ...],
+    msd=[0, 0.5, 1.2, ...],
+    species="Li",
+    output_path="msd.html"
+)
+                </div>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="03_quickstart.html" class="btn-nav">← 이전: 빠른 시작</a>
+                <a href="05_cli_reference.html" class="btn-nav btn-next">다음: CLI 참조 →</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>SurfScreen v0.2.0 Documentation</p>
+    </footer>
+</body>
+</html>

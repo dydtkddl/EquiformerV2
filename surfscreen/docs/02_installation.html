@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. 설치 - SurfScreen Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">Surf<span>Screen</span></a>
+            <nav>
+                <a href="01_introduction.html">소개</a>
+                <a href="02_installation.html" class="active">설치</a>
+                <a href="03_quickstart.html">빠른 시작</a>
+                <a href="05_cli_reference.html">CLI</a>
+                <a href="06_api_reference.html">API</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="doc-container">
+        <aside class="sidebar">
+            <h3>목차</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#requirements">2.1 시스템 요구사항</a></li>
+                <li><a href="#pip-install">2.2 pip 설치</a></li>
+                <li><a href="#source-install">2.3 소스에서 설치</a></li>
+                <li><a href="#dependencies">2.4 의존성 설치</a></li>
+                <li><a href="#mace">2.5 MACE 설정</a></li>
+                <li><a href="#verify">2.6 설치 확인</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="breadcrumb">
+                <a href="index.html">홈</a> / <span>2. 설치</span>
+            </div>
+
+            <h1>2. 설치 (Installation)</h1>
+
+            <section id="requirements">
+                <h2>2.1 시스템 요구사항</h2>
+                
+                <h3>최소 요구사항</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>구성요소</th>
+                            <th>최소</th>
+                            <th>권장</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Python</td>
+                            <td>3.9</td>
+                            <td>3.10+</td>
+                        </tr>
+                        <tr>
+                            <td>메모리</td>
+                            <td>8 GB</td>
+                            <td>32 GB+</td>
+                        </tr>
+                        <tr>
+                            <td>디스크</td>
+                            <td>10 GB</td>
+                            <td>50 GB+</td>
+                        </tr>
+                        <tr>
+                            <td>GPU (선택)</td>
+                            <td>CUDA 11.0+</td>
+                            <td>CUDA 12.0+ / RTX 3090+</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <h4>💡 권장 환경</h4>
+                    <p>최상의 성능을 위해 NVIDIA GPU가 있는 Linux 서버를 권장합니다. 
+                    MACE 계산은 GPU에서 10배 이상 빨라집니다.</p>
+                </div>
+            </section>
+
+            <section id="pip-install">
+                <h2>2.2 pip 설치</h2>
+                <p>가장 간단한 설치 방법:</p>
+
+                <div class="code-block">
+pip install surfscreen
+                </div>
+
+                <p>GPU 지원을 위한 설치:</p>
+                <div class="code-block">
+pip install surfscreen[cuda]
+                </div>
+            </section>
+
+            <section id="source-install">
+                <h2>2.3 소스에서 설치</h2>
+                <p>개발용 또는 최신 버전이 필요한 경우:</p>
+
+                <div class="code-block">
+# 저장소 클론
+git clone https://github.com/user/surfscreen.git
+cd surfscreen
+
+# 가상환경 생성 및 활성화
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# venv\Scripts\activate   # Windows
+
+# 개발 모드로 설치
+pip install -e ".[dev]"
+                </div>
+            </section>
+
+            <section id="dependencies">
+                <h2>2.4 의존성 설치</h2>
+                
+                <h3>핵심 의존성</h3>
+                <p>SurfScreen이 자동으로 설치하는 패키지:</p>
+                <ul>
+                    <li><code>ase</code> - Atomic Simulation Environment</li>
+                    <li><code>numpy</code> - 수치 계산</li>
+                    <li><code>scipy</code> - 과학 계산</li>
+                    <li><code>click</code> - CLI 프레임워크</li>
+                    <li><code>rich</code> - 터미널 출력</li>
+                    <li><code>pymatgen</code> - 재료 분석</li>
+                </ul>
+
+                <h3>선택적 의존성</h3>
+                <div class="code-block">
+# MACE ML 포텐셜
+pip install mace-torch
+
+# xTB 계산기
+pip install xtb
+
+# 시각화 (선택)
+pip install plotly
+                </div>
+            </section>
+
+            <section id="mace">
+                <h2>2.5 MACE 설정</h2>
+                <p>MACE는 SurfScreen의 기본 계산 엔진입니다:</p>
+
+                <div class="code-block">
+# MACE 설치
+pip install mace-torch
+
+# GPU 지원 확인
+python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
+                </div>
+
+                <h3>MACE 모델 다운로드</h3>
+                <p>첫 실행 시 자동으로 다운로드되거나, 수동 다운로드:</p>
+                <div class="code-block">
+# 사전 훈련된 모델 사용 (자동 다운로드)
+# mace_mp("medium") - 중간 정확도, 빠름
+# mace_mp("large") - 높은 정확도, 느림
+
+# 또는 직접 다운로드
+python -c "from mace.calculators import mace_mp; mace_mp(model='medium')"
+                </div>
+
+                <div class="warning-box">
+                    <h4>⚠️ GPU 메모리</h4>
+                    <p>MACE large 모델은 최소 8GB GPU 메모리가 필요합니다. 
+                    메모리 부족 시 medium 또는 small 모델을 사용하세요.</p>
+                </div>
+            </section>
+
+            <section id="verify">
+                <h2>2.6 설치 확인</h2>
+                <p>설치가 올바른지 확인:</p>
+
+                <div class="code-block">
+# 버전 확인
+surfscreen --version
+
+# 도움말 표시
+surfscreen --help
+
+# 계산 엔진 확인
+surfscreen config show
+                </div>
+
+                <h3>예상 출력</h3>
+                <div class="code-block">
+$ surfscreen --version
+SurfScreen v0.2.0
+
+$ surfscreen config show
+SurfScreen Configuration
+Available engines: ['mace', 'xtb']
+Available elements: ['Cu', 'Au', 'Ag', 'Pt', 'Pd', 'Ni', ...]
+                </div>
+
+                <div class="success-box">
+                    <h4>✅ 설치 완료!</h4>
+                    <p>이제 <a href="03_quickstart.html">빠른 시작</a>으로 이동하여 
+                    첫 번째 스크리닝을 실행해보세요.</p>
+                </div>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="01_introduction.html" class="btn-nav">← 이전: 소개</a>
+                <a href="03_quickstart.html" class="btn-nav btn-next">다음: 빠른 시작 →</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>SurfScreen v0.2.0 Documentation</p>
+    </footer>
+</body>
+</html>

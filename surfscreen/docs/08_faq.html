@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8. FAQ - SurfScreen Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">Surf<span>Screen</span></a>
+            <nav>
+                <a href="01_introduction.html">소개</a>
+                <a href="02_installation.html">설치</a>
+                <a href="03_quickstart.html">빠른 시작</a>
+                <a href="05_cli_reference.html">CLI</a>
+                <a href="06_api_reference.html">API</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="doc-container">
+        <aside class="sidebar">
+            <h3>FAQ 카테고리</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#installation">설치</a></li>
+                <li><a href="#usage">사용법</a></li>
+                <li><a href="#performance">성능</a></li>
+                <li><a href="#errors">오류 해결</a></li>
+                <li><a href="#advanced">고급</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="breadcrumb">
+                <a href="index.html">홈</a> / <span>8. FAQ</span>
+            </div>
+
+            <h1>8. 자주 묻는 질문 (FAQ)</h1>
+
+            <section id="installation">
+                <h2>설치 관련</h2>
+
+                <div class="faq-item">
+                    <h3>Q: MACE 설치 시 CUDA 오류가 발생합니다</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> PyTorch와 CUDA 버전이 일치하는지 확인하세요:</p>
+                        <div class="code-block">
+# CUDA 버전 확인
+nvidia-smi
+
+# PyTorch CUDA 버전 확인
+python -c "import torch; print(torch.version.cuda)"
+
+# 필요 시 재설치
+pip install torch --index-url https://download.pytorch.org/whl/cu121
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: ASE와 pymatgen 버전 충돌이 발생합니다</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 다음 순서로 설치하세요:</p>
+                        <div class="code-block">
+pip install ase==3.22.1
+pip install pymatgen==2024.1.26
+pip install surfscreen
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: 가상환경 없이 설치할 수 있나요?</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 가능하지만 권장하지 않습니다. 의존성 충돌을 피하기 위해 반드시 가상환경을 사용하세요:</p>
+                        <div class="code-block">
+conda create -n surfscreen python=3.10
+conda activate surfscreen
+pip install surfscreen
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="usage">
+                <h2>사용법 관련</h2>
+
+                <div class="faq-item">
+                    <h3>Q: 어떤 파일 형식을 지원하나요?</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> ASE가 지원하는 모든 형식을 지원합니다:</p>
+                        <ul>
+                            <li><strong>입력:</strong> xyz, extxyz, cif, poscar, mol, sdf</li>
+                            <li><strong>출력:</strong> extxyz (권장), xyz, cif</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: 여러 분자를 동시에 스크리닝할 수 있나요?</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 현재는 한 번에 하나의 분자만 스크리닝됩니다. 배치 스크립트를 사용하세요:</p>
+                        <div class="code-block">
+for mol in molecule1.xyz molecule2.xyz molecule3.xyz; do
+    surfscreen screen run -s surface.xyz -m $mol -o results/$(basename $mol .xyz)/
+done
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: 흡착 사이트가 감지되지 않습니다</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 표면 파일에 cell 정보가 포함되어 있는지 확인하세요. extxyz 형식 사용을 권장합니다:</p>
+                        <div class="code-block">
+# Python에서 cell 확인
+from ase.io import read
+atoms = read("surface.xyz")
+print(atoms.cell)  # cell이 모두 0이면 문제
+
+# 올바른 저장
+from ase.io import write
+write("surface.extxyz", atoms)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="performance">
+                <h2>성능 관련</h2>
+
+                <div class="faq-item">
+                    <h3>Q: GPU 사용량이 낮습니다</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 배치 크기를 늘리거나 병렬 처리를 활성화하세요. 원자 수가 적으면 GPU 효율이 떨어집니다.</p>
+                        <div class="code-block">
+# 환경변수로 배치 크기 설정
+export MACE_BATCH_SIZE=8
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: 메모리 부족 오류가 발생합니다</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 원자 수가 많으면 메모리 사용량이 증가합니다. 해결 방법:</p>
+                        <ul>
+                            <li>smaller MACE 모델 사용 (<code>--model small</code>)</li>
+                            <li>supercell 크기 축소</li>
+                            <li>CPU 모드 사용 (<code>--device cpu</code>)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: 스크리닝에 얼마나 걸리나요?</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 시스템 크기와 하드웨어에 따라 다릅니다:</p>
+                        <table>
+                            <thead>
+                                <tr><th>시스템</th><th>GPU</th><th>CPU</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>~50 atoms</td><td>~5분</td><td>~30분</td></tr>
+                                <tr><td>~100 atoms</td><td>~15분</td><td>~2시간</td></tr>
+                                <tr><td>~200 atoms</td><td>~1시간</td><td>~8시간</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="errors">
+                <h2>오류 해결</h2>
+
+                <div class="faq-item">
+                    <h3>Q: "CUDA out of memory" 오류</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> GPU 메모리가 부족합니다:</p>
+                        <div class="code-block">
+# 다른 프로세스 확인
+nvidia-smi
+
+# 메모리 정리
+import torch
+torch.cuda.empty_cache()
+
+# CPU 모드로 전환
+surfscreen screen run ... --device cpu
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: "Cell has zero volume" 오류</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 표면 파일에 unit cell 정보가 없습니다:</p>
+                        <div class="code-block">
+from ase.io import read, write
+from ase.build import fcc111
+
+# 올바른 표면 생성
+surf = fcc111("Cu", size=(3,3,4), vacuum=15.0)
+write("Cu111.extxyz", surf)  # cell 정보 포함
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: 최적화가 수렴하지 않습니다</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> fmax 값을 높이거나 최대 스텝 수를 늘리세요:</p>
+                        <div class="code-block">
+surfscreen screen run ... --fmax 0.1 --max-steps 500
+                        </div>
+                        <p>초기 구조가 매우 불안정할 경우 먼저 xTB로 pre-optimization을 수행하세요.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="advanced">
+                <h2>고급 사용법</h2>
+
+                <div class="faq-item">
+                    <h3>Q: 커스텀 MACE 모델을 사용할 수 있나요?</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> 네, 모델 경로를 직접 지정할 수 있습니다:</p>
+                        <div class="code-block">
+from surfscreen import CalculatorFactory
+
+calc = CalculatorFactory.create(
+    engine="mace",
+    model="/path/to/my_model.model",
+    device="cuda"
+)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: DFT 검증은 어떻게 하나요?</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> CP2K 엔진을 사용하세요:</p>
+                        <div class="code-block">
+calc = CalculatorFactory.create(
+    engine="cp2k",
+    inp_file="cp2k.inp",
+    pseudo_dir="/path/to/pseudopotentials"
+)
+                        </div>
+                        <p>또는 상위 N개 구조만 DFT로 검증하는 것을 권장합니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <h3>Q: 결과를 다른 형식으로 내보낼 수 있나요?</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> JSON과 CSV 형식을 지원합니다:</p>
+                        <div class="code-block">
+# JSON 결과
+cat results/results.json
+
+# CSV 변환
+import json
+import pandas as pd
+
+with open("results/results.json") as f:
+    data = json.load(f)
+    
+df = pd.DataFrame(data["configurations"])
+df.to_csv("results.csv", index=False)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="07_tutorials.html" class="btn-nav">← 이전: 튜토리얼</a>
+                <a href="index.html" class="btn-nav btn-next">처음으로 →</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>SurfScreen v0.2.0 Documentation</p>
+    </footer>
+</body>
+</html>

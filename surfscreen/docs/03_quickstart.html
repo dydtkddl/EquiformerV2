@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3. 빠른 시작 - SurfScreen Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">Surf<span>Screen</span></a>
+            <nav>
+                <a href="01_introduction.html">소개</a>
+                <a href="02_installation.html">설치</a>
+                <a href="03_quickstart.html" class="active">빠른 시작</a>
+                <a href="05_cli_reference.html">CLI</a>
+                <a href="06_api_reference.html">API</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="doc-container">
+        <aside class="sidebar">
+            <h3>목차</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#overview">3.1 개요</a></li>
+                <li><a href="#step1">3.2 표면 생성</a></li>
+                <li><a href="#step2">3.3 분자 준비</a></li>
+                <li><a href="#step3">3.4 스크리닝 실행</a></li>
+                <li><a href="#step4">3.5 결과 분석</a></li>
+                <li><a href="#step5">3.6 리포트 생성</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="breadcrumb">
+                <a href="index.html">홈</a> / <span>3. 빠른 시작</span>
+            </div>
+
+            <h1>3. 빠른 시작 (Quick Start)</h1>
+
+            <section id="overview">
+                <h2>3.1 개요</h2>
+                <p>
+                    이 가이드에서는 Cu(111) 표면에 아세톤(acetone) 분자의 흡착을 
+                    스크리닝하는 전체 워크플로우를 5분 안에 완료합니다.
+                </p>
+
+                <div class="info-box">
+                    <h4>📋 준비물</h4>
+                    <ul>
+                        <li>SurfScreen 설치 완료 (<a href="02_installation.html">설치 가이드</a>)</li>
+                        <li>MACE 또는 xTB 계산기 활성화</li>
+                        <li>인터넷 연결 (PubChem 다운로드용)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="step1">
+                <h2>3.2 Step 1: 표면 생성</h2>
+                <p>Cu(111) 표면 슬랩을 생성합니다:</p>
+
+                <div class="code-block">
+surfscreen surface create Cu --miller 111 --supercell 3x3x1 --layers 4 -o Cu111.extxyz
+                </div>
+
+                <h4>옵션 설명</h4>
+                <ul>
+                    <li><code>Cu</code> - 원소 기호</li>
+                    <li><code>--miller 111</code> - 밀러 지수</li>
+                    <li><code>--supercell 3x3x1</code> - 슈퍼셀 크기 (3×3 표면, 1층 반복)</li>
+                    <li><code>--layers 4</code> - 원자층 수 (일반적으로 3-5)</li>
+                    <li><code>-o</code> - 출력 파일명</li>
+                </ul>
+
+                <div class="success-box">
+                    <h4>✅ 결과</h4>
+                    <p><code>Cu111.extxyz</code> 파일이 생성됩니다 (36개 Cu 원자).</p>
+                </div>
+            </section>
+
+            <section id="step2">
+                <h2>3.3 Step 2: 분자 준비</h2>
+                <p>PubChem에서 아세톤 분자를 다운로드합니다:</p>
+
+                <div class="code-block">
+surfscreen molecule from-pubchem acetone -o acetone.xyz
+                </div>
+
+                <p>또는 기존 파일을 사용:</p>
+                <div class="code-block">
+surfscreen molecule from-file my_molecule.xyz -o molecule.xyz
+                </div>
+
+                <h4>지원 포맷</h4>
+                <ul>
+                    <li><code>.xyz</code> - XYZ 형식</li>
+                    <li><code>.extxyz</code> - Extended XYZ</li>
+                    <li><code>.cif</code> - CIF 형식</li>
+                    <li><code>.mol</code> - Mol 형식</li>
+                </ul>
+            </section>
+
+            <section id="step3">
+                <h2>3.4 Step 3: 스크리닝 실행</h2>
+                <p>표면과 분자를 사용하여 흡착 스크리닝을 실행합니다:</p>
+
+                <div class="code-block">
+surfscreen screen run \
+    -s Cu111.extxyz \
+    -m acetone.xyz \
+    --engine mace \
+    --model medium \
+    --rotations 4 \
+    --heights 2.0,2.5,3.0 \
+    -o results/
+                </div>
+
+                <h4>옵션 설명</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>옵션</th>
+                            <th>설명</th>
+                            <th>기본값</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>-s</code></td>
+                            <td>표면 파일</td>
+                            <td>(필수)</td>
+                        </tr>
+                        <tr>
+                            <td><code>-m</code></td>
+                            <td>분자 파일</td>
+                            <td>(필수)</td>
+                        </tr>
+                        <tr>
+                            <td><code>--engine</code></td>
+                            <td>계산 엔진</td>
+                            <td>mace</td>
+                        </tr>
+                        <tr>
+                            <td><code>--model</code></td>
+                            <td>MACE 모델 크기</td>
+                            <td>medium</td>
+                        </tr>
+                        <tr>
+                            <td><code>--rotations</code></td>
+                            <td>회전 샘플 수 (0°, 90°, ...)</td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td><code>--heights</code></td>
+                            <td>흡착 높이 (Å)</td>
+                            <td>2.0</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>실행 중 출력 예시</h4>
+                <div class="code-block">
+🔬 SurfScreen Adsorption Screening
+
+Surface: Cu111.extxyz (36 atoms)
+Molecule: acetone.xyz (10 atoms)
+Engine: mace (medium)
+
+Detecting adsorption sites...
+  Found 12 sites: 4 top, 4 bridge, 4 hollow
+
+Generating configurations...
+  Total: 144 configurations
+
+🚀 Running screening...
+  [████████████████████████████████████████] 144/144 (100%)
+  
+✅ Screening completed!
+   Best: site_top_0_rot0_h2.0 (-1.234 eV)
+   Output: results/
+                </div>
+            </section>
+
+            <section id="step4">
+                <h2>3.5 Step 4: 결과 분석</h2>
+                <p>스크리닝 결과를 분석합니다:</p>
+
+                <div class="code-block">
+# 결과 요약
+surfscreen screen results results/
+
+# 상위 10개 구성
+surfscreen screen results results/ --top 10
+
+# Boltzmann 분포 분석
+surfscreen analysis boltzmann results/ -T 300 -o boltzmann.html
+                </div>
+
+                <h4>출력 예시</h4>
+                <div class="code-block">
+📊 Screening Results Summary
+
+Total configurations: 144
+Valid configurations: 138 (95.8%)
+Energy range: -1.234 to -0.156 eV
+
+Top 5 Configurations:
+  1. site_top_0_rot0_h2.0    -1.234 eV
+  2. site_top_1_rot90_h2.0   -1.198 eV
+  3. site_bridge_0_rot45_h2.5 -1.156 eV
+  4. site_hollow_2_rot0_h2.0  -1.089 eV
+  5. site_top_2_rot180_h2.5   -1.045 eV
+                </div>
+            </section>
+
+            <section id="step5">
+                <h2>3.6 Step 5: 리포트 생성</h2>
+                <p>인터랙티브 HTML 리포트를 생성합니다:</p>
+
+                <div class="code-block">
+surfscreen screen report results/ -o report.html
+                </div>
+
+                <p>브라우저에서 열기:</p>
+                <div class="code-block">
+# Linux
+xdg-open report.html
+
+# Mac
+open report.html
+
+# Windows
+start report.html
+                </div>
+
+                <h4>리포트 기능</h4>
+                <ul>
+                    <li>📊 에너지 분포 차트</li>
+                    <li>🔬 3D 구조 시각화 (3Dmol.js)</li>
+                    <li>📈 사이트별 비교</li>
+                    <li>🎞️ 최적화 트라젝토리 재생</li>
+                    <li>📋 상세 데이터 테이블</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>다음 단계</h2>
+                <ul>
+                    <li><a href="04_core_modules.html">핵심 모듈 상세</a> - 각 모듈의 깊은 이해</li>
+                    <li><a href="05_cli_reference.html">CLI 레퍼런스</a> - 모든 명령 옵션</li>
+                    <li><a href="07_tutorials.html">튜토리얼</a> - 고급 워크플로우</li>
+                </ul>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="02_installation.html" class="btn-nav">← 이전: 설치</a>
+                <a href="04_core_modules.html" class="btn-nav btn-next">다음: 핵심 모듈 →</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>SurfScreen v0.2.0 Documentation</p>
+    </footer>
+</body>
+</html>

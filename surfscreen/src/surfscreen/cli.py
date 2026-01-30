@@ -5,6 +5,7 @@ Click 기반 명령행 인터페이스
 """
 
 import os
+from pathlib import Path
 
 # CPU 스레드 기본값 설정 (라이브러리 import 전에!)
 def _set_cpu_threads():
