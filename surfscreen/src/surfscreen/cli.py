@@ -414,5 +414,417 @@ def config_show():
     console.print(f"Available elements: {SurfaceBuilder.available_elements()}")
 
 
+# ============ Adsorb Commands ============
+
+@main.group()
+def adsorb():
+    """Adsorption configuration operations"""
+    pass
+
+
+@adsorb.command("generate")
+@click.option("--surface", "-s", required=True, help="Surface structure file")
+@click.option("--molecule", "-m", required=True, help="Molecule structure file")
+@click.option("--rotations", "-r", default="0,45,90,135", help="Rotation angles (degrees)")
+@click.option("--heights", "-H", default="2.0", help="Adsorption heights (Å)")
+@click.option("--max-configs", default=100, help="Maximum configurations")
+@click.option("--output", "-o", default="configs", help="Output directory")
+def adsorb_generate(surface, molecule, rotations, heights, max_configs, output):
+    """Generate adsorption configurations"""
+    from ase.io import read
+    from surfscreen.surface.builder import Surface
+    from surfscreen.adsorption.generator import AdsorptionGenerator
+    
+    console.print("\n[bold]🎯 Generating adsorption configurations[/bold]\n")
+    
+    # Load structures
+    surf_atoms = read(surface)
+    mol_atoms = read(molecule)
+    
+    surf = Surface(atoms=surf_atoms, name=Path(surface).stem)
+    
+    # Parse options
+    rot_list = [float(r) for r in rotations.split(",")]
+    height_list = [float(h) for h in heights.split(",")]
+    
+    # Generate
+    generator = AdsorptionGenerator(surf, mol_atoms)
+    configs = generator.generate_configurations(
+        rotations=rot_list,
+        heights=height_list,
+        max_configs=max_configs
+    )
+    
+    # Filter overlapping
+    valid_configs = generator.filter_overlapping(min_distance=1.5)
+    
+    console.print(f"Generated: {len(configs)} configurations")
+    console.print(f"Valid (no overlap): {len(valid_configs)} configurations")
+    
+    # Save
+    saved = generator.save_configs(output)
+    console.print(f"\n[green]✓[/green] Saved to: {output}/")
+    
+    # Generate preview
+    preview_path = generator.visualize_html(f"{output}/preview.html")
+    console.print(f"[green]✓[/green] Preview: {preview_path}")
+
+
+@adsorb.command("visualize")
+@click.argument("configs_dir")
+@click.option("--output", "-o", default="configs_preview.html", help="Output HTML file")
+def adsorb_visualize(configs_dir, output):
+    """Visualize adsorption configurations"""
+    from ase.io import read
+    from surfscreen.surface.builder import Surface
+    from surfscreen.adsorption.generator import AdsorptionGenerator, AdsorptionConfig
+    import json
+    
+    configs_path = Path(configs_dir)
+    
+    # Load metadata
+    meta_path = configs_path / "configs_metadata.json"
+    if meta_path.exists():
+        with open(meta_path) as f:
+            metadata = json.load(f)
+    else:
+        metadata = {"configs": []}
+    
+    console.print(f"\n[bold]🔍 Loading configurations from {configs_dir}[/bold]\n")
+    
+    # Load structures
+    xyz_files = list(configs_path.glob("*.xyz")) + list(configs_path.glob("*.extxyz"))
+    console.print(f"Found {len(xyz_files)} configuration files")
+    
+    # Generate HTML preview
+    from surfscreen.visualization import create_energy_distribution_plot
+    
+    console.print(f"[green]✓[/green] Preview generation not yet implemented for existing configs")
+
+
+# ============ MD Commands ============
+
+@main.group()
+def md():
+    """Molecular dynamics operations"""
+    pass
+
+
+@md.command("run")
+@click.argument("structure")
+@click.option("--ensemble", default="nvt", type=click.Choice(["nvt", "npt", "nve"]))
+@click.option("--temperature", "-T", default=300.0, help="Temperature (K)")
+@click.option("--pressure", "-P", default=1.0, help="Pressure (bar, NPT only)")
+@click.option("--timestep", default=1.0, help="Timestep (fs)")
+@click.option("--steps", "-n", default=10000, help="Number of steps")
+@click.option("--thermostat", default="langevin", type=click.Choice(["langevin", "berendsen"]))
+@click.option("--engine", default="mace", type=click.Choice(["mace", "xtb"]))
+@click.option("--model", default="medium", help="MACE model size")
+@click.option("--device", default="cuda", type=click.Choice(["cuda", "cpu"]))
+@click.option("--output", "-o", default="md_output", help="Output directory")
+def md_run(structure, ensemble, temperature, pressure, timestep, steps, 
+           thermostat, engine, model, device, output):
+    """Run molecular dynamics simulation"""
+    from ase.io import read
+    from surfscreen.md import MDEngine, MDConfig
+    
+    console.print("\n[bold]🚀 Molecular Dynamics Simulation[/bold]\n")
+    console.print(f"Structure: {structure}")
+    console.print(f"Ensemble: {ensemble.upper()}")
+    console.print(f"Temperature: {temperature} K")
+    console.print(f"Steps: {steps}")
+    console.print(f"Engine: {engine}")
+    console.print()
+    
+    # Load structure
+    atoms = read(structure)
+    
+    # Configure
+    config = MDConfig(
+        ensemble=ensemble,
+        temperature=temperature,
+        pressure=pressure,
+        timestep=timestep,
+        steps=steps,
+        thermostat=thermostat,
+        engine=engine,
+        model=model,
+        device=device
+    )
+    
+    # Run
+    md_engine = MDEngine(atoms, config, output)
+    summary = md_engine.run()
+    
+    console.print("\n[bold green]✓ MD completed![/bold green]")
+
+
+@md.command("continue")
+@click.argument("checkpoint_dir")
+@click.option("--steps", "-n", default=10000, help="Additional steps")
+def md_continue(checkpoint_dir, steps):
+    """Continue MD from checkpoint"""
+    from surfscreen.md import MDEngine
+    
+    console.print(f"\n[bold]🔄 Continuing MD from {checkpoint_dir}[/bold]\n")
+    
+    md_engine = MDEngine.continue_from_checkpoint(checkpoint_dir, steps)
+    summary = md_engine.run()
+    
+    console.print("\n[bold green]✓ MD continued![/bold green]")
+
+
+@md.command("status")
+@click.argument("output_dir")
+def md_status(output_dir):
+    """Check MD simulation status"""
+    import json
+    
+    output_path = Path(output_dir)
+    
+    console.print(f"\n[bold]📊 MD Status: {output_dir}[/bold]\n")
+    
+    # Check for summary
+    summary_path = output_path / "summary.json"
+    if summary_path.exists():
+        with open(summary_path) as f:
+            summary = json.load(f)
+        
+        console.print(f"Total steps: {summary.get('total_steps', 'N/A')}")
+        console.print(f"Total time: {summary.get('total_time_fs', 'N/A')} fs")
+        console.print(f"Avg temperature: {summary.get('avg_temperature_K', 'N/A'):.1f} K")
+        console.print(f"Wall time: {summary.get('wall_time_s', 'N/A'):.1f} s")
+    else:
+        # Check for checkpoint
+        checkpoint_path = output_path / "checkpoint_state.json"
+        if checkpoint_path.exists():
+            with open(checkpoint_path) as f:
+                state = json.load(f)
+            console.print(f"[yellow]In progress...[/yellow]")
+            console.print(f"Current step: {state.get('step', 'N/A')}")
+        else:
+            console.print("[red]No MD data found[/red]")
+
+
+# ============ Analysis Commands ============
+
+@main.group()
+def analysis():
+    """Analysis operations"""
+    pass
+
+
+@analysis.command("height")
+@click.argument("structure")
+@click.option("--n-surface", default=0, help="Number of surface atoms (0 = auto)")
+def analysis_height(structure, n_surface):
+    """Calculate adsorption height"""
+    from ase.io import read
+    from surfscreen.analysis import StructuralAnalyzer
+    
+    atoms = read(structure)
+    analyzer = StructuralAnalyzer(atoms, n_surface_atoms=n_surface)
+    
+    height = analyzer.calculate_adsorption_height()
+    min_dist = analyzer.calculate_min_distance()
+    tilt = analyzer.calculate_tilt_angle()
+    site = analyzer.classify_site_type()
+    
+    console.print(f"\n[bold]📏 Structural Analysis: {structure}[/bold]\n")
+    console.print(f"Adsorption height: {height:.3f} Å")
+    console.print(f"Minimum distance: {min_dist:.3f} Å")
+    console.print(f"Tilt angle: {tilt:.1f}°")
+    console.print(f"Site type: {site}")
+
+
+@analysis.command("msd")
+@click.argument("trajectory")
+@click.option("--species", "-s", required=True, help="Atom species (e.g., Li)")
+@click.option("--timestep", default=1.0, help="Timestep (fs)")
+@click.option("--output", "-o", default="msd_plot.html", help="Output plot")
+def analysis_msd(trajectory, species, timestep, output):
+    """Calculate Mean Square Displacement"""
+    from surfscreen.analysis import DynamicsAnalyzer
+    from surfscreen.visualization import create_msd_plot
+    
+    console.print(f"\n[bold]📈 MSD Analysis: {species}[/bold]\n")
+    
+    analyzer = DynamicsAnalyzer(trajectory, timestep=timestep)
+    msd_result = analyzer.calculate_msd(species)
+    
+    console.print(f"Frames analyzed: {len(msd_result.time)}")
+    console.print(f"Final MSD: {msd_result.msd[-1]:.3f} Å²")
+    
+    # Calculate diffusion
+    diffusion = analyzer.calculate_diffusion(species)
+    console.print(f"\nDiffusion coefficient: {diffusion.D:.2e} cm²/s")
+    console.print(f"R² = {diffusion.r_squared:.4f}")
+    
+    # Create plot
+    create_msd_plot(
+        msd_result.time.tolist(),
+        msd_result.msd.tolist(),
+        species,
+        diffusion.to_dict(),
+        output
+    )
+    console.print(f"\n[green]✓[/green] Plot saved: {output}")
+
+
+@analysis.command("diffusion")
+@click.argument("trajectory")
+@click.option("--species", "-s", required=True, help="Atom species")
+@click.option("--timestep", default=1.0, help="Timestep (fs)")
+@click.option("--fit-start", default=0.2, help="Fit start (fraction)")
+@click.option("--fit-end", default=0.8, help="Fit end (fraction)")
+def analysis_diffusion(trajectory, species, timestep, fit_start, fit_end):
+    """Calculate diffusion coefficient"""
+    from surfscreen.analysis import DynamicsAnalyzer
+    
+    console.print(f"\n[bold]🔬 Diffusion Analysis: {species}[/bold]\n")
+    
+    analyzer = DynamicsAnalyzer(trajectory, timestep=timestep)
+    result = analyzer.calculate_diffusion(species, fit_start=fit_start, fit_end=fit_end)
+    
+    console.print(f"Diffusion coefficient: {result.D:.4e} cm²/s")
+    console.print(f"Error: ±{result.D_error:.4e} cm²/s")
+    console.print(f"D_x: {result.D_x:.4e} cm²/s")
+    console.print(f"D_y: {result.D_y:.4e} cm²/s")
+    console.print(f"D_z: {result.D_z:.4e} cm²/s")
+    console.print(f"R² = {result.r_squared:.4f}")
+
+
+@analysis.command("conductivity")
+@click.argument("trajectory")
+@click.option("--species", "-s", required=True, help="Ion species")
+@click.option("--charge", "-z", required=True, type=int, help="Ion charge")
+@click.option("--temperature", "-T", required=True, type=float, help="Temperature (K)")
+@click.option("--timestep", default=1.0, help="Timestep (fs)")
+def analysis_conductivity(trajectory, species, charge, temperature, timestep):
+    """Calculate ionic conductivity"""
+    from surfscreen.analysis import DynamicsAnalyzer
+    
+    console.print(f"\n[bold]⚡ Conductivity Analysis: {species}[/bold]\n")
+    
+    analyzer = DynamicsAnalyzer(trajectory, timestep=timestep)
+    result = analyzer.calculate_conductivity(species, charge, temperature)
+    
+    console.print(f"Ionic conductivity: {result.sigma:.4e} S/cm")
+    console.print(f"Error: ±{result.sigma_error:.4e} S/cm")
+    console.print(f"Temperature: {result.temperature} K")
+    console.print(f"Number of carriers: {result.n_carriers}")
+    console.print(f"Volume: {result.volume:.1f} ų")
+
+
+@analysis.command("rdf")
+@click.argument("trajectory")
+@click.option("--pair", "-p", required=True, help="Atom pair (e.g., Li-O)")
+@click.option("--rmax", default=10.0, help="Maximum distance (Å)")
+@click.option("--timestep", default=1.0, help="Timestep (fs)")
+@click.option("--output", "-o", default="rdf_plot.html", help="Output plot")
+def analysis_rdf(trajectory, pair, rmax, timestep, output):
+    """Calculate Radial Distribution Function"""
+    from surfscreen.analysis import DynamicsAnalyzer
+    from surfscreen.visualization import create_rdf_plot
+    
+    pair_tuple = tuple(pair.split("-"))
+    
+    console.print(f"\n[bold]🔵 RDF Analysis: {pair}[/bold]\n")
+    
+    analyzer = DynamicsAnalyzer(trajectory, timestep=timestep)
+    result = analyzer.calculate_rdf(pair_tuple, r_max=rmax)
+    
+    console.print(f"First peak: r = {result.first_peak_r:.3f} Å, g(r) = {result.first_peak_g:.2f}")
+    console.print(f"Coordination number: {result.coordination_number:.2f}")
+    
+    # Create plot
+    create_rdf_plot(
+        result.r.tolist(),
+        result.g_r.tolist(),
+        pair_tuple,
+        output
+    )
+    console.print(f"\n[green]✓[/green] Plot saved: {output}")
+
+
+@analysis.command("boltzmann")
+@click.argument("results_dir")
+@click.option("--temperature", "-T", default=300.0, help="Temperature (K)")
+@click.option("--output", "-o", default="boltzmann_plot.html", help="Output plot")
+def analysis_boltzmann(results_dir, temperature, output):
+    """Calculate Boltzmann distribution"""
+    from surfscreen.analysis import ThermodynamicAnalyzer
+    from surfscreen.visualization import create_boltzmann_plot
+    
+    console.print(f"\n[bold]🎲 Boltzmann Analysis (T = {temperature} K)[/bold]\n")
+    
+    analyzer = ThermodynamicAnalyzer()
+    analyzer.load_from_directory(results_dir)
+    
+    result = analyzer.calculate_boltzmann(temperature)
+    
+    # Top 5
+    sorted_idx = sorted(range(len(result.probabilities)), 
+                        key=lambda i: result.probabilities[i], reverse=True)
+    
+    console.print("Top 5 configurations:")
+    for rank, idx in enumerate(sorted_idx[:5], 1):
+        console.print(f"  {rank}. {result.names[idx]}: {result.probabilities[idx]*100:.1f}%")
+    
+    # Create plot
+    create_boltzmann_plot(
+        result.names,
+        result.probabilities,
+        result.energies,
+        temperature,
+        output
+    )
+    console.print(f"\n[green]✓[/green] Plot saved: {output}")
+
+
+# ============ Plot Commands ============
+
+@main.group()
+def plot():
+    """Visualization and plotting"""
+    pass
+
+
+@plot.command("energy-dist")
+@click.argument("results_dir")
+@click.option("--output", "-o", default="energy_distribution.html", help="Output file")
+def plot_energy_dist(results_dir, output):
+    """Plot energy distribution histogram"""
+    import json
+    from surfscreen.visualization import create_energy_distribution_plot
+    
+    # Load results
+    results_path = Path(results_dir) / "results.json"
+    if results_path.exists():
+        with open(results_path) as f:
+            data = json.load(f)
+        
+        energies = [r.get("adsorption_energy", r.get("energy", 0)) 
+                    for r in data.get("results", [])]
+        names = [r.get("name", "") for r in data.get("results", [])]
+    else:
+        console.print("[red]results.json not found[/red]")
+        return
+    
+    create_energy_distribution_plot(energies, names, output)
+    console.print(f"[green]✓[/green] Plot saved: {output}")
+
+
+@plot.command("correlation")
+@click.argument("results_dir")
+@click.option("--x", "x_prop", default="height", help="X-axis property")
+@click.option("--y", "y_prop", default="e_ads", help="Y-axis property")
+@click.option("--output", "-o", default="correlation.html", help="Output file")
+def plot_correlation(results_dir, x_prop, y_prop, output):
+    """Plot correlation between properties"""
+    console.print(f"[yellow]Correlation plot: {x_prop} vs {y_prop}[/yellow]")
+    console.print("[dim]Requires structural analysis data[/dim]")
+
+
 if __name__ == "__main__":
     main()
