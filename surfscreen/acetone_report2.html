@@ -1,0 +1,1800 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SurfScreen Report - acetone</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1c;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --bg-hover: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent: #06b6d4;
+            --accent-hover: #22d3ee;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 30px rgba(6, 182, 212, 0.3);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --bg-card: #f9fafb;
+            --bg-hover: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--gradient-primary);
+            padding: 2.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .header-content {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .header h1 span {
+            font-size: 2.5rem;
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .header-stat {
+            text-align: right;
+        }
+        
+        .header-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .header-stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-size: 1.25rem;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(15deg);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon.cyan { background: rgba(6, 182, 212, 0.2); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.2); }
+        .stat-icon.purple { background: rgba(139, 92, 246, 0.2); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.2); }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .stat-change.positive { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .stat-change.negative { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        
+        /* Section */
+        .section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .chart-container {
+            height: 350px;
+        }
+        
+        /* 3D Viewer Section */
+        .viewer-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 900px) {
+            .viewer-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .viewer-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .viewer-header {
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .viewer-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .viewer-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .viewer-badge.rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+        .viewer-badge.rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; }
+        .viewer-badge.rank-3 { background: linear-gradient(135deg, #cd7f32, #b8860b); color: #fff; }
+        
+        .mol-viewer {
+            height: 350px;
+            background: #1a1a2e;
+        }
+        
+        .viewer-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .viewer-btn {
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-hover);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+        
+        .viewer-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .viewer-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .viewer-info {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .viewer-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .viewer-info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .viewer-info-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+        
+        .filter-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .chip {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .chip:hover, .chip.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        th:hover {
+            color: var(--accent);
+        }
+        
+        th .sort-icon {
+            margin-left: 0.25rem;
+            opacity: 0.5;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        tr {
+            transition: var(--transition);
+        }
+        
+        tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        tr.selected {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 3px solid var(--accent);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge-top { background: rgba(6, 182, 212, 0.2); color: var(--accent); }
+        .badge-bridge { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-hollow { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+        .badge-fcc { background: rgba(236, 72, 153, 0.2); color: var(--pink); }
+        .badge-hcp { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-unknown { background: rgba(107, 114, 128, 0.2); color: var(--text-muted); }
+        
+        .energy-bar {
+            height: 6px;
+            background: var(--bg-hover);
+            border-radius: 3px;
+            overflow: hidden;
+            min-width: 100px;
+        }
+        
+        .energy-bar-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        
+        .rank-badge.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+        .rank-badge.silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; }
+        .rank-badge.bronze { background: linear-gradient(135deg, #cd7f32, #b8860b); color: #fff; }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .theme-toggle, .toolbar, .btn { display: none !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1><span>🧪</span> SurfScreen Report</h1>
+            <div class="header-meta">
+                <div class="header-stat">
+                    <div class="header-stat-value">acetone</div>
+                    <div class="header-stat-label">2026-01-29 06:51:02</div>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid animate-in">
+            <div class="stat-card">
+                <div class="stat-icon cyan">📊</div>
+                <div class="stat-value">50</div>
+                <div class="stat-label">Total Configurations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">⚡</div>
+                <div class="stat-value">-4.145</div>
+                <div class="stat-label">Best E_ads (eV)</div>
+                <div class="stat-change negative">↓ Most Stable</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">🎯</div>
+                <div class="stat-value">bridge</div>
+                <div class="stat-label">Optimal Site Type</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">🔄</div>
+                <div class="stat-value">154</div>
+                <div class="stat-label">Avg. Optimization Steps</div>
+            </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="section animate-in" style="animation-delay: 0.1s">
+                <div class="section-header">
+                    <div class="section-title">📈 Energy Distribution</div>
+                </div>
+                <div class="section-content">
+                    <div id="energy-bar-chart" class="chart-container"></div>
+                </div>
+            </div>
+            
+            <div class="section animate-in" style="animation-delay: 0.2s">
+                <div class="section-header">
+                    <div class="section-title">🎨 Site Type Breakdown</div>
+                </div>
+                <div class="section-content">
+                    <div id="site-pie-chart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Energy Histogram -->
+        <div class="section animate-in" style="animation-delay: 0.3s">
+            <div class="section-header">
+                <div class="section-title">📊 Energy Histogram</div>
+            </div>
+            <div class="section-content">
+                <div id="energy-histogram" class="chart-container"></div>
+            </div>
+        </div>
+        
+        <!-- 3D Viewers -->
+        <div class="section animate-in" style="animation-delay: 0.4s">
+            <div class="section-header">
+                <div class="section-title">🔬 Top Structures</div>
+            </div>
+            <div class="section-content">
+                <div class="viewer-section">
+                    <div class="viewer-card">
+                        <div class="viewer-header">
+                            <div class="viewer-title">
+                                <span class="viewer-badge rank-1">🥇 #1</span>
+                                site11_rot45
+                            </div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" onclick="toggleAxes(1)" title="Toggle cell axes">📐 Axes</button>
+                                <button class="viewer-btn" onclick="togglePBC(1)" title="Toggle periodic images">🔁 PBC</button>
+                                <button class="viewer-btn" onclick="toggleSpin(1)" title="Toggle rotation">🔄 Spin</button>
+                            </div>
+                        </div>
+                        <div class="mol-viewer" id="viewer-1"></div>
+                        <div class="viewer-info">
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Energy</span>
+                                <span class="viewer-info-value">-4.1445 eV</span>
+                            </div>
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Site</span>
+                                <span class="viewer-info-value">bridge</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="viewer-card">
+                        <div class="viewer-header">
+                            <div class="viewer-title">
+                                <span class="viewer-badge rank-2">🥈 #2</span>
+                                site11_rot90
+                            </div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" onclick="toggleAxes(2)" title="Toggle cell axes">📐 Axes</button>
+                                <button class="viewer-btn" onclick="togglePBC(2)" title="Toggle periodic images">🔁 PBC</button>
+                                <button class="viewer-btn" onclick="toggleSpin(2)" title="Toggle rotation">🔄 Spin</button>
+                            </div>
+                        </div>
+                        <div class="mol-viewer" id="viewer-2"></div>
+                        <div class="viewer-info">
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Energy</span>
+                                <span class="viewer-info-value">-4.1443 eV</span>
+                            </div>
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Site</span>
+                                <span class="viewer-info-value">bridge</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Table -->
+        <div class="section animate-in" style="animation-delay: 0.5s">
+            <div class="section-header">
+                <div class="section-title">📋 All Results</div>
+                <div class="toolbar">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search configurations..." oninput="filterTable()">
+                    </div>
+                    <div class="filter-chips">
+                        <span class="chip active" onclick="filterByType('all')">All</span>
+                        <span class="chip" onclick="filterByType('top')">Top</span>
+                        <span class="chip" onclick="filterByType('bridge')">Bridge</span>
+                        <span class="chip" onclick="filterByType('hollow')">Hollow</span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+                    <button class="btn btn-secondary" onclick="exportJSON()">📥 Export JSON</button>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Rank <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(1)">Configuration <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(2)">Site Type <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(3)">E_ads (eV) <span class="sort-icon">↕</span></th>
+                                <th>Relative</th>
+                                <th onclick="sortTable(5)">Steps <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(6)">Status <span class="sort-icon">↕</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                <tr>
+                    <td><span class="rank-badge gold">1</span></td>
+                    <td><strong>site11_rot45</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-4.1445</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 100.0%"></div>
+                        </div>
+                    </td>
+                    <td>181</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td><span class="rank-badge silver">2</span></td>
+                    <td><strong>site11_rot90</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-4.1443</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 100.0%"></div>
+                        </div>
+                    </td>
+                    <td>193</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td><span class="rank-badge bronze">3</span></td>
+                    <td><strong>site8_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-4.0573</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 92.6%"></div>
+                        </div>
+                    </td>
+                    <td>213</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>4</td>
+                    <td><strong>site7_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-4.0361</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 90.7%"></div>
+                        </div>
+                    </td>
+                    <td>190</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>5</td>
+                    <td><strong>site4_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.9297</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 81.7%"></div>
+                        </div>
+                    </td>
+                    <td>168</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>6</td>
+                    <td><strong>site9_rot0</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.8964</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 78.8%"></div>
+                        </div>
+                    </td>
+                    <td>223</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>7</td>
+                    <td><strong>site8_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.8237</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 72.6%"></div>
+                        </div>
+                    </td>
+                    <td>195</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>8</td>
+                    <td><strong>site5_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.8176</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 72.1%"></div>
+                        </div>
+                    </td>
+                    <td>266</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>9</td>
+                    <td><strong>site1_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.7791</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 68.8%"></div>
+                        </div>
+                    </td>
+                    <td>223</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>10</td>
+                    <td><strong>site4_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.7753</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 68.5%"></div>
+                        </div>
+                    </td>
+                    <td>168</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>11</td>
+                    <td><strong>site11_rot0</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.7645</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 67.6%"></div>
+                        </div>
+                    </td>
+                    <td>183</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>12</td>
+                    <td><strong>site1_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.7290</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 64.5%"></div>
+                        </div>
+                    </td>
+                    <td>161</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>13</td>
+                    <td><strong>site5_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.7253</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 64.2%"></div>
+                        </div>
+                    </td>
+                    <td>160</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>14</td>
+                    <td><strong>site1_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.7108</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 63.0%"></div>
+                        </div>
+                    </td>
+                    <td>161</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>15</td>
+                    <td><strong>site7_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.6955</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 61.7%"></div>
+                        </div>
+                    </td>
+                    <td>184</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>16</td>
+                    <td><strong>site4_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.6898</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 61.2%"></div>
+                        </div>
+                    </td>
+                    <td>217</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>17</td>
+                    <td><strong>site4_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.6365</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 56.6%"></div>
+                        </div>
+                    </td>
+                    <td>177</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>18</td>
+                    <td><strong>site1_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.6252</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 55.7%"></div>
+                        </div>
+                    </td>
+                    <td>158</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>19</td>
+                    <td><strong>site3_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.6011</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 53.6%"></div>
+                        </div>
+                    </td>
+                    <td>152</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>20</td>
+                    <td><strong>site8_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5995</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 53.5%"></div>
+                        </div>
+                    </td>
+                    <td>152</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>21</td>
+                    <td><strong>site11_rot135</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.5955</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 53.1%"></div>
+                        </div>
+                    </td>
+                    <td>126</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>22</td>
+                    <td><strong>site7_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5880</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 52.5%"></div>
+                        </div>
+                    </td>
+                    <td>136</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>23</td>
+                    <td><strong>site6_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5867</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 52.4%"></div>
+                        </div>
+                    </td>
+                    <td>137</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>24</td>
+                    <td><strong>site2_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5739</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 51.3%"></div>
+                        </div>
+                    </td>
+                    <td>143</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>25</td>
+                    <td><strong>site6_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5694</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 50.9%"></div>
+                        </div>
+                    </td>
+                    <td>133</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>26</td>
+                    <td><strong>site6_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5555</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 49.7%"></div>
+                        </div>
+                    </td>
+                    <td>129</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>27</td>
+                    <td><strong>site2_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5405</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 48.4%"></div>
+                        </div>
+                    </td>
+                    <td>118</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>28</td>
+                    <td><strong>site2_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5373</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 48.2%"></div>
+                        </div>
+                    </td>
+                    <td>139</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>29</td>
+                    <td><strong>site8_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5357</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 48.0%"></div>
+                        </div>
+                    </td>
+                    <td>144</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>30</td>
+                    <td><strong>site2_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.5161</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 46.4%"></div>
+                        </div>
+                    </td>
+                    <td>135</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>31</td>
+                    <td><strong>site3_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4795</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 43.2%"></div>
+                        </div>
+                    </td>
+                    <td>167</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>32</td>
+                    <td><strong>site3_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4682</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 42.3%"></div>
+                        </div>
+                    </td>
+                    <td>151</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>33</td>
+                    <td><strong>site0_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4515</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 40.8%"></div>
+                        </div>
+                    </td>
+                    <td>156</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>34</td>
+                    <td><strong>site0_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4496</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 40.7%"></div>
+                        </div>
+                    </td>
+                    <td>155</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>35</td>
+                    <td><strong>site7_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4277</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 38.8%"></div>
+                        </div>
+                    </td>
+                    <td>133</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>36</td>
+                    <td><strong>site6_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4223</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 38.4%"></div>
+                        </div>
+                    </td>
+                    <td>136</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>37</td>
+                    <td><strong>site0_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4212</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 38.3%"></div>
+                        </div>
+                    </td>
+                    <td>159</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>38</td>
+                    <td><strong>site10_rot90</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.4173</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 37.9%"></div>
+                        </div>
+                    </td>
+                    <td>153</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>39</td>
+                    <td><strong>site3_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.4063</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 37.0%"></div>
+                        </div>
+                    </td>
+                    <td>112</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>40</td>
+                    <td><strong>site10_rot45</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.4001</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 36.5%"></div>
+                        </div>
+                    </td>
+                    <td>176</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>41</td>
+                    <td><strong>site5_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.3949</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 36.0%"></div>
+                        </div>
+                    </td>
+                    <td>153</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>42</td>
+                    <td><strong>site10_rot0</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.3704</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 33.9%"></div>
+                        </div>
+                    </td>
+                    <td>177</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>43</td>
+                    <td><strong>site5_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.3615</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 33.2%"></div>
+                        </div>
+                    </td>
+                    <td>124</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>44</td>
+                    <td><strong>site12_rot0</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.1969</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 19.1%"></div>
+                        </div>
+                    </td>
+                    <td>111</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>45</td>
+                    <td><strong>site12_rot45</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.1474</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 14.9%"></div>
+                        </div>
+                    </td>
+                    <td>93</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>46</td>
+                    <td><strong>site9_rot45</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.0735</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 8.6%"></div>
+                        </div>
+                    </td>
+                    <td>112</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>47</td>
+                    <td><strong>site9_rot90</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-3.0605</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 7.5%"></div>
+                        </div>
+                    </td>
+                    <td>98</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>48</td>
+                    <td><strong>site0_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-3.0434</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 6.0%"></div>
+                        </div>
+                    </td>
+                    <td>95</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>49</td>
+                    <td><strong>site10_rot135</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-2.9857</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 1.1%"></div>
+                        </div>
+                    </td>
+                    <td>96</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr>
+                    <td>50</td>
+                    <td><strong>site9_rot135</strong></td>
+                    <td><span class="badge badge-bridge">bridge</span></td>
+                    <td>-2.9730</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 0.0%"></div>
+                        </div>
+                    </td>
+                    <td>91</td>
+                    <td>✅</td>
+                </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Generated by <a href="#">SurfScreen v0.1.0</a> — Enterprise Surface Adsorption Screening Platform<br>
+        <small>Powered by MACE MLIP | 2026-01-29 06:51:02</small>
+    </div>
+    
+    <script>
+        // Data
+        const resultsData = [{"name": "site11_rot45", "site_idx": 11, "site_type": "bridge", "rotation": 45.0, "initial_energy": -170.8212127685547, "final_energy": -174.83941650390625, "e_ads": -4.144546508789063, "steps": 181, "converged": true}, {"name": "site11_rot90", "site_idx": 11, "site_type": "bridge", "rotation": 90.0, "initial_energy": -170.80453491210938, "final_energy": -174.83917236328125, "e_ads": -4.144302368164063, "steps": 193, "converged": true}, {"name": "site8_rot90", "site_idx": 8, "site_type": "top", "rotation": 90.0, "initial_energy": -170.80992126464844, "final_energy": -174.752197265625, "e_ads": -4.0573272705078125, "steps": 213, "converged": true}, {"name": "site7_rot135", "site_idx": 7, "site_type": "top", "rotation": 135.0, "initial_energy": -170.81031799316406, "final_energy": -174.7310028076172, "e_ads": -4.0361328125, "steps": 190, "converged": true}, {"name": "site4_rot0", "site_idx": 4, "site_type": "top", "rotation": 0.0, "initial_energy": -170.81976318359375, "final_energy": -174.62457275390625, "e_ads": -3.9297027587890634, "steps": 168, "converged": true}, {"name": "site9_rot0", "site_idx": 9, "site_type": "bridge", "rotation": 0.0, "initial_energy": -170.82852172851562, "final_energy": -174.5912628173828, "e_ads": -3.896392822265625, "steps": 223, "converged": true}, {"name": "site8_rot45", "site_idx": 8, "site_type": "top", "rotation": 45.0, "initial_energy": -170.79689025878906, "final_energy": -174.51853942871094, "e_ads": -3.82366943359375, "steps": 195, "converged": true}, {"name": "site5_rot90", "site_idx": 5, "site_type": "top", "rotation": 90.0, "initial_energy": -170.80606079101562, "final_energy": -174.51242065429688, "e_ads": -3.817550659179688, "steps": 266, "converged": true}, {"name": "site1_rot90", "site_idx": 1, "site_type": "top", "rotation": 90.0, "initial_energy": -170.80787658691406, "final_energy": -174.4739227294922, "e_ads": -3.779052734375, "steps": 223, "converged": true}, {"name": "site4_rot45", "site_idx": 4, "site_type": "top", "rotation": 45.0, "initial_energy": -170.81666564941406, "final_energy": -174.47019958496094, "e_ads": -3.77532958984375, "steps": 168, "converged": true}, {"name": "site11_rot0", "site_idx": 11, "site_type": "bridge", "rotation": 0.0, "initial_energy": -170.8153839111328, "final_energy": -174.45933532714844, "e_ads": -3.76446533203125, "steps": 183, "converged": true}, {"name": "site1_rot45", "site_idx": 1, "site_type": "top", "rotation": 45.0, "initial_energy": -170.8234100341797, "final_energy": -174.4239044189453, "e_ads": -3.729034423828125, "steps": 161, "converged": true}, {"name": "site5_rot135", "site_idx": 5, "site_type": "top", "rotation": 135.0, "initial_energy": -170.80328369140625, "final_energy": -174.42013549804688, "e_ads": -3.725265502929688, "steps": 160, "converged": true}, {"name": "site1_rot0", "site_idx": 1, "site_type": "top", "rotation": 0.0, "initial_energy": -170.838134765625, "final_energy": -174.4056396484375, "e_ads": -3.710769653320313, "steps": 161, "converged": true}, {"name": "site7_rot0", "site_idx": 7, "site_type": "top", "rotation": 0.0, "initial_energy": -170.7703857421875, "final_energy": -174.39041137695312, "e_ads": -3.6955413818359375, "steps": 184, "converged": true}, {"name": "site4_rot135", "site_idx": 4, "site_type": "top", "rotation": 135.0, "initial_energy": -170.80250549316406, "final_energy": -174.3846893310547, "e_ads": -3.6898193359375, "steps": 217, "converged": true}, {"name": "site4_rot90", "site_idx": 4, "site_type": "top", "rotation": 90.0, "initial_energy": -170.80477905273438, "final_energy": -174.33140563964844, "e_ads": -3.63653564453125, "steps": 177, "converged": true}, {"name": "site1_rot135", "site_idx": 1, "site_type": "top", "rotation": 135.0, "initial_energy": -170.78466796875, "final_energy": -174.32008361816406, "e_ads": -3.625213623046875, "steps": 158, "converged": true}, {"name": "site3_rot45", "site_idx": 3, "site_type": "top", "rotation": 45.0, "initial_energy": -170.77560424804688, "final_energy": -174.29600524902344, "e_ads": -3.60113525390625, "steps": 152, "converged": true}, {"name": "site8_rot0", "site_idx": 8, "site_type": "top", "rotation": 0.0, "initial_energy": -170.76565551757812, "final_energy": -174.29432678222656, "e_ads": -3.599456787109375, "steps": 152, "converged": true}, {"name": "site11_rot135", "site_idx": 11, "site_type": "bridge", "rotation": 135.0, "initial_energy": -170.78114318847656, "final_energy": -174.29037475585938, "e_ads": -3.5955047607421875, "steps": 126, "converged": true}, {"name": "site7_rot45", "site_idx": 7, "site_type": "top", "rotation": 45.0, "initial_energy": -170.78611755371094, "final_energy": -174.2829132080078, "e_ads": -3.588043212890625, "steps": 136, "converged": true}, {"name": "site6_rot0", "site_idx": 6, "site_type": "top", "rotation": 0.0, "initial_energy": -170.76113891601562, "final_energy": -174.28158569335938, "e_ads": -3.5867156982421875, "steps": 137, "converged": true}, {"name": "site2_rot90", "site_idx": 2, "site_type": "top", "rotation": 90.0, "initial_energy": -170.8050079345703, "final_energy": -174.26876831054688, "e_ads": -3.5738983154296875, "steps": 143, "converged": true}, {"name": "site6_rot90", "site_idx": 6, "site_type": "top", "rotation": 90.0, "initial_energy": -170.7781524658203, "final_energy": -174.26422119140625, "e_ads": -3.5693511962890625, "steps": 133, "converged": true}, {"name": "site6_rot135", "site_idx": 6, "site_type": "top", "rotation": 135.0, "initial_energy": -170.80001831054688, "final_energy": -174.2504119873047, "e_ads": -3.5555419921875, "steps": 129, "converged": true}, {"name": "site2_rot135", "site_idx": 2, "site_type": "top", "rotation": 135.0, "initial_energy": -170.78501892089844, "final_energy": -174.2353515625, "e_ads": -3.5404815673828125, "steps": 118, "converged": true}, {"name": "site2_rot0", "site_idx": 2, "site_type": "top", "rotation": 0.0, "initial_energy": -170.82154846191406, "final_energy": -174.23214721679688, "e_ads": -3.5372772216796875, "steps": 139, "converged": true}, {"name": "site8_rot135", "site_idx": 8, "site_type": "top", "rotation": 135.0, "initial_energy": -170.8116455078125, "final_energy": -174.23057556152344, "e_ads": -3.53570556640625, "steps": 144, "converged": true}, {"name": "site2_rot45", "site_idx": 2, "site_type": "top", "rotation": 45.0, "initial_energy": -170.81849670410156, "final_energy": -174.2109832763672, "e_ads": -3.51611328125, "steps": 135, "converged": true}, {"name": "site3_rot135", "site_idx": 3, "site_type": "top", "rotation": 135.0, "initial_energy": -170.79322814941406, "final_energy": -174.17434692382812, "e_ads": -3.479476928710937, "steps": 167, "converged": true}, {"name": "site3_rot90", "site_idx": 3, "site_type": "top", "rotation": 90.0, "initial_energy": -170.77532958984375, "final_energy": -174.16307067871094, "e_ads": -3.46820068359375, "steps": 151, "converged": true}, {"name": "site0_rot45", "site_idx": 0, "site_type": "top", "rotation": 45.0, "initial_energy": -170.7852325439453, "final_energy": -174.14634704589844, "e_ads": -3.45147705078125, "steps": 156, "converged": true}, {"name": "site0_rot0", "site_idx": 0, "site_type": "top", "rotation": 0.0, "initial_energy": -170.8163299560547, "final_energy": -174.14442443847656, "e_ads": -3.449554443359375, "steps": 155, "converged": true}, {"name": "site7_rot90", "site_idx": 7, "site_type": "top", "rotation": 90.0, "initial_energy": -170.8029327392578, "final_energy": -174.12257385253906, "e_ads": -3.427703857421875, "steps": 133, "converged": true}, {"name": "site6_rot45", "site_idx": 6, "site_type": "top", "rotation": 45.0, "initial_energy": -170.75631713867188, "final_energy": -174.11717224121094, "e_ads": -3.42230224609375, "steps": 136, "converged": true}, {"name": "site0_rot90", "site_idx": 0, "site_type": "top", "rotation": 90.0, "initial_energy": -170.766357421875, "final_energy": -174.1160430908203, "e_ads": -3.421173095703125, "steps": 159, "converged": true}, {"name": "site10_rot90", "site_idx": 10, "site_type": "bridge", "rotation": 90.0, "initial_energy": -170.7745819091797, "final_energy": -174.11219787597656, "e_ads": -3.417327880859375, "steps": 153, "converged": true}, {"name": "site3_rot0", "site_idx": 3, "site_type": "top", "rotation": 0.0, "initial_energy": -170.79640197753906, "final_energy": -174.1011505126953, "e_ads": -3.406280517578125, "steps": 112, "converged": true}, {"name": "site10_rot45", "site_idx": 10, "site_type": "bridge", "rotation": 45.0, "initial_energy": -170.784912109375, "final_energy": -174.0950164794922, "e_ads": -3.400146484375, "steps": 176, "converged": true}, {"name": "site5_rot45", "site_idx": 5, "site_type": "top", "rotation": 45.0, "initial_energy": -170.82469177246094, "final_energy": -174.0897216796875, "e_ads": -3.3948516845703125, "steps": 153, "converged": true}, {"name": "site10_rot0", "site_idx": 10, "site_type": "bridge", "rotation": 0.0, "initial_energy": -170.80056762695312, "final_energy": -174.06527709960938, "e_ads": -3.3704071044921875, "steps": 177, "converged": true}, {"name": "site5_rot0", "site_idx": 5, "site_type": "top", "rotation": 0.0, "initial_energy": -170.81527709960938, "final_energy": -174.05636596679688, "e_ads": -3.3614959716796875, "steps": 124, "converged": true}, {"name": "site12_rot0", "site_idx": 12, "site_type": "bridge", "rotation": 0.0, "initial_energy": -170.81590270996094, "final_energy": -173.89178466796875, "e_ads": -3.1969146728515625, "steps": 111, "converged": true}, {"name": "site12_rot45", "site_idx": 12, "site_type": "bridge", "rotation": 45.0, "initial_energy": -170.80735778808594, "final_energy": -173.84222412109375, "e_ads": -3.1473541259765625, "steps": 93, "converged": true}, {"name": "site9_rot45", "site_idx": 9, "site_type": "bridge", "rotation": 45.0, "initial_energy": -170.8173065185547, "final_energy": -173.76840209960938, "e_ads": -3.0735321044921875, "steps": 112, "converged": true}, {"name": "site9_rot90", "site_idx": 9, "site_type": "bridge", "rotation": 90.0, "initial_energy": -170.7909393310547, "final_energy": -173.75535583496094, "e_ads": -3.06048583984375, "steps": 98, "converged": true}, {"name": "site0_rot135", "site_idx": 0, "site_type": "top", "rotation": 135.0, "initial_energy": -170.76319885253906, "final_energy": -173.73822021484375, "e_ads": -3.0433502197265625, "steps": 95, "converged": true}, {"name": "site10_rot135", "site_idx": 10, "site_type": "bridge", "rotation": 135.0, "initial_energy": -170.78424072265625, "final_energy": -173.6806182861328, "e_ads": -2.985748291015625, "steps": 96, "converged": true}, {"name": "site9_rot135", "site_idx": 9, "site_type": "bridge", "rotation": 135.0, "initial_energy": -170.77806091308594, "final_energy": -173.66787719726562, "e_ads": -2.973007202148437, "steps": 91, "converged": true}];
+        
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector('.theme-toggle');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.textContent = '☀️';
+            }
+        }
+        
+        // Energy Bar Chart
+        Plotly.newPlot('energy-bar-chart', [{
+            x: resultsData.slice(0, 15).map(r => r.name),
+            y: resultsData.slice(0, 15).map(r => r.e_ads),
+            type: 'bar',
+            marker: {
+                color: resultsData.slice(0, 15).map(r => r.e_ads),
+                colorscale: [[0, '#06b6d4'], [0.5, '#8b5cf6'], [1, '#ec4899']],
+                reversescale: true
+            },
+            hovertemplate: '<b>%{x}</b><br>E_ads: %{y:.4f} eV<extra></extra>'
+        }], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#9ca3af' },
+            xaxis: {
+                tickangle: -45,
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            yaxis: {
+                title: 'E_ads (eV)',
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            margin: { t: 20, b: 100, l: 60, r: 20 }
+        }, {responsive: true});
+        
+        // Site Type Pie Chart
+        const siteCounts = {};
+        resultsData.forEach(r => {
+            siteCounts[r.site_type] = (siteCounts[r.site_type] || 0) + 1;
+        });
+        
+        Plotly.newPlot('site-pie-chart', [{
+            values: Object.values(siteCounts),
+            labels: Object.keys(siteCounts),
+            type: 'pie',
+            hole: 0.5,
+            marker: {
+                colors: ['#06b6d4', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b']
+            },
+            textinfo: 'label+percent',
+            textposition: 'outside',
+            hovertemplate: '<b>%{label}</b><br>Count: %{value}<extra></extra>'
+        }], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#9ca3af' },
+            showlegend: false,
+            margin: { t: 20, b: 20, l: 20, r: 20 }
+        }, {responsive: true});
+        
+        // Energy Histogram
+        Plotly.newPlot('energy-histogram', [{
+            x: resultsData.map(r => r.e_ads),
+            type: 'histogram',
+            nbinsx: 20,
+            marker: {
+                color: '#8b5cf6',
+                line: { color: '#a78bfa', width: 1 }
+            },
+            hovertemplate: 'Range: %{x:.2f} eV<br>Count: %{y}<extra></extra>'
+        }], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#9ca3af' },
+            xaxis: {
+                title: 'E_ads (eV)',
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            yaxis: {
+                title: 'Count',
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            margin: { t: 20, b: 50, l: 60, r: 20 }
+        }, {responsive: true});
+        
+        // 3D Viewers - State
+        const viewers = {};
+        const viewerState = {
+            1: { axes: false, pbc: false, spin: true },
+            2: { axes: false, pbc: false, spin: true }
+        };
+        
+        // Cell parameters (from surface) - approximate for Cu(111) 3x3
+        const cellParams = {"a": [9.06778344908523, 0.0], "b": [0.0, 8.053805287386995], "c": 15.0, "zmin": 14.714953894870675};
+        
+        function initViewer(id, xyz, viewerId) {
+            if (!xyz) return;
+            const viewer = $3Dmol.createViewer(id, {
+                backgroundColor: '#1a1a2e'
+            });
+            viewers[viewerId] = { viewer, xyz, models: [] };
+            
+            // Add main model
+            viewer.addModel(xyz, 'xyz');
+            viewer.setStyle({}, {
+                stick: { radius: 0.12, colorscheme: 'Jmol' },
+                sphere: { scale: 0.25, colorscheme: 'Jmol' }
+            });
+            
+            viewer.zoomTo();
+            viewer.render();
+            viewer.spin('y', 0.5);
+        }
+        
+        function toggleAxes(viewerId) {
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata) return;
+            
+            state.axes = !state.axes;
+            const btn = event.target;
+            btn.classList.toggle('active', state.axes);
+            
+            if (state.axes && cellParams) {
+                // Draw cell axes from origin
+                const origin = [0, 0, cellParams.zmin];
+                const a = cellParams.a;
+                const b = cellParams.b;
+                const c = cellParams.c || 10;
+                
+                // X axis (red)
+                vdata.viewer.addArrow({
+                    start: { x: origin[0], y: origin[1], z: origin[2] },
+                    end: { x: origin[0] + a[0], y: origin[1] + a[1], z: origin[2] },
+                    radius: 0.1,
+                    color: '#ff4444'
+                });
+                // Y axis (green)
+                vdata.viewer.addArrow({
+                    start: { x: origin[0], y: origin[1], z: origin[2] },
+                    end: { x: origin[0] + b[0], y: origin[1] + b[1], z: origin[2] },
+                    radius: 0.1,
+                    color: '#44ff44'
+                });
+                // Z axis (blue)
+                vdata.viewer.addArrow({
+                    start: { x: origin[0], y: origin[1], z: origin[2] },
+                    end: { x: origin[0], y: origin[1], z: origin[2] + c },
+                    radius: 0.1,
+                    color: '#4444ff'
+                });
+                
+                // Draw cell box outline
+                const corners = [
+                    origin,
+                    [origin[0] + a[0], origin[1] + a[1], origin[2]],
+                    [origin[0] + a[0] + b[0], origin[1] + a[1] + b[1], origin[2]],
+                    [origin[0] + b[0], origin[1] + b[1], origin[2]]
+                ];
+                for (let i = 0; i < 4; i++) {
+                    const c1 = corners[i];
+                    const c2 = corners[(i + 1) % 4];
+                    vdata.viewer.addCylinder({
+                        start: { x: c1[0], y: c1[1], z: c1[2] },
+                        end: { x: c2[0], y: c2[1], z: c2[2] },
+                        radius: 0.03,
+                        color: '#888888',
+                        dashed: true
+                    });
+                }
+            } else {
+                // Remove shapes by re-rendering
+                vdata.viewer.removeAllShapes();
+            }
+            vdata.viewer.render();
+        }
+        
+        function togglePBC(viewerId) {
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata || !cellParams) return;
+            
+            state.pbc = !state.pbc;
+            const btn = event.target;
+            btn.classList.toggle('active', state.pbc);
+            
+            // Clear and rebuild
+            vdata.viewer.removeAllModels();
+            vdata.viewer.removeAllShapes();
+            
+            if (state.pbc) {
+                // Add main + 8 periodic images (3x3 in xy)
+                const a = cellParams.a;
+                const b = cellParams.b;
+                const offsets = [
+                    [0, 0], [-1, 0], [1, 0], [0, -1], [0, 1],
+                    [-1, -1], [-1, 1], [1, -1], [1, 1]
+                ];
+                
+                offsets.forEach(([i, j]) => {
+                    const model = vdata.viewer.addModel(vdata.xyz, 'xyz');
+                    // Translate
+                    const dx = i * a[0] + j * b[0];
+                    const dy = i * a[1] + j * b[1];
+                    model.setStyle({}, {
+                        stick: { radius: 0.12, colorscheme: 'Jmol' },
+                        sphere: { scale: 0.25, colorscheme: 'Jmol' }
+                    });
+                    if (i !== 0 || j !== 0) {
+                        // Fade periodic images
+                        model.setStyle({}, {
+                            stick: { radius: 0.10, colorscheme: 'Jmol', opacity: 0.4 },
+                            sphere: { scale: 0.20, colorscheme: 'Jmol', opacity: 0.4 }
+                        });
+                    }
+                });
+            } else {
+                vdata.viewer.addModel(vdata.xyz, 'xyz');
+                vdata.viewer.setStyle({}, {
+                    stick: { radius: 0.12, colorscheme: 'Jmol' },
+                    sphere: { scale: 0.25, colorscheme: 'Jmol' }
+                });
+            }
+            
+            // Re-add axes if enabled
+            if (state.axes) {
+                state.axes = false;
+                toggleAxes(viewerId);
+            }
+            
+            vdata.viewer.zoomTo();
+            vdata.viewer.render();
+        }
+        
+        function toggleSpin(viewerId) {
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata) return;
+            
+            state.spin = !state.spin;
+            const btn = event.target;
+            btn.classList.toggle('active', state.spin);
+            
+            if (state.spin) {
+                vdata.viewer.spin('y', 0.5);
+            } else {
+                vdata.viewer.spin(false);
+            }
+        }
+        
+        initViewer('viewer-1', `46\n\nCu      0.319927003275233     -0.466410654444989     16.240911698093214\nCu      2.698534620138928     -0.311015399292399     15.985080206089959\nCu      5.156709116083885     -0.099671665797183     15.764412384337810\nCu      1.223785948266133      1.720187146091650     16.104414103881343\nCu      3.664041982031543      1.896568765468160     15.759941693030854\nCu      6.077450443829194      2.091670169741528     15.390773349043023\nCu      2.199763411248527      3.961612423705052     15.989170060662666\nCu      4.603230613227867      4.106505897580171     15.317498109150526\nCu      6.992895313107947      4.221386510503627     14.714953894870675\nCu      1.620219508894970      0.338015678386209     18.076262650677862\nCu      4.117412475610660      0.539282952783777     17.820611410277230\nCu      6.578899187605939      1.008570473993221     17.548957267552137\nCu      2.699792575708950      2.569442437728467     17.931645505554531\nCu      5.149008336812976      2.967988508180303     17.600066454136286\nCu      7.618479560935053      3.234125514669925     16.896925922044982\nCu      3.816682046857363      5.027763092232396     17.443157103959692\nCu      6.232769173094922      5.199506836957514     16.781169638983592\nCu      8.563366502443623      5.338038300933198     16.152380536964785\nCu      0.329021651614237      2.473078871547407     18.319049257621295\nCu      2.987795611198897      1.147859170905490     20.005846183356873\nCu      5.374400132100107      1.373837121323536     19.675504740579530\nCu      1.728751916215008      4.696011454612576     18.688449598475923\nCu      3.853406811033765      3.665314790070828     19.741895178415216\nCu      7.058282372746620      3.038111131675354     19.246565302449866\nCu      3.526047225157060      6.273954572854620     19.479958927821947\nCu      5.683224581271864      5.128315111845274     19.107588767149501\nCu      8.061146786555335      5.118256384927925     18.495626854168041\nCu      0.534376040337912      0.821364855384621     20.164833242574016\nCu      1.791068544347077      1.276550261734285     22.200218044317285\nCu      4.556800606270210      1.008501349549715     21.915552421890677\nCu      1.480534077968591      3.005278106214545     20.441653709969309\nCu      3.391087300419717      3.173002451258709     22.082455472871331\nCu      5.766341568479820      3.070554555205401     21.334454391405583\nCu      2.292677082075494      5.166127916734662     21.165511333633159\nCu      4.781928589835927      5.281841678179119     21.394613261302236\nCu      7.274703587987124      4.911430836786615     20.858998781521283\nO       3.960836443173100      0.040944486772075     23.415587472708619\nC       2.915900059214574      0.688743023554200     23.867643189388794\nC       3.091320109640059      1.985521698854160     24.630534411002905\nC       1.657646308802549     -0.082642395852107     24.186808428576803\nH       2.319064356582142      2.714532042225287     24.341057850875142\nH       2.967311221016460      1.790981987764080     25.704067485957523\nH       4.079079572669147      2.422585048327174     24.446385114622256\nH       1.651371154479435     -1.047686597497193     23.673852924589738\nH       0.730350826353025      0.465824448612549     23.944290689507408\nH       1.609808283513702     -0.247226436622052     25.271246563156009\n`, 1);
+        initViewer('viewer-2', `46\n\nCu      0.337093940559212     -0.500963198210002     16.024376450493641\nCu      2.727399605723524     -0.299556457529137     15.788291922021271\nCu      5.189935178019739     -0.019325891976757     15.622071910436775\nCu      1.228415240139728      1.685486497202394     15.999301356854081\nCu      3.668852722012732      1.934367853857788     15.717580741623731\nCu      6.093157099074073      2.204343357604081     15.430924734880282\nCu      2.173818707316859      3.933549306829767     16.013742766172221\nCu      4.586692789853964      4.185650854360819     15.463757473189997\nCu      6.989399576537282      4.387361121268398     14.933355061799553\nCu      1.635467835168340      0.161519018970773     17.901292476499169\nCu      4.115403127569083      0.457836105447071     17.699385008400522\nCu      6.567394723232226      0.984770369812896     17.515695391716925\nCu      2.632780111279140      2.435146213307223     17.906009201100574\nCu      5.084287144522174      2.897969614831393     17.677579535888338\nCu      7.566104746919639      3.265040225490139     17.059630186612026\nCu      3.686804720027257      4.928435032259168     17.624297815846340\nCu      6.137111782784966      5.205275795742742     17.035421197522236\nCu      8.503740342156529      5.418958397508468     16.498582011793623\nCu      0.249823117114168      2.178890513206289     18.255222677360575\nCu      2.941268152386013      0.862174472954455     19.904246485686816\nCu      5.327022668247968      1.163076764342487     19.655184591754434\nCu      1.571708118356435      4.457009891871107     18.805802783864248\nCu      3.714531959588815      3.424964986711998     19.814636362974984\nCu      6.941383661771075      2.920532116276005     19.371493603370549\nCu      3.305124432270401      6.029459240299185     19.725060177769961\nCu      5.513483104927283      4.969176395046186     19.335681779926407\nCu      7.907892090795618      5.064139565151308     18.791829463364881\nCu      0.488290284711869      0.425700924939954     19.994572015844430\nCu      1.708842053386382      0.731331149353523     22.064582299787563\nCu      4.451228581294737      0.665076859083816     21.859002869933953\nCu      1.347981600492389      2.619423938970855     20.416830179799565\nCu      3.191535060966034      2.750136019731901     22.094129565949554\nCu      5.593009342922063      2.795303581616061     21.410040906795100\nCu      2.061471165634111      4.769855231812748     21.295098195066334\nCu      4.543086717234259      4.964177779145045     21.599030327107076\nCu      7.064084159998671      4.705419153064789     21.116176311330449\nO       3.923141382116808     -0.339330682030078     23.350995160604349\nC       2.725728778627292      0.024824798528249     23.737026530701762\nC       2.521159030855727      1.306741644901972     24.510902664064815\nC       1.690865870127508     -1.049339922909073     23.976272098970771\nH       1.536111950003824      1.745691664170204     24.298760646509265\nH       2.547258850498877      1.073486504123277     25.584001605905144\nH       3.299206031528889      2.051136436516545     24.286037637862322\nH       2.070652203443234     -2.018710961543301     23.639967225192603\nH       0.735840683996917     -0.845885414826494     23.463722995506103\nH       1.472651231597220     -1.096842654589116     25.050980512038553\n`, 2);
+        
+        // Table Filter
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#resultsTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+        
+        function filterByType(type) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const rows = document.querySelectorAll('#resultsTable tbody tr');
+            rows.forEach(row => {
+                if (type === 'all') {
+                    row.style.display = '';
+                } else {
+                    const siteType = row.querySelector('.badge')?.textContent.toLowerCase();
+                    row.style.display = siteType === type ? '' : 'none';
+                }
+            });
+        }
+        
+        // Table Sort
+        let sortDirection = {};
+        function sortTable(col) {
+            const table = document.getElementById('resultsTable');
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            sortDirection[col] = !sortDirection[col];
+            
+            rows.sort((a, b) => {
+                let aVal = a.cells[col].textContent.trim();
+                let bVal = b.cells[col].textContent.trim();
+                
+                if (!isNaN(parseFloat(aVal))) {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+                
+                if (sortDirection[col]) {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+            
+            const tbody = table.querySelector('tbody');
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Export
+        function exportCSV() {
+            let csv = 'name,site_type,e_ads,steps,converged\n';
+            resultsData.forEach(r => {
+                csv += `${r.name},${r.site_type},${r.e_ads},${r.steps},${r.converged}\n`;
+            });
+            downloadFile(csv, 'results.csv', 'text/csv');
+        }
+        
+        function exportJSON() {
+            const json = JSON.stringify(resultsData, null, 2);
+            downloadFile(json, 'results.json', 'application/json');
+        }
+        
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

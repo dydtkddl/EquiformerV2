@@ -1,0 +1,1722 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SurfScreen Report - acetone</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1c;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --bg-hover: #374151;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent: #06b6d4;
+            --accent-hover: #22d3ee;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-accent: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 30px rgba(6, 182, 212, 0.3);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --bg-card: #f9fafb;
+            --bg-hover: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--gradient-primary);
+            padding: 2.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .header-content {
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .header h1 span {
+            font-size: 2.5rem;
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .header-stat {
+            text-align: right;
+        }
+        
+        .header-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .header-stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-size: 1.25rem;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(15deg);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon.cyan { background: rgba(6, 182, 212, 0.2); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.2); }
+        .stat-icon.purple { background: rgba(139, 92, 246, 0.2); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.2); }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .stat-change.positive { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .stat-change.negative { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        
+        /* Section */
+        .section {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .chart-container {
+            height: 350px;
+        }
+        
+        /* 3D Viewer Section */
+        .viewer-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 900px) {
+            .viewer-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .viewer-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .viewer-header {
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .viewer-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .viewer-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .viewer-badge.rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+        .viewer-badge.rank-2 { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; }
+        .viewer-badge.rank-3 { background: linear-gradient(135deg, #cd7f32, #b8860b); color: #fff; }
+        
+        .mol-viewer {
+            height: 350px;
+            background: #1a1a2e;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .viewer-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .viewer-btn {
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-hover);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+        
+        .viewer-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .viewer-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .viewer-info {
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        
+        .viewer-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .viewer-info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .viewer-info-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            gap: 0.5rem;
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+        }
+        
+        .filter-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .chip {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .chip:hover, .chip.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        th:hover {
+            color: var(--accent);
+        }
+        
+        th .sort-icon {
+            margin-left: 0.25rem;
+            opacity: 0.5;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        tr {
+            transition: var(--transition);
+        }
+        
+        tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        tr.selected {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 3px solid var(--accent);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge-top { background: rgba(6, 182, 212, 0.2); color: var(--accent); }
+        .badge-bridge { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .badge-hollow { background: rgba(139, 92, 246, 0.2); color: var(--purple); }
+        .badge-fcc { background: rgba(236, 72, 153, 0.2); color: var(--pink); }
+        .badge-hcp { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .badge-unknown { background: rgba(107, 114, 128, 0.2); color: var(--text-muted); }
+        
+        .energy-bar {
+            height: 6px;
+            background: var(--bg-hover);
+            border-radius: 3px;
+            overflow: hidden;
+            min-width: 100px;
+        }
+        
+        .energy-bar-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .rank-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        
+        .rank-badge.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+        .rank-badge.silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: #fff; }
+        .rank-badge.bronze { background: linear-gradient(135deg, #cd7f32, #b8860b); color: #fff; }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.3s ease;
+        }
+        
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(90vh - 80px);
+        }
+        
+        .modal-viewer {
+            height: 450px;
+            background: #1a1a2e;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modal-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        
+        @media (max-width: 600px) {
+            .modal-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .modal-info-item {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .modal-info-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        
+        .modal-info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        
+        tr.clickable {
+            cursor: pointer;
+        }
+        
+        tr.clickable:hover {
+            background: rgba(6, 182, 212, 0.1);
+        }
+        
+        .traj-controls {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .traj-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .traj-frame-info {
+            margin-left: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        #trajSlider {
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--bg-hover);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        #trajSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .theme-toggle, .toolbar, .btn { display: none !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1><span>🧪</span> SurfScreen Report</h1>
+            <div class="header-meta">
+                <div class="header-stat">
+                    <div class="header-stat-value">acetone</div>
+                    <div class="header-stat-label">2026-01-29 15:39:49</div>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid animate-in">
+            <div class="stat-card">
+                <div class="stat-icon cyan">📊</div>
+                <div class="stat-value">5</div>
+                <div class="stat-label">Total Configurations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">⚡</div>
+                <div class="stat-value">-0.107</div>
+                <div class="stat-label">Best E_ads (eV)</div>
+                <div class="stat-change negative">↓ Most Stable</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">🎯</div>
+                <div class="stat-value">top</div>
+                <div class="stat-label">Optimal Site Type</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">🔄</div>
+                <div class="stat-value">6</div>
+                <div class="stat-label">Avg. Optimization Steps</div>
+            </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="section animate-in" style="animation-delay: 0.1s">
+                <div class="section-header">
+                    <div class="section-title">📈 Energy Distribution</div>
+                </div>
+                <div class="section-content">
+                    <div id="energy-bar-chart" class="chart-container"></div>
+                </div>
+            </div>
+            
+            <div class="section animate-in" style="animation-delay: 0.2s">
+                <div class="section-header">
+                    <div class="section-title">🎨 Site Type Breakdown</div>
+                </div>
+                <div class="section-content">
+                    <div id="site-pie-chart" class="chart-container"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Energy Histogram -->
+        <div class="section animate-in" style="animation-delay: 0.3s">
+            <div class="section-header">
+                <div class="section-title">📊 Energy Histogram</div>
+            </div>
+            <div class="section-content">
+                <div id="energy-histogram" class="chart-container"></div>
+            </div>
+        </div>
+        
+        <!-- 3D Viewers -->
+        <div class="section animate-in" style="animation-delay: 0.4s">
+            <div class="section-header">
+                <div class="section-title">🔬 Top Structures</div>
+            </div>
+            <div class="section-content">
+                <div class="viewer-section">
+                    <div class="viewer-card">
+                        <div class="viewer-header">
+                            <div class="viewer-title">
+                                <span class="viewer-badge rank-1">🥇 #1</span>
+                                site0_rot135
+                            </div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" onclick="toggleAxes(1)" title="Toggle cell axes">📐 Axes</button>
+                                <button class="viewer-btn" onclick="togglePBC(1)" title="Toggle periodic images">🔁 PBC</button>
+                                <button class="viewer-btn" onclick="toggleSpin(1)" title="Toggle rotation">🔄 Spin</button>
+                            </div>
+                        </div>
+                        <div class="mol-viewer" id="viewer-1"></div>
+                        <div class="viewer-info">
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Energy</span>
+                                <span class="viewer-info-value">-0.1068 eV</span>
+                            </div>
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Site</span>
+                                <span class="viewer-info-value">top</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="viewer-card">
+                        <div class="viewer-header">
+                            <div class="viewer-title">
+                                <span class="viewer-badge rank-2">🥈 #2</span>
+                                site0_rot45
+                            </div>
+                            <div class="viewer-controls">
+                                <button class="viewer-btn" onclick="toggleAxes(2)" title="Toggle cell axes">📐 Axes</button>
+                                <button class="viewer-btn" onclick="togglePBC(2)" title="Toggle periodic images">🔁 PBC</button>
+                                <button class="viewer-btn" onclick="toggleSpin(2)" title="Toggle rotation">🔄 Spin</button>
+                            </div>
+                        </div>
+                        <div class="mol-viewer" id="viewer-2"></div>
+                        <div class="viewer-info">
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Energy</span>
+                                <span class="viewer-info-value">-0.1067 eV</span>
+                            </div>
+                            <div class="viewer-info-item">
+                                <span class="viewer-info-label">Site</span>
+                                <span class="viewer-info-value">top</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Table -->
+        <div class="section animate-in" style="animation-delay: 0.5s">
+            <div class="section-header">
+                <div class="section-title">📋 All Results</div>
+                <div class="toolbar">
+                    <div class="search-box">
+                        <span>🔍</span>
+                        <input type="text" id="searchInput" placeholder="Search configurations..." oninput="filterTable()">
+                    </div>
+                    <div class="filter-chips">
+                        <span class="chip active" onclick="filterByType('all')">All</span>
+                        <span class="chip" onclick="filterByType('top')">Top</span>
+                        <span class="chip" onclick="filterByType('bridge')">Bridge</span>
+                        <span class="chip" onclick="filterByType('hollow')">Hollow</span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="exportCSV()">📥 Export CSV</button>
+                    <button class="btn btn-secondary" onclick="exportJSON()">📥 Export JSON</button>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="table-container">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Rank <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(1)">Configuration <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(2)">Site Type <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(3)">E_ads (eV) <span class="sort-icon">↕</span></th>
+                                <th>Relative</th>
+                                <th onclick="sortTable(5)">Steps <span class="sort-icon">↕</span></th>
+                                <th onclick="sortTable(6)">Status <span class="sort-icon">↕</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                <tr class="clickable" onclick="openStructureModal('site0_rot135', 1)">
+                    <td><span class="rank-badge gold">1</span></td>
+                    <td><strong>site0_rot135</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-0.1068</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 100.0%"></div>
+                        </div>
+                    </td>
+                    <td>6</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr class="clickable" onclick="openStructureModal('site0_rot45', 2)">
+                    <td><span class="rank-badge silver">2</span></td>
+                    <td><strong>site0_rot45</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-0.1067</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 98.6%"></div>
+                        </div>
+                    </td>
+                    <td>6</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr class="clickable" onclick="openStructureModal('site0_rot0', 3)">
+                    <td><span class="rank-badge bronze">3</span></td>
+                    <td><strong>site0_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-0.1052</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 29.2%"></div>
+                        </div>
+                    </td>
+                    <td>7</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr class="clickable" onclick="openStructureModal('site1_rot0', 4)">
+                    <td>4</td>
+                    <td><strong>site1_rot0</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-0.1052</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 29.2%"></div>
+                        </div>
+                    </td>
+                    <td>7</td>
+                    <td>✅</td>
+                </tr>
+            
+                <tr class="clickable" onclick="openStructureModal('site0_rot90', 5)">
+                    <td>5</td>
+                    <td><strong>site0_rot90</strong></td>
+                    <td><span class="badge badge-top">top</span></td>
+                    <td>-0.1046</td>
+                    <td>
+                        <div class="energy-bar">
+                            <div class="energy-bar-fill" style="width: 0.0%"></div>
+                        </div>
+                    </td>
+                    <td>6</td>
+                    <td>✅</td>
+                </tr>
+            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Generated by <a href="#">SurfScreen v0.1.0</a> — Enterprise Surface Adsorption Screening Platform<br>
+        <small>Powered by MACE MLIP | 2026-01-29 15:39:49</small>
+    </div>
+    
+    <!-- Structure Modal -->
+    <div class="modal-overlay" id="structureModal" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>🔬</span>
+                    <span id="modalTitle">Structure Viewer</span>
+                </div>
+                <div class="viewer-controls">
+                    <button class="viewer-btn" onclick="toggleModalAxes()" title="Toggle cell axes">📐 Axes</button>
+                    <button class="viewer-btn" onclick="toggleModalPBC()" title="Toggle periodic images">🔁 PBC</button>
+                    <select id="pbcRepeat" class="viewer-btn" onchange="updateModalPBC()" title="PBC repeat count">
+                        <option value="1">1×1</option>
+                        <option value="2">2×2</option>
+                        <option value="3" selected>3×3</option>
+                        <option value="5">5×5</option>
+                    </select>
+                    <button class="viewer-btn" onclick="toggleModalSpin()" title="Toggle rotation">🔄 Spin</button>
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-viewer" id="modalViewer"></div>
+                <div class="modal-info">
+                    <div class="modal-info-item">
+                        <div class="modal-info-value" id="modalEnergy">-</div>
+                        <div class="modal-info-label">E_ads (eV)</div>
+                    </div>
+                    <div class="modal-info-item">
+                        <div class="modal-info-value" id="modalSite">-</div>
+                        <div class="modal-info-label">Site Type</div>
+                    </div>
+                    <div class="modal-info-item">
+                        <div class="modal-info-value" id="modalSteps">-</div>
+                        <div class="modal-info-label">Opt Steps</div>
+                    </div>
+                    <div class="modal-info-item">
+                        <div class="modal-info-value" id="modalRank">-</div>
+                        <div class="modal-info-label">Rank</div>
+                    </div>
+                </div>
+                
+                <!-- Trajectory Animation Controls -->
+                <div id="trajControls" class="traj-controls" style="display: none;">
+                    <div class="traj-buttons">
+                        <button class="viewer-btn" onclick="trajPrev()">⏪</button>
+                        <button class="viewer-btn" id="trajPlayBtn" onclick="trajPlayPause()">▶️ Play</button>
+                        <button class="viewer-btn" onclick="trajNext()">⏩</button>
+                        <span class="traj-frame-info">Frame: <span id="trajFrameNum">0</span>/<span id="trajFrameTotal">0</span></span>
+                        <input type="range" id="trajSlider" min="0" max="100" value="0" onchange="trajSeek(this.value)" style="flex:1; margin-left: 1rem;">
+                    </div>
+                </div>
+                
+                <!-- Energy Graph -->
+                <div id="energyGraphContainer" style="display: none; margin-top: 1rem;">
+                    <div id="modalEnergyGraph" style="height: 200px; background: var(--bg-card); border-radius: 8px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data
+        const resultsData = [{"name": "site0_rot135", "site_idx": 0, "site_type": "top", "rotation": 135.0, "initial_energy": -194.74766540527344, "final_energy": -194.7662048339844, "e_ads": -0.1067657470703125, "steps": 6, "converged": true}, {"name": "site0_rot45", "site_idx": 0, "site_type": "top", "rotation": 45.0, "initial_energy": -194.74761962890625, "final_energy": -194.76617431640625, "e_ads": -0.1067352294921875, "steps": 6, "converged": true}, {"name": "site0_rot0", "site_idx": 0, "site_type": "top", "rotation": 0.0, "initial_energy": -194.74560546875, "final_energy": -194.7646484375, "e_ads": -0.1052093505859375, "steps": 7, "converged": true}, {"name": "site1_rot0", "site_idx": 1, "site_type": "top", "rotation": 0.0, "initial_energy": -194.74560546875, "final_energy": -194.7646484375, "e_ads": -0.1052093505859375, "steps": 7, "converged": true}, {"name": "site0_rot90", "site_idx": 0, "site_type": "top", "rotation": 90.0, "initial_energy": -194.7455902099609, "final_energy": -194.76400756835935, "e_ads": -0.1045684814453125, "steps": 6, "converged": true}];
+        const trajectoryData = {"site0_rot135": {"energies": [-194.74766540527344, -194.7544403076172, -194.76141357421875, -194.76388549804688, -194.7648468017578, -194.7657928466797, -194.76620483398438], "frames": ["46\nFrame 0\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475818 19.174242\nCu 2.556191 1.475818 19.174242\nCu 5.112382 1.475818 19.174242\nCu 1.278096 3.689544 19.174242\nCu 3.834287 3.689544 19.174242\nCu 6.390478 3.689544 19.174242\nCu 2.556191 5.903270 19.174242\nCu 5.112382 5.903270 19.174242\nCu 7.668573 5.903270 19.174242\nCu 0.000000 0.000000 21.261364\nCu 2.556191 0.000000 21.261364\nCu 5.112382 0.000000 21.261364\nCu 1.278096 2.213726 21.261364\nCu 3.834287 2.213726 21.261364\nCu 6.390478 2.213726 21.261364\nCu 2.556191 4.427453 21.261364\nCu 5.112382 4.427453 21.261364\nCu 7.668573 4.427453 21.261364\nO 0.000000 0.000000 25.261364\nC -0.869458 -0.869883 25.262164\nC -2.333594 -0.522410 25.261364\nC -0.521421 -2.333877 25.261364\nH -2.805941 -0.928431 24.363564\nH -2.807921 -0.933098 26.156064\nH -2.454721 0.564342 25.264264\nH 0.565473 -2.454580 25.264264\nH -0.927300 -2.806365 24.363564\nH -0.931967 -2.808487 26.156064", "46\nFrame 1\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000025 1.475810 19.173484\nCu 2.556202 1.475834 19.173498\nCu 5.112396 1.475800 19.173452\nCu 1.278132 3.689571 19.173475\nCu 3.834268 3.689564 19.173412\nCu 6.390462 3.689533 19.173443\nCu 2.556177 5.903252 19.173421\nCu 5.112358 5.903252 19.173458\nCu 7.668610 5.903276 19.173494\nCu -0.000010 0.000005 21.262612\nCu 2.556196 0.000038 21.261834\nCu 5.112370 0.000013 21.262074\nCu 1.278073 2.213749 21.261689\nCu 3.834364 2.213613 21.261907\nCu 6.390436 2.213797 21.261942\nCu 2.556241 4.427416 21.262076\nCu 5.112500 4.427443 21.261870\nCu 7.668496 4.427388 21.261826\nO 0.001427 0.001475 25.260418\nC -0.863501 -0.864060 25.263774\nC -2.335171 -0.520368 25.261355\nC -0.519233 -2.335327 25.261472\nH -2.808662 -0.929669 24.362340\nH -2.809752 -0.934672 26.156935\nH -2.454132 0.563184 25.264016\nH 0.564317 -2.453869 25.263997\nH -0.928664 -2.809102 24.362268\nH -0.933568 -2.810303 26.156934", "46\nFrame 2\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000085 1.475776 19.171775\nCu 2.556232 1.475870 19.171799\nCu 5.112431 1.475755 19.171655\nCu 1.278221 3.689639 19.171729\nCu 3.834223 3.689611 19.171525\nCu 6.390427 3.689504 19.171618\nCu 2.556153 5.903214 19.171575\nCu 5.112289 5.903218 19.171688\nCu 7.668698 5.903293 19.171798\nCu -0.000037 0.000017 21.265554\nCu 2.556203 0.000126 21.262907\nCu 5.112347 0.000035 21.263734\nCu 1.278020 2.213803 21.262414\nCu 3.834548 2.213349 21.263151\nCu 6.390339 2.213960 21.263275\nCu 2.556365 4.427328 21.263740\nCu 5.112773 4.427423 21.263026\nCu 7.668321 4.427240 21.262877\nO 0.009811 0.009983 25.258220\nC -0.856863 -0.857621 25.267114\nC -2.337081 -0.519603 25.261278\nC -0.518283 -2.337121 25.261509\nH -2.814182 -0.931879 24.360790\nH -2.813340 -0.937733 26.157855\nH -2.453242 0.562569 25.263456\nH 0.563799 -2.452697 25.263396\nH -0.931098 -2.814570 24.360699\nH -0.936679 -2.813845 26.157852", "46\nFrame 3\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000144 1.475716 19.170434\nCu 2.556262 1.475900 19.170421\nCu 5.112464 1.475708 19.170211\nCu 1.278304 3.689707 19.170322\nCu 3.834181 3.689649 19.170009\nCu 6.390396 3.689476 19.170133\nCu 2.556153 5.903193 19.170139\nCu 5.112204 5.903207 19.170297\nCu 7.668778 5.903313 19.170444\nCu -0.000066 0.000023 21.268185\nCu 2.556201 0.000204 21.263780\nCu 5.112339 0.000032 21.265166\nCu 1.277970 2.213848 21.262966\nCu 3.834716 2.213121 21.264179\nCu 6.390256 2.214091 21.264391\nCu 2.556492 4.427245 21.265174\nCu 5.113005 4.427412 21.263973\nCu 7.668178 4.427115 21.263728\nO 0.014905 0.015193 25.256399\nC -0.852211 -0.852987 25.269070\nC -2.336417 -0.521817 25.261187\nC -0.520462 -2.336517 25.261384\nH -2.818046 -0.933084 24.361026\nH -2.815748 -0.939769 26.157357\nH -2.452859 0.563236 25.263001\nH 0.564635 -2.452068 25.262902\nH -0.932440 -2.818306 24.361054\nH -0.938738 -2.816200 26.157354", "46\nFrame 4\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000191 1.475637 19.169697\nCu 2.556289 1.475919 19.169603\nCu 5.112488 1.475667 19.169373\nCu 1.278367 3.689763 19.169499\nCu 3.834150 3.689673 19.169129\nCu 6.390376 3.689452 19.169246\nCu 2.556177 5.903192 19.169368\nCu 5.112117 5.903220 19.169530\nCu 7.668836 5.903332 19.169666\nCu -0.000095 0.000023 21.270065\nCu 2.556191 0.000260 21.264302\nCu 5.112349 0.000006 21.266127\nCu 1.277934 2.213879 21.263247\nCu 3.834839 2.212966 21.264814\nCu 6.390199 2.214170 21.265099\nCu 2.556600 4.427184 21.266134\nCu 5.113157 4.427412 21.264550\nCu 7.668094 4.427036 21.264233\nO 0.017251 0.017625 25.255224\nC -0.850866 -0.851585 25.269394\nC -2.334683 -0.522823 25.261171\nC -0.521435 -2.334827 25.261336\nH -2.819839 -0.933554 24.362352\nH -2.816708 -0.940878 26.156083\nH -2.452670 0.562714 25.262725\nH 0.564226 -2.451706 25.262591\nH -0.933002 -2.819996 24.362479\nH -0.939844 -2.817117 26.156080", "46\nFrame 5\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000267 1.475479 19.168889\nCu 2.556335 1.475943 19.168602\nCu 5.112526 1.475597 19.168380\nCu 1.278466 3.689855 19.168512\nCu 3.834104 3.689701 19.168085\nCu 6.390349 3.689413 19.168156\nCu 2.556243 5.903208 19.168554\nCu 5.111955 5.903267 19.168684\nCu 7.668923 5.903367 19.168759\nCu -0.000145 0.000018 21.272843\nCu 2.556169 0.000341 21.264949\nCu 5.112382 -0.000062 21.267468\nCu 1.277883 2.213922 21.263521\nCu 3.835026 2.212746 21.265628\nCu 6.390119 2.214264 21.266036\nCu 2.556779 4.427087 21.267470\nCu 5.113364 4.427420 21.265279\nCu 7.667993 4.426930 21.264848\nO 0.018928 0.019441 25.253553\nC -0.849578 -0.850195 25.268806\nC -2.332033 -0.523810 25.261203\nC -0.522354 -2.332158 25.261358\nH -2.821461 -0.933968 24.365291\nH -2.817247 -0.942271 26.153420\nH -2.452396 0.561350 25.262376\nH 0.563005 -2.451174 25.262175\nH -0.933557 -2.821476 24.365544\nH -0.941205 -2.817590 26.153420", "46\nFrame 6\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000322 1.475331 19.168632\nCu 2.556371 1.475956 19.168137\nCu 5.112552 1.475540 19.167963\nCu 1.278537 3.689926 19.168079\nCu 3.834073 3.689713 19.167643\nCu 6.390335 3.689382 19.167649\nCu 2.556316 5.903234 19.168341\nCu 5.111816 5.903324 19.168410\nCu 7.668980 5.903396 19.168392\nCu -0.000187 0.000008 21.274709\nCu 2.556148 0.000396 21.265259\nCu 5.112423 -0.000137 21.268288\nCu 1.277853 2.213950 21.263566\nCu 3.835155 2.212606 21.266050\nCu 6.390067 2.214305 21.266556\nCu 2.556920 4.427016 21.268281\nCu 5.113486 4.427433 21.265648\nCu 7.667949 4.426869 21.265130\nO 0.019063 0.019685 25.252357\nC -0.849181 -0.849737 25.267655\nC -2.330708 -0.523806 25.261243\nC -0.522293 -2.330731 25.261422\nH -2.821835 -0.934250 24.367593\nH -2.816941 -0.943235 26.151441\nH -2.452174 0.560229 25.262204\nH 0.561954 -2.450769 25.261942\nH -0.933937 -2.821760 24.367914\nH -0.942115 -2.817230 26.151444"], "steps": [0, 1, 2, 3, 4, 5, 6]}, "site0_rot45": {"energies": [-194.74761962890625, -194.75439453125, -194.76138305664062, -194.76385498046875, -194.76483154296875, -194.76576232910156, -194.76617431640625], "frames": ["46\nFrame 0\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475818 19.174242\nCu 2.556191 1.475818 19.174242\nCu 5.112382 1.475818 19.174242\nCu 1.278096 3.689544 19.174242\nCu 3.834287 3.689544 19.174242\nCu 6.390478 3.689544 19.174242\nCu 2.556191 5.903270 19.174242\nCu 5.112382 5.903270 19.174242\nCu 7.668573 5.903270 19.174242\nCu 0.000000 0.000000 21.261364\nCu 2.556191 0.000000 21.261364\nCu 5.112382 0.000000 21.261364\nCu 1.278096 2.213726 21.261364\nCu 3.834287 2.213726 21.261364\nCu 6.390478 2.213726 21.261364\nCu 2.556191 4.427453 21.261364\nCu 5.112382 4.427453 21.261364\nCu 7.668573 4.427453 21.261364\nO 0.000000 0.000000 25.261364\nC -0.869883 0.869458 25.262164\nC -0.522410 2.333594 25.261364\nC -2.333877 0.521421 25.261364\nH -0.928431 2.805941 24.363564\nH -0.933098 2.807921 26.156064\nH 0.564342 2.454721 25.264264\nH -2.454580 -0.565473 25.264264\nH -2.806365 0.927300 24.363564\nH -2.808487 0.931967 26.156064", "46\nFrame 1\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000046 1.475819 19.173426\nCu 2.556214 1.475788 19.173454\nCu 5.112407 1.475810 19.173427\nCu 1.278079 3.689560 19.173479\nCu 3.834321 3.689532 19.173482\nCu 6.390459 3.689512 19.173457\nCu 2.556158 5.903308 19.173467\nCu 5.112393 5.903272 19.173476\nCu 7.668595 5.903301 19.173458\nCu -0.000007 -0.000005 21.262611\nCu 2.556194 -0.000043 21.261829\nCu 5.112369 -0.000021 21.262074\nCu 1.278207 2.213738 21.261871\nCu 3.834212 2.213793 21.261824\nCu 6.390530 2.213767 21.262078\nCu 2.556144 4.427386 21.261946\nCu 5.112362 4.427428 21.261687\nCu 7.668654 4.427566 21.261909\nO 0.001419 -0.001482 25.260418\nC -0.863916 0.863642 25.263773\nC -0.520251 2.335027 25.261453\nC -2.335471 0.519350 25.261374\nH -0.929800 2.808680 24.362267\nH -0.934714 2.809755 26.156956\nH 0.563228 2.454014 25.263998\nH -2.453988 -0.564272 25.264016\nH -2.809085 0.928530 24.362351\nH -2.810300 0.933527 26.156913", "46\nFrame 2\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000152 1.475809 19.171586\nCu 2.556267 1.475721 19.171655\nCu 5.112468 1.475791 19.171580\nCu 1.278043 3.689597 19.171743\nCu 3.834395 3.689506 19.171746\nCu 6.390420 3.689435 19.171673\nCu 2.556090 5.903400 19.171727\nCu 5.112405 5.903287 19.171743\nCu 7.668649 5.903374 19.171675\nCu -0.000027 -0.000014 21.265553\nCu 2.556200 -0.000145 21.262889\nCu 5.112340 -0.000058 21.263734\nCu 1.278465 2.213761 21.263031\nCu 3.834044 2.213945 21.262869\nCu 6.390662 2.213867 21.263745\nCu 2.556035 4.427233 21.263288\nCu 5.112317 4.427372 21.262409\nCu 7.668845 4.427830 21.263159\nO 0.009789 -0.010004 25.258220\nC -0.857278 0.857201 25.267114\nC -0.519320 2.336805 25.261477\nC -2.337396 0.518564 25.261313\nH -0.932252 2.814154 24.360688\nH -0.937850 2.813327 26.157904\nH 0.562766 2.452843 25.263396\nH -2.453095 -0.563600 25.263455\nH -2.814602 0.930718 24.360830\nH -2.813859 0.936562 26.157802", "46\nFrame 3\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000244 1.475775 19.170145\nCu 2.556309 1.475666 19.170190\nCu 5.112529 1.475774 19.170108\nCu 1.278015 3.689627 19.170344\nCu 3.834444 3.689487 19.170333\nCu 6.390398 3.689363 19.170239\nCu 2.556055 5.903491 19.170378\nCu 5.112384 5.903322 19.170373\nCu 7.668703 5.903439 19.170240\nCu -0.000049 -0.000019 21.268185\nCu 2.556198 -0.000236 21.263754\nCu 5.112325 -0.000067 21.265168\nCu 1.278685 2.213771 21.263980\nCu 3.833909 2.214068 21.263715\nCu 6.390791 2.213959 21.265184\nCu 2.555944 4.427111 21.264410\nCu 5.112276 4.427325 21.262960\nCu 7.669015 4.428062 21.264195\nO 0.014874 -0.015233 25.256398\nC -0.852631 0.852557 25.269071\nC -0.521475 2.336217 25.261369\nC -2.336713 0.520800 25.261216\nH -0.933611 2.817896 24.361033\nH -0.939922 2.815694 26.157407\nH 0.563603 2.452209 25.262901\nH -2.452714 -0.564268 25.263000\nH -2.818472 0.931908 24.361087\nH -2.816257 0.938588 26.157305", "46\nFrame 4\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000305 1.475720 19.169360\nCu 2.556333 1.475631 19.169313\nCu 5.112579 1.475760 19.169269\nCu 1.277999 3.689644 19.169527\nCu 3.834461 3.689478 19.169490\nCu 6.390397 3.689308 19.169406\nCu 2.556058 5.903565 19.169661\nCu 5.112334 5.903371 19.169608\nCu 7.668748 5.903485 19.169404\nCu -0.000070 -0.000019 21.270064\nCu 2.556191 -0.000300 21.264270\nCu 5.112325 -0.000045 21.266132\nCu 1.278829 2.213766 21.264554\nCu 3.833833 2.214143 21.264213\nCu 6.390898 2.214026 21.266147\nCu 2.555885 4.427041 21.265120\nCu 5.112248 4.427294 21.263240\nCu 7.669135 4.428224 21.264837\nO 0.017209 -0.017677 25.255222\nC -0.851283 0.851157 25.269396\nC -0.522437 2.334542 25.261332\nC -2.334960 0.521815 25.261194\nH -0.934177 2.819583 24.362464\nH -0.941030 2.816615 26.156123\nH 0.563185 2.451842 25.262589\nH -2.452529 -0.563757 25.262724\nH -2.820273 0.932373 24.362417\nH -2.817214 0.939697 26.156046", "46\nFrame 5\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000388 1.475603 19.168510\nCu 2.556361 1.475585 19.168234\nCu 5.112661 1.475741 19.168299\nCu 1.277981 3.689666 19.168553\nCu 3.834461 3.689469 19.168452\nCu 6.390414 3.689224 19.168418\nCu 2.556098 5.903684 19.168915\nCu 5.112215 5.903473 19.168748\nCu 7.668822 5.903554 19.168410\nCu -0.000109 -0.000013 21.272837\nCu 2.556175 -0.000393 21.264909\nCu 5.112341 0.000022 21.267476\nCu 1.279028 2.213745 21.265276\nCu 3.833745 2.214236 21.264816\nCu 6.391071 2.214129 21.267487\nCu 2.555805 4.426960 21.266055\nCu 5.112208 4.427251 21.263514\nCu 7.669313 4.428458 21.265661\nO 0.018869 -0.019507 25.253552\nC -0.849983 0.849782 25.268809\nC -0.523345 2.331888 25.261365\nC -2.332295 0.522808 25.261226\nH -0.934734 2.821054 24.365541\nH -0.942389 2.817091 26.153447\nH 0.561954 2.451305 25.262174\nH -2.452260 -0.562409 25.262378\nH -2.821907 0.932784 24.365356\nH -2.817746 0.941087 26.153408", "46\nFrame 6\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000438 1.475489 19.168254\nCu 2.556374 1.475560 19.167724\nCu 5.112725 1.475730 19.167919\nCu 1.277975 3.689676 19.168130\nCu 3.834438 3.689468 19.167963\nCu 6.390442 3.689166 19.167999\nCu 2.556158 5.903775 19.168732\nCu 5.112094 5.903570 19.168444\nCu 7.668880 5.903600 19.167987\nCu -0.000141 -0.000003 21.274701\nCu 2.556160 -0.000453 21.265214\nCu 5.112366 0.000103 21.268301\nCu 1.279148 2.213718 21.265637\nCu 3.833711 2.214284 21.265088\nCu 6.391203 2.214202 21.268303\nCu 2.555759 4.426927 21.266574\nCu 5.112185 4.427223 21.263559\nCu 7.669432 4.428611 21.266093\nO 0.018996 -0.019758 25.252355\nC -0.849579 0.849333 25.267659\nC -0.523284 2.330458 25.261427\nC -2.330970 0.522803 25.261272\nH -0.935113 2.821333 24.367923\nH -0.943300 2.816739 26.151464\nH 0.560901 2.450900 25.261941\nH -2.452037 -0.561291 25.262206\nH -2.822291 0.933067 24.367659\nH -2.817430 0.942049 26.151442"], "steps": [0, 1, 2, 3, 4, 5, 6]}, "site0_rot0": {"energies": [-194.74560546875, -194.75244140625, -194.75953674316406, -194.7620391845703, -194.76303100585938, -194.76400756835938, -194.76443481445312, -194.7646484375], "frames": ["46\nFrame 0\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475818 19.174242\nCu 2.556191 1.475818 19.174242\nCu 5.112382 1.475818 19.174242\nCu 1.278096 3.689544 19.174242\nCu 3.834287 3.689544 19.174242\nCu 6.390478 3.689544 19.174242\nCu 2.556191 5.903270 19.174242\nCu 5.112382 5.903270 19.174242\nCu 7.668573 5.903270 19.174242\nCu 0.000000 0.000000 21.261364\nCu 2.556191 0.000000 21.261364\nCu 5.112382 0.000000 21.261364\nCu 1.278096 2.213726 21.261364\nCu 3.834287 2.213726 21.261364\nCu 6.390478 2.213726 21.261364\nCu 2.556191 4.427453 21.261364\nCu 5.112382 4.427453 21.261364\nCu 7.668573 4.427453 21.261364\nO 0.000000 0.000000 25.261364\nC -0.000300 1.229900 25.262164\nC 1.280700 2.019500 25.261364\nC -1.281600 2.019000 25.261364\nH 1.327600 2.640600 24.363564\nH 1.325700 2.645300 26.156064\nH 2.134800 1.336700 25.264264\nH -2.135500 1.335800 25.264264\nH -1.328700 2.640100 24.363564\nH -1.326900 2.644900 26.156064", "46\nFrame 1\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000000 1.475845 19.173436\nCu 2.556149 1.475823 19.173439\nCu 5.112424 1.475823 19.173439\nCu 1.278089 3.689491 19.173482\nCu 3.834287 3.689533 19.173493\nCu 6.390484 3.689491 19.173482\nCu 2.556194 5.903302 19.173472\nCu 5.112379 5.903302 19.173472\nCu 7.668573 5.903292 19.173435\nCu 0.000000 0.000001 21.262610\nCu 2.556270 -0.000049 21.261905\nCu 5.112303 -0.000049 21.261905\nCu 1.278113 2.213713 21.262165\nCu 3.834286 2.213703 21.261949\nCu 6.390460 2.213713 21.262165\nCu 2.556211 4.427439 21.261736\nCu 5.112362 4.427439 21.261736\nCu 7.668573 4.427543 21.261831\nO -0.000005 -0.002058 25.260425\nC -0.000295 1.221604 25.263757\nC 1.283166 2.019039 25.261409\nC -1.284098 2.018531 25.261428\nH 1.328611 2.643512 24.362213\nH 1.325860 2.647740 26.156955\nH 2.133420 1.337029 25.263993\nH -2.134087 1.336157 25.263992\nH -1.329714 2.643007 24.362213\nH -1.327058 2.647318 26.156933", "46\nFrame 2\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475900 19.171618\nCu 2.556049 1.475837 19.171604\nCu 5.112524 1.475837 19.171604\nCu 1.278072 3.689362 19.171747\nCu 3.834287 3.689503 19.171771\nCu 6.390501 3.689362 19.171746\nCu 2.556212 5.903384 19.171723\nCu 5.112361 5.903384 19.171723\nCu 7.668573 5.903343 19.171580\nCu 0.000000 0.000006 21.265570\nCu 2.556454 -0.000164 21.263155\nCu 5.112119 -0.000165 21.263155\nCu 1.278152 2.213680 21.264061\nCu 3.834286 2.213644 21.263301\nCu 6.390421 2.213680 21.264061\nCu 2.556258 4.427405 21.262580\nCu 5.112316 4.427405 21.262580\nCu 7.668573 4.427752 21.262898\nO -0.000015 -0.014072 25.258227\nC -0.000296 1.212290 25.267085\nC 1.284918 2.019768 25.261337\nC -1.285873 2.019256 25.261368\nH 1.330862 2.649184 24.360481\nH 1.326180 2.652522 26.157901\nH 2.132031 1.336622 25.263374\nH -2.132656 1.335787 25.263373\nH -1.331975 2.648660 24.360491\nH -1.327375 2.652062 26.157850", "46\nFrame 3\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475927 19.170221\nCu 2.555959 1.475855 19.170144\nCu 5.112614 1.475855 19.170144\nCu 1.278055 3.689240 19.170362\nCu 3.834287 3.689469 19.170376\nCu 6.390518 3.689240 19.170362\nCu 2.556253 5.903473 19.170354\nCu 5.112320 5.903473 19.170353\nCu 7.668573 5.903388 19.170074\nCu 0.000000 0.000017 21.268210\nCu 2.556605 -0.000264 21.264188\nCu 5.111968 -0.000264 21.264187\nCu 1.278180 2.213645 21.265713\nCu 3.834286 2.213582 21.264421\nCu 6.390393 2.213645 21.265714\nCu 2.556299 4.427377 21.263240\nCu 5.112274 4.427377 21.263240\nCu 7.668573 4.427922 21.263758\nO -0.000024 -0.021389 25.256410\nC -0.000302 1.205668 25.269013\nC 1.282832 2.020990 25.261146\nC -1.283760 2.020485 25.261162\nH 1.332637 2.652837 24.360687\nH 1.326383 2.655685 26.157382\nH 2.131960 1.335661 25.262859\nH -2.132588 1.334829 25.262859\nH -1.333759 2.652299 24.360705\nH -1.327578 2.655209 26.157329", "46\nFrame 4\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475921 19.169498\nCu 2.555893 1.475873 19.169318\nCu 5.112680 1.475873 19.169318\nCu 1.278042 3.689147 19.169573\nCu 3.834287 3.689437 19.169553\nCu 6.390531 3.689147 19.169573\nCu 2.556311 5.903553 19.169608\nCu 5.112262 5.903553 19.169608\nCu 7.668573 5.903420 19.169184\nCu 0.000000 0.000031 21.270083\nCu 2.556696 -0.000330 21.264822\nCu 5.111877 -0.000330 21.264821\nCu 1.278193 2.213614 21.266838\nCu 3.834285 2.213529 21.265115\nCu 6.390379 2.213614 21.266839\nCu 2.556329 4.427358 21.263597\nCu 5.112244 4.427359 21.263597\nCu 7.668573 4.428024 21.264260\nO -0.000032 -0.024750 25.255253\nC -0.000300 1.203768 25.269291\nC 1.280895 2.020572 25.261044\nC -1.281804 2.020065 25.261049\nH 1.333476 2.654445 24.362012\nH 1.326228 2.657125 26.156068\nH 2.131254 1.335750 25.262532\nH -2.131890 1.334915 25.262532\nH -1.334604 2.653904 24.362024\nH -1.327422 2.656646 26.156026", "46\nFrame 5\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475882 19.168753\nCu 2.555794 1.475906 19.168341\nCu 5.112779 1.475906 19.168340\nCu 1.278020 3.688998 19.168631\nCu 3.834287 3.689379 19.168523\nCu 6.390553 3.688998 19.168631\nCu 2.556432 5.903693 19.168773\nCu 5.112141 5.903693 19.168772\nCu 7.668573 5.903467 19.168068\nCu 0.000000 0.000061 21.272901\nCu 2.556814 -0.000422 21.265657\nCu 5.111759 -0.000423 21.265656\nCu 1.278203 2.213559 21.268471\nCu 3.834285 2.213439 21.266036\nCu 6.390368 2.213559 21.268471\nCu 2.556374 4.427329 21.263996\nCu 5.112199 4.427329 21.263995\nCu 7.668573 4.428152 21.264881\nO -0.000042 -0.027219 25.253581\nC -0.000291 1.201900 25.268616\nC 1.278245 2.019470 25.260963\nC -1.279136 2.018958 25.260957\nH 1.334202 2.655945 24.364967\nH 1.325545 2.658484 26.153292\nH 2.129773 1.336311 25.262079\nH -2.130420 1.335469 25.262080\nH -1.335339 2.655405 24.364965\nH -1.326734 2.658001 26.153266", "46\nFrame 6\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475826 19.168607\nCu 2.555727 1.475935 19.167958\nCu 5.112846 1.475935 19.167957\nCu 1.278005 3.688892 19.168250\nCu 3.834287 3.689331 19.168044\nCu 6.390568 3.688892 19.168249\nCu 2.556547 5.903806 19.168507\nCu 5.112026 5.903806 19.168506\nCu 7.668573 5.903496 19.167554\nCu 0.000000 0.000089 21.274782\nCu 2.556873 -0.000477 21.266097\nCu 5.111700 -0.000478 21.266095\nCu 1.278203 2.213515 21.269498\nCu 3.834285 2.213369 21.266528\nCu 6.390368 2.213514 21.269498\nCu 2.556405 4.427306 21.264126\nCu 5.112169 4.427307 21.264125\nCu 7.668573 4.428210 21.265160\nO -0.000048 -0.027433 25.252393\nC -0.000284 1.201342 25.267391\nC 1.277244 2.018522 25.260935\nC -1.278136 2.018011 25.260929\nH 1.334172 2.656459 24.367231\nH 1.324594 2.658934 26.151244\nH 2.128613 1.336800 25.261817\nH -2.129262 1.335957 25.261817\nH -1.335313 2.655921 24.367219\nH -1.325778 2.658445 26.151225", "46\nFrame 7\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475760 19.168852\nCu 2.555682 1.475961 19.167959\nCu 5.112891 1.475961 19.167958\nCu 1.277994 3.688813 19.168228\nCu 3.834287 3.689289 19.167918\nCu 6.390579 3.688813 19.168227\nCu 2.556657 5.903899 19.168607\nCu 5.111916 5.903899 19.168607\nCu 7.668573 5.903514 19.167427\nCu 0.000000 0.000113 21.276059\nCu 2.556894 -0.000508 21.266286\nCu 5.111679 -0.000509 21.266285\nCu 1.278197 2.213477 21.270133\nCu 3.834285 2.213314 21.266747\nCu 6.390374 2.213476 21.270133\nCu 2.556426 4.427286 21.264089\nCu 5.112148 4.427286 21.264088\nCu 7.668573 4.428222 21.265223\nO -0.000049 -0.026871 25.251379\nC -0.000284 1.201287 25.266097\nC 1.277225 2.017961 25.260905\nC -1.278124 2.017453 25.260899\nH 1.333723 2.656666 24.368530\nH 1.323479 2.659046 26.150121\nH 2.128045 1.336895 25.261678\nH -2.128687 1.336054 25.261677\nH -1.334866 2.656127 24.368514\nH -1.324659 2.658552 26.150101"], "steps": [0, 1, 2, 3, 4, 5, 6, 7]}, "site1_rot0": {"energies": [-194.74560546875, -194.75244140625, -194.75953674316406, -194.7620391845703, -194.76303100585938, -194.76400756835938, -194.76443481445312, -194.7646484375], "frames": ["46\nFrame 0\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475818 19.174242\nCu 2.556191 1.475818 19.174242\nCu 5.112382 1.475818 19.174242\nCu 1.278096 3.689544 19.174242\nCu 3.834287 3.689544 19.174242\nCu 6.390478 3.689544 19.174242\nCu 2.556191 5.903270 19.174242\nCu 5.112382 5.903270 19.174242\nCu 7.668573 5.903270 19.174242\nCu 0.000000 0.000000 21.261364\nCu 2.556191 0.000000 21.261364\nCu 5.112382 0.000000 21.261364\nCu 1.278096 2.213726 21.261364\nCu 3.834287 2.213726 21.261364\nCu 6.390478 2.213726 21.261364\nCu 2.556191 4.427453 21.261364\nCu 5.112382 4.427453 21.261364\nCu 7.668573 4.427453 21.261364\nO 2.556191 0.000000 25.261364\nC 2.555891 1.229900 25.262164\nC 3.836891 2.019500 25.261364\nC 1.274591 2.019000 25.261364\nH 3.883791 2.640600 24.363564\nH 3.881891 2.645300 26.156064\nH 4.690991 1.336700 25.264264\nH 0.420691 1.335800 25.264264\nH 1.227491 2.640100 24.363564\nH 1.229291 2.644900 26.156064", "46\nFrame 1\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000042 1.475823 19.173439\nCu 2.556191 1.475845 19.173436\nCu 5.112340 1.475823 19.173439\nCu 1.278102 3.689491 19.173482\nCu 3.834280 3.689491 19.173482\nCu 6.390478 3.689533 19.173493\nCu 2.556191 5.903292 19.173435\nCu 5.112385 5.903302 19.173472\nCu 7.668570 5.903302 19.173472\nCu -0.000079 -0.000049 21.261905\nCu 2.556191 0.000001 21.262610\nCu 5.112461 -0.000049 21.261905\nCu 1.278078 2.213713 21.262165\nCu 3.834304 2.213713 21.262165\nCu 6.390477 2.213703 21.261949\nCu 2.556191 4.427543 21.261831\nCu 5.112402 4.427439 21.261736\nCu 7.668553 4.427439 21.261736\nO 2.556186 -0.002058 25.260425\nC 2.555896 1.221604 25.263757\nC 3.839357 2.019039 25.261409\nC 1.272093 2.018531 25.261428\nH 3.884802 2.643512 24.362213\nH 3.882051 2.647740 26.156955\nH 4.689611 1.337029 25.263993\nH 0.422104 1.336157 25.263992\nH 1.226477 2.643007 24.362213\nH 1.229133 2.647318 26.156933", "46\nFrame 2\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000142 1.475837 19.171604\nCu 2.556191 1.475900 19.171618\nCu 5.112240 1.475837 19.171604\nCu 1.278119 3.689362 19.171746\nCu 3.834263 3.689362 19.171747\nCu 6.390477 3.689503 19.171771\nCu 2.556191 5.903343 19.171580\nCu 5.112403 5.903384 19.171723\nCu 7.668552 5.903384 19.171723\nCu -0.000263 -0.000165 21.263155\nCu 2.556191 0.000006 21.265570\nCu 5.112645 -0.000164 21.263155\nCu 1.278039 2.213680 21.264061\nCu 3.834343 2.213680 21.264061\nCu 6.390477 2.213644 21.263301\nCu 2.556191 4.427752 21.262898\nCu 5.112449 4.427405 21.262580\nCu 7.668507 4.427405 21.262580\nO 2.556177 -0.014072 25.258227\nC 2.555895 1.212290 25.267085\nC 3.841109 2.019768 25.261337\nC 1.270318 2.019256 25.261368\nH 3.887053 2.649184 24.360481\nH 3.882371 2.652522 26.157901\nH 4.688222 1.336622 25.263374\nH 0.423535 1.335787 25.263373\nH 1.224216 2.648660 24.360491\nH 1.228816 2.652062 26.157850", "46\nFrame 3\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000232 1.475855 19.170144\nCu 2.556191 1.475927 19.170221\nCu 5.112150 1.475855 19.170144\nCu 1.278136 3.689240 19.170362\nCu 3.834246 3.689240 19.170362\nCu 6.390477 3.689469 19.170376\nCu 2.556191 5.903388 19.170074\nCu 5.112444 5.903473 19.170353\nCu 7.668511 5.903473 19.170353\nCu -0.000414 -0.000264 21.264187\nCu 2.556191 0.000017 21.268210\nCu 5.112796 -0.000264 21.264188\nCu 1.278011 2.213645 21.265714\nCu 3.834371 2.213645 21.265713\nCu 6.390477 2.213582 21.264421\nCu 2.556191 4.427923 21.263758\nCu 5.112490 4.427377 21.263240\nCu 7.668465 4.427377 21.263240\nO 2.556167 -0.021389 25.256410\nC 2.555889 1.205667 25.269013\nC 3.839023 2.020990 25.261146\nC 1.272430 2.020485 25.261162\nH 3.888828 2.652837 24.360687\nH 3.882574 2.655685 26.157382\nH 4.688151 1.335661 25.262859\nH 0.423603 1.334829 25.262859\nH 1.222432 2.652299 24.360705\nH 1.228613 2.655209 26.157329", "46\nFrame 4\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000298 1.475873 19.169318\nCu 2.556191 1.475922 19.169498\nCu 5.112084 1.475873 19.169318\nCu 1.278149 3.689147 19.169573\nCu 3.834233 3.689147 19.169573\nCu 6.390477 3.689437 19.169553\nCu 2.556191 5.903420 19.169184\nCu 5.112502 5.903553 19.169608\nCu 7.668454 5.903553 19.169608\nCu -0.000505 -0.000330 21.264821\nCu 2.556191 0.000031 21.270083\nCu 5.112887 -0.000330 21.264822\nCu 1.277997 2.213614 21.266839\nCu 3.834384 2.213614 21.266838\nCu 6.390476 2.213529 21.265115\nCu 2.556191 4.428024 21.264260\nCu 5.112520 4.427358 21.263597\nCu 7.668435 4.427359 21.263597\nO 2.556159 -0.024750 25.255253\nC 2.555891 1.203768 25.269291\nC 3.837086 2.020572 25.261044\nC 1.274387 2.020065 25.261049\nH 3.889667 2.654445 24.362012\nH 3.882419 2.657125 26.156068\nH 4.687445 1.335750 25.262532\nH 0.424301 1.334914 25.262532\nH 1.221587 2.653904 24.362024\nH 1.228769 2.656646 26.156026", "46\nFrame 5\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000397 1.475906 19.168340\nCu 2.556191 1.475882 19.168753\nCu 5.111985 1.475906 19.168341\nCu 1.278171 3.688998 19.168631\nCu 3.834211 3.688998 19.168631\nCu 6.390477 3.689379 19.168523\nCu 2.556191 5.903467 19.168068\nCu 5.112623 5.903693 19.168772\nCu 7.668332 5.903693 19.168772\nCu -0.000623 -0.000423 21.265656\nCu 2.556191 0.000061 21.272901\nCu 5.113005 -0.000422 21.265657\nCu 1.277986 2.213559 21.268471\nCu 3.834395 2.213559 21.268471\nCu 6.390476 2.213439 21.266036\nCu 2.556191 4.428152 21.264881\nCu 5.112565 4.427329 21.263996\nCu 7.668390 4.427329 21.263995\nO 2.556149 -0.027219 25.253581\nC 2.555900 1.201901 25.268616\nC 3.834436 2.019470 25.260963\nC 1.277055 2.018958 25.260957\nH 3.890393 2.655945 24.364966\nH 3.881736 2.658484 26.153292\nH 4.685963 1.336311 25.262079\nH 0.425771 1.335469 25.262080\nH 1.220852 2.655405 24.364965\nH 1.229457 2.658001 26.153266", "46\nFrame 6\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000464 1.475935 19.167958\nCu 2.556191 1.475826 19.168607\nCu 5.111918 1.475935 19.167958\nCu 1.278186 3.688892 19.168249\nCu 3.834196 3.688892 19.168250\nCu 6.390477 3.689331 19.168044\nCu 2.556191 5.903496 19.167554\nCu 5.112738 5.903806 19.168506\nCu 7.668217 5.903806 19.168506\nCu -0.000682 -0.000478 21.266095\nCu 2.556191 0.000089 21.274782\nCu 5.113064 -0.000477 21.266097\nCu 1.277986 2.213514 21.269498\nCu 3.834394 2.213515 21.269497\nCu 6.390476 2.213369 21.266528\nCu 2.556191 4.428210 21.265160\nCu 5.112596 4.427306 21.264126\nCu 7.668360 4.427307 21.264125\nO 2.556143 -0.027433 25.252393\nC 2.555907 1.201342 25.267391\nC 3.833435 2.018522 25.260935\nC 1.278055 2.018011 25.260929\nH 3.890363 2.656459 24.367231\nH 3.880785 2.658934 26.151245\nH 4.684804 1.336800 25.261817\nH 0.426929 1.335957 25.261817\nH 1.220878 2.655921 24.367219\nH 1.230413 2.658445 26.151225", "46\nFrame 7\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu 0.000509 1.475961 19.167958\nCu 2.556191 1.475760 19.168852\nCu 5.111873 1.475961 19.167959\nCu 1.278197 3.688813 19.168227\nCu 3.834185 3.688813 19.168228\nCu 6.390477 3.689289 19.167918\nCu 2.556191 5.903514 19.167427\nCu 5.112848 5.903899 19.168607\nCu 7.668107 5.903899 19.168607\nCu -0.000703 -0.000509 21.266285\nCu 2.556191 0.000113 21.276059\nCu 5.113085 -0.000508 21.266286\nCu 1.277992 2.213476 21.270133\nCu 3.834388 2.213477 21.270133\nCu 6.390475 2.213314 21.266747\nCu 2.556191 4.428222 21.265223\nCu 5.112617 4.427286 21.264089\nCu 7.668339 4.427286 21.264088\nO 2.556142 -0.026871 25.251379\nC 2.555908 1.201287 25.266097\nC 3.833415 2.017961 25.260905\nC 1.278067 2.017453 25.260899\nH 3.889914 2.656666 24.368530\nH 3.879670 2.659046 26.150121\nH 4.684236 1.336895 25.261678\nH 0.427504 1.336054 25.261677\nH 1.221325 2.656127 24.368514\nH 1.231532 2.658552 26.150102"], "steps": [0, 1, 2, 3, 4, 5, 6, 7]}, "site0_rot90": {"energies": [-194.74559020996094, -194.7523193359375, -194.75930786132812, -194.76174926757812, -194.76271057128906, -194.76361083984375, -194.76400756835938], "frames": ["46\nFrame 0\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000000 1.475818 19.174242\nCu 2.556191 1.475818 19.174242\nCu 5.112382 1.475818 19.174242\nCu 1.278096 3.689544 19.174242\nCu 3.834287 3.689544 19.174242\nCu 6.390478 3.689544 19.174242\nCu 2.556191 5.903270 19.174242\nCu 5.112382 5.903270 19.174242\nCu 7.668573 5.903270 19.174242\nCu 0.000000 0.000000 21.261364\nCu 2.556191 0.000000 21.261364\nCu 5.112382 0.000000 21.261364\nCu 1.278096 2.213726 21.261364\nCu 3.834287 2.213726 21.261364\nCu 6.390478 2.213726 21.261364\nCu 2.556191 4.427453 21.261364\nCu 5.112382 4.427453 21.261364\nCu 7.668573 4.427453 21.261364\nO 0.000000 0.000000 25.261364\nC -1.229900 -0.000300 25.262164\nC -2.019500 1.280700 25.261364\nC -2.019000 -1.281600 25.261364\nH -2.640600 1.327600 24.363564\nH -2.645300 1.325700 26.156064\nH -1.336700 2.134800 25.264264\nH -1.335800 -2.135500 25.264264\nH -2.640100 -1.328700 24.363564\nH -2.644900 -1.326900 26.156064", "46\nFrame 1\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000034 1.475820 19.173458\nCu 2.556219 1.475813 19.173499\nCu 5.112387 1.475806 19.173408\nCu 1.278090 3.689560 19.173494\nCu 3.834303 3.689544 19.173455\nCu 6.390466 3.689529 19.173453\nCu 2.556174 5.903285 19.173407\nCu 5.112375 5.903254 19.173485\nCu 7.668598 5.903287 19.173464\nCu -0.000002 -0.000002 21.262616\nCu 2.556194 -0.000000 21.261686\nCu 5.112372 -0.000003 21.261962\nCu 1.278108 2.213789 21.261932\nCu 3.834197 2.213809 21.261835\nCu 6.390535 2.213812 21.261897\nCu 2.556242 4.427372 21.261898\nCu 5.112398 4.427394 21.261927\nCu 7.668487 4.427366 21.261838\nO 0.002136 -0.000004 25.260409\nC -1.221615 -0.000297 25.263796\nC -2.019090 1.283263 25.261405\nC -2.018583 -1.284193 25.261423\nH -2.643404 1.328650 24.362414\nH -2.647712 1.325897 26.156942\nH -1.337084 2.133588 25.264032\nH -1.336212 -2.134255 25.264031\nH -2.642899 -1.329756 24.362392\nH -2.647290 -1.327095 26.156920", "46\nFrame 2\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000111 1.475810 19.171671\nCu 2.556283 1.475807 19.171787\nCu 5.112400 1.475778 19.171489\nCu 1.278080 3.689596 19.171775\nCu 3.834341 3.689546 19.171640\nCu 6.390436 3.689494 19.171635\nCu 2.556145 5.903326 19.171502\nCu 5.112344 5.903220 19.171758\nCu 7.668660 5.903324 19.171672\nCu -0.000008 -0.000006 21.265601\nCu 2.556199 -0.000002 21.262409\nCu 5.112350 -0.000009 21.263362\nCu 1.278134 2.213932 21.263253\nCu 3.833990 2.214000 21.262924\nCu 6.390668 2.214009 21.263135\nCu 2.556361 4.427187 21.263139\nCu 5.112435 4.427259 21.263237\nCu 7.668285 4.427165 21.262933\nO 0.014229 -0.000013 25.258169\nC -1.212214 -0.000299 25.267218\nC -2.019773 1.285218 25.261443\nC -2.019268 -1.286170 25.261462\nH -2.648927 1.331019 24.361043\nH -2.652461 1.326312 26.157882\nH -1.336828 2.132583 25.263507\nH -1.335994 -2.133208 25.263507\nH -2.648396 -1.332138 24.360984\nH -2.652002 -1.327508 26.157831", "46\nFrame 3\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000171 1.475773 19.170300\nCu 2.556329 1.475809 19.170426\nCu 5.112411 1.475752 19.169971\nCu 1.278074 3.689624 19.170420\nCu 3.834372 3.689552 19.170193\nCu 6.390407 3.689465 19.170186\nCu 2.556146 5.903374 19.170030\nCu 5.112285 5.903202 19.170427\nCu 7.668721 5.903353 19.170249\nCu -0.000018 -0.000010 21.268221\nCu 2.556194 -0.000005 21.262947\nCu 5.112339 -0.000013 21.264520\nCu 1.278148 2.214048 21.264335\nCu 3.833824 2.214158 21.263796\nCu 6.390775 2.214163 21.264144\nCu 2.556461 4.427046 21.264148\nCu 5.112461 4.427147 21.264311\nCu 7.668117 4.427001 21.263813\nO 0.021444 -0.000022 25.256348\nC -1.205666 -0.000305 25.269188\nC -2.020789 1.283239 25.261454\nC -2.020301 -1.284166 25.261441\nH -2.652459 1.332884 24.361486\nH -2.655557 1.326610 26.157400\nH -1.336018 2.132871 25.263099\nH -1.335188 -2.133496 25.263101\nH -2.651900 -1.334016 24.361400\nH -2.655082 -1.327805 26.157344", "46\nFrame 4\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000203 1.475711 19.169542\nCu 2.556351 1.475820 19.169609\nCu 5.112419 1.475734 19.169068\nCu 1.278075 3.689640 19.169622\nCu 3.834393 3.689561 19.169321\nCu 6.390383 3.689447 19.169314\nCu 2.556177 5.903423 19.169205\nCu 5.112205 5.903203 19.169685\nCu 7.668770 5.903369 19.169398\nCu -0.000033 -0.000013 21.270116\nCu 2.556184 -0.000008 21.263221\nCu 5.112338 -0.000013 21.265272\nCu 1.278150 2.214121 21.265025\nCu 3.833719 2.214259 21.264326\nCu 6.390840 2.214251 21.264781\nCu 2.556527 4.426968 21.264784\nCu 5.112471 4.427075 21.264996\nCu 7.668006 4.426895 21.264349\nO 0.024851 -0.000031 25.255156\nC -1.203692 -0.000304 25.269543\nC -2.020220 1.281334 25.261521\nC -2.019737 -1.282244 25.261481\nH -2.654052 1.333826 24.362970\nH -2.657006 1.326537 26.156156\nH -1.336191 2.132440 25.262864\nH -1.335361 -2.133070 25.262865\nH -2.653478 -1.334967 24.362856\nH -2.656529 -1.327732 26.156102", "46\nFrame 5\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000238 1.475582 19.168750\nCu 2.556369 1.475847 19.168645\nCu 5.112431 1.475706 19.168020\nCu 1.278080 3.689657 19.168705\nCu 3.834421 3.689580 19.168288\nCu 6.390345 3.689424 19.168285\nCu 2.556258 5.903508 19.168322\nCu 5.112047 5.903221 19.168898\nCu 7.668847 5.903386 19.168399\nCu -0.000064 -0.000019 21.272829\nCu 2.556162 -0.000014 21.263473\nCu 5.112345 -0.000011 21.266240\nCu 1.278142 2.214211 21.265903\nCu 3.833589 2.214390 21.264958\nCu 6.390920 2.214350 21.265580\nCu 2.556614 4.426886 21.265580\nCu 5.112476 4.426981 21.265868\nCu 7.667857 4.426762 21.264994\nO 0.027250 -0.000043 25.253510\nC -1.201840 -0.000298 25.269006\nC -2.018965 1.278880 25.261692\nC -2.018485 -1.279774 25.261620\nH -2.655417 1.334656 24.366077\nH -2.658281 1.325999 26.153631\nH -1.336854 2.131407 25.262599\nH -1.336024 -2.132043 25.262598\nH -2.654824 -1.335810 24.365913\nH -2.657802 -1.327189 26.153574", "46\nFrame 6\nCu 0.000000 0.000000 15.000000\nCu 2.556191 0.000000 15.000000\nCu 5.112382 0.000000 15.000000\nCu 1.278096 2.213726 15.000000\nCu 3.834287 2.213726 15.000000\nCu 6.390478 2.213726 15.000000\nCu 2.556191 4.427453 15.000000\nCu 5.112382 4.427453 15.000000\nCu 7.668573 4.427453 15.000000\nCu 1.278096 0.737909 17.087121\nCu 3.834287 0.737909 17.087121\nCu 6.390478 0.737909 17.087121\nCu 2.556191 2.951635 17.087121\nCu 5.112382 2.951635 17.087121\nCu 7.668573 2.951635 17.087121\nCu 3.834287 5.165362 17.087121\nCu 6.390478 5.165362 17.087121\nCu 8.946669 5.165362 17.087121\nCu -0.000250 1.475455 19.168514\nCu 2.556368 1.475876 19.168201\nCu 5.112438 1.475687 19.167557\nCu 1.278089 3.689663 19.168314\nCu 3.834436 3.689598 19.167811\nCu 6.390316 3.689411 19.167813\nCu 2.556348 5.903583 19.168031\nCu 5.111899 5.903249 19.168646\nCu 7.668905 5.903392 19.167947\nCu -0.000093 -0.000023 21.274660\nCu 2.556141 -0.000018 21.263508\nCu 5.112356 -0.000007 21.266783\nCu 1.278128 2.214259 21.266386\nCu 3.833519 2.214463 21.265255\nCu 6.390957 2.214390 21.266008\nCu 2.556665 4.426857 21.266003\nCu 5.112468 4.426925 21.266347\nCu 7.667769 4.426689 21.265302\nO 0.027513 -0.000050 25.252321\nC -1.201252 -0.000293 25.267913\nC -2.017943 1.277993 25.261844\nC -2.017466 -1.278886 25.261759\nH -2.655842 1.334719 24.368505\nH -2.658678 1.325158 26.151773\nH -1.337414 2.130531 25.262495\nH -1.336586 -2.131167 25.262491\nH -2.655235 -1.335880 24.368303\nH -2.658199 -1.326344 26.151702"], "steps": [0, 1, 2, 3, 4, 5, 6]}};
+        
+        // Trajectory animation state
+        let trajFrames = [];
+        let trajEnergies = [];
+        let trajSteps = [];
+        let trajCurrentFrame = 0;
+        let trajPlaying = false;
+        let trajInterval = null;
+        let currentConfigName = '';
+        
+        function trajPlayPause() {
+            if (trajPlaying) {
+                trajPlaying = false;
+                clearInterval(trajInterval);
+                document.getElementById('trajPlayBtn').textContent = '▶️ Play';
+            } else {
+                trajPlaying = true;
+                document.getElementById('trajPlayBtn').textContent = '⏸️ Pause';
+                trajInterval = setInterval(() => {
+                    if (trajCurrentFrame >= trajFrames.length - 1) {
+                        trajCurrentFrame = 0; // Loop back to start
+                    } else {
+                        trajCurrentFrame++;
+                    }
+                    updateTrajFrame();
+                }, 100); // Faster playback (100ms per frame)
+            }
+        }
+        
+        function trajPrev() {
+            if (trajCurrentFrame > 0) {
+                trajCurrentFrame--;
+                updateTrajFrame();
+            }
+        }
+        
+        function trajNext() {
+            if (trajCurrentFrame < trajFrames.length - 1) {
+                trajCurrentFrame++;
+                updateTrajFrame();
+            }
+        }
+        
+        function trajSeek(value) {
+            trajCurrentFrame = parseInt(value);
+            updateTrajFrame();
+        }
+        
+        function updateTrajFrame() {
+            if (!modalViewer || trajFrames.length === 0) return;
+            
+            const xyz = trajFrames[trajCurrentFrame];
+            modalViewer.removeAllModels();
+            modalViewer.removeAllShapes();
+            
+            // Apply PBC if enabled
+            if (modalState.pbc && cellParams) {
+                const a = cellParams.a, b = cellParams.b;
+                const repeatCount = parseInt(document.getElementById('pbcRepeat').value) || 3;
+                const half = Math.floor(repeatCount / 2);
+                
+                for (let i = -half; i <= half; i++) {
+                    for (let j = -half; j <= half; j++) {
+                        const dx = i * a[0] + j * b[0];
+                        const dy = i * a[1] + j * b[1];
+                        const translatedXyz = translateXyz(trajFrames[trajCurrentFrame], dx, dy, 0);
+                        const model = modalViewer.addModel(translatedXyz, 'xyz');
+                        const isCenter = (i === 0 && j === 0);
+                        const style = isCenter ?
+                            { stick:{radius:0.12,colorscheme:'Jmol'}, sphere:{scale:0.25,colorscheme:'Jmol'} } :
+                            { stick:{radius:0.10,colorscheme:'Jmol',opacity:0.4}, sphere:{scale:0.20,colorscheme:'Jmol',opacity:0.4} };
+                        model.setStyle({}, style);
+                    }
+                }
+            } else {
+                modalViewer.addModel(xyz, 'xyz');
+                modalViewer.setStyle({}, {
+                    stick: { radius: 0.12, colorscheme: 'Jmol' },
+                    sphere: { scale: 0.25, colorscheme: 'Jmol' }
+                });
+            }
+            modalViewer.render();
+            
+            // Update UI
+            document.getElementById('trajFrameNum').textContent = trajCurrentFrame + 1;
+            document.getElementById('trajSlider').value = trajCurrentFrame;
+            
+            // Update energy display
+            if (trajEnergies[trajCurrentFrame]) {
+                document.getElementById('modalEnergy').textContent = trajEnergies[trajCurrentFrame].toFixed(4);
+            }
+            
+            // Highlight current point on graph
+            updateEnergyGraphMarker(trajCurrentFrame);
+        }
+        
+        function showEnergyGraph(energies, steps) {
+            if (!energies || energies.length === 0) return;
+            
+            Plotly.newPlot('modalEnergyGraph', [{
+                x: steps,
+                y: energies,
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: { color: '#06b6d4', width: 2 },
+                marker: { size: 6 }
+            }], {
+                title: { text: 'Energy vs Optimization Step', font: { color: '#9ca3af', size: 14 } },
+                xaxis: { title: 'Step', color: '#9ca3af', gridcolor: '#374151' },
+                yaxis: { title: 'Energy (eV)', color: '#9ca3af', gridcolor: '#374151' },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                margin: { t: 40, r: 20, b: 50, l: 60 }
+            }, { responsive: true });
+        }
+        
+        function updateEnergyGraphMarker(frameIdx) {
+            if (!trajSteps || trajSteps.length === 0) return;
+            
+            Plotly.relayout('modalEnergyGraph', {
+                shapes: [{
+                    type: 'line',
+                    x0: trajSteps[frameIdx],
+                    x1: trajSteps[frameIdx],
+                    y0: 0,
+                    y1: 1,
+                    yref: 'paper',
+                    line: { color: '#ef4444', width: 2, dash: 'dash' }
+                }]
+            });
+        }
+        
+        // Helper function to translate XYZ coordinates
+        function translateXyz(xyzString, dx, dy, dz) {
+            const lines = xyzString.replace(/\\n/g, '\n').split('\n');
+            const result = [];
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (i < 2 || !line) {
+                    result.push(lines[i]);
+                    continue;
+                }
+                const parts = line.split(/\s+/);
+                if (parts.length >= 4) {
+                    const symbol = parts[0];
+                    const x = parseFloat(parts[1]) + dx;
+                    const y = parseFloat(parts[2]) + dy;
+                    const z = parseFloat(parts[3]) + dz;
+                    result.push(symbol + ' ' + x.toFixed(6) + ' ' + y.toFixed(6) + ' ' + z.toFixed(6));
+                } else {
+                    result.push(lines[i]);
+                }
+            }
+            return result.join('\n');
+        }
+        
+        // Theme Toggle
+        function toggleTheme() {
+            const body = document.body;
+            const btn = document.querySelector('.theme-toggle');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.textContent = '☀️';
+            }
+        }
+        
+        // Energy Bar Chart
+        Plotly.newPlot('energy-bar-chart', [{
+            x: resultsData.slice(0, 15).map(r => r.name),
+            y: resultsData.slice(0, 15).map(r => r.e_ads),
+            type: 'bar',
+            marker: {
+                color: resultsData.slice(0, 15).map(r => r.e_ads),
+                colorscale: [[0, '#06b6d4'], [0.5, '#8b5cf6'], [1, '#ec4899']],
+                reversescale: true
+            },
+            hovertemplate: '<b>%{x}</b><br>E_ads: %{y:.4f} eV<extra></extra>'
+        }], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#9ca3af' },
+            xaxis: {
+                tickangle: -45,
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            yaxis: {
+                title: 'E_ads (eV)',
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            margin: { t: 20, b: 100, l: 60, r: 20 }
+        }, {responsive: true});
+        
+        // Site Type Pie Chart
+        const siteCounts = {};
+        resultsData.forEach(r => {
+            siteCounts[r.site_type] = (siteCounts[r.site_type] || 0) + 1;
+        });
+        
+        Plotly.newPlot('site-pie-chart', [{
+            values: Object.values(siteCounts),
+            labels: Object.keys(siteCounts),
+            type: 'pie',
+            hole: 0.5,
+            marker: {
+                colors: ['#06b6d4', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b']
+            },
+            textinfo: 'label+percent',
+            textposition: 'outside',
+            hovertemplate: '<b>%{label}</b><br>Count: %{value}<extra></extra>'
+        }], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#9ca3af' },
+            showlegend: false,
+            margin: { t: 20, b: 20, l: 20, r: 20 }
+        }, {responsive: true});
+        
+        // Energy Histogram
+        Plotly.newPlot('energy-histogram', [{
+            x: resultsData.map(r => r.e_ads),
+            type: 'histogram',
+            nbinsx: 20,
+            marker: {
+                color: '#8b5cf6',
+                line: { color: '#a78bfa', width: 1 }
+            },
+            hovertemplate: 'Range: %{x:.2f} eV<br>Count: %{y}<extra></extra>'
+        }], {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#9ca3af' },
+            xaxis: {
+                title: 'E_ads (eV)',
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            yaxis: {
+                title: 'Count',
+                gridcolor: 'rgba(255,255,255,0.05)'
+            },
+            margin: { t: 20, b: 50, l: 60, r: 20 }
+        }, {responsive: true});
+        
+        // 3D Viewers - State
+        const viewers = {};
+        const viewerState = {
+            1: { axes: false, pbc: false, spin: true },
+            2: { axes: false, pbc: false, spin: true }
+        };
+        
+        // Cell parameters (from surface) - approximate for Cu(111) 3x3
+        const cellParams = {"a": [7.668573041968109, 0.0], "b": [3.8342865209840546, 6.641179065120891], "c": 36.261363669361494, "zmin": 15.0};
+        
+        function initViewer(id, xyz, viewerId) {
+            if (!xyz) return;
+            const viewer = $3Dmol.createViewer(id, {
+                backgroundColor: '#1a1a2e'
+            });
+            viewers[viewerId] = { viewer, xyz, models: [] };
+            
+            // Add main model
+            viewer.addModel(xyz, 'xyz');
+            viewer.setStyle({}, {
+                stick: { radius: 0.12, colorscheme: 'Jmol' },
+                sphere: { scale: 0.25, colorscheme: 'Jmol' }
+            });
+            
+            viewer.zoomTo();
+            viewer.render();
+            viewer.spin('y', 0.5);
+        }
+        
+        function toggleAxes(viewerId) {
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata) return;
+            
+            state.axes = !state.axes;
+            const btn = event.target;
+            btn.classList.toggle('active', state.axes);
+            
+            if (state.axes && cellParams) {
+                // Draw cell axes from origin
+                const origin = [0, 0, cellParams.zmin];
+                const a = cellParams.a;
+                const b = cellParams.b;
+                const c = cellParams.c || 10;
+                
+                // X axis (red)
+                vdata.viewer.addArrow({
+                    start: { x: origin[0], y: origin[1], z: origin[2] },
+                    end: { x: origin[0] + a[0], y: origin[1] + a[1], z: origin[2] },
+                    radius: 0.1,
+                    color: '#ff4444'
+                });
+                // Y axis (green)
+                vdata.viewer.addArrow({
+                    start: { x: origin[0], y: origin[1], z: origin[2] },
+                    end: { x: origin[0] + b[0], y: origin[1] + b[1], z: origin[2] },
+                    radius: 0.1,
+                    color: '#44ff44'
+                });
+                // Z axis (blue)
+                vdata.viewer.addArrow({
+                    start: { x: origin[0], y: origin[1], z: origin[2] },
+                    end: { x: origin[0], y: origin[1], z: origin[2] + c },
+                    radius: 0.1,
+                    color: '#4444ff'
+                });
+                
+                // Draw cell box outline
+                const corners = [
+                    origin,
+                    [origin[0] + a[0], origin[1] + a[1], origin[2]],
+                    [origin[0] + a[0] + b[0], origin[1] + a[1] + b[1], origin[2]],
+                    [origin[0] + b[0], origin[1] + b[1], origin[2]]
+                ];
+                for (let i = 0; i < 4; i++) {
+                    const c1 = corners[i];
+                    const c2 = corners[(i + 1) % 4];
+                    vdata.viewer.addCylinder({
+                        start: { x: c1[0], y: c1[1], z: c1[2] },
+                        end: { x: c2[0], y: c2[1], z: c2[2] },
+                        radius: 0.03,
+                        color: '#888888',
+                        dashed: true
+                    });
+                }
+            } else {
+                // Remove shapes by re-rendering
+                vdata.viewer.removeAllShapes();
+            }
+            vdata.viewer.render();
+        }
+        
+        function togglePBC(viewerId) {
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata || !cellParams) return;
+            
+            state.pbc = !state.pbc;
+            const btn = event.target;
+            btn.classList.toggle('active', state.pbc);
+            
+            // Clear and rebuild
+            vdata.viewer.removeAllModels();
+            vdata.viewer.removeAllShapes();
+            
+            if (state.pbc) {
+                // Add main + 8 periodic images (3x3 in xy)
+                const a = cellParams.a;
+                const b = cellParams.b;
+                const offsets = [
+                    [0, 0], [-1, 0], [1, 0], [0, -1], [0, 1],
+                    [-1, -1], [-1, 1], [1, -1], [1, 1]
+                ];
+                
+                offsets.forEach(([i, j]) => {
+                    const dx = i * a[0] + j * b[0];
+                    const dy = i * a[1] + j * b[1];
+                    const translatedXyz = translateXyz(vdata.xyz, dx, dy, 0);
+                    
+                    const model = vdata.viewer.addModel(translatedXyz, 'xyz');
+                    const isCenter = (i === 0 && j === 0);
+                    const style = isCenter ?
+                        { stick: { radius: 0.12, colorscheme: 'Jmol' }, sphere: { scale: 0.25, colorscheme: 'Jmol' } } :
+                        { stick: { radius: 0.10, colorscheme: 'Jmol', opacity: 0.4 }, sphere: { scale: 0.20, colorscheme: 'Jmol', opacity: 0.4 } };
+                    model.setStyle({}, style);
+                });
+            } else {
+                vdata.viewer.addModel(vdata.xyz, 'xyz');
+                vdata.viewer.setStyle({}, {
+                    stick: { radius: 0.12, colorscheme: 'Jmol' },
+                    sphere: { scale: 0.25, colorscheme: 'Jmol' }
+                });
+            }
+            
+            // Re-add axes if enabled
+            if (state.axes) {
+                state.axes = false;
+                toggleAxes(viewerId);
+            }
+            
+            vdata.viewer.zoomTo();
+            vdata.viewer.render();
+        }
+        
+        function toggleSpin(viewerId) {
+            const state = viewerState[viewerId];
+            const vdata = viewers[viewerId];
+            if (!vdata) return;
+            
+            state.spin = !state.spin;
+            const btn = event.target;
+            btn.classList.toggle('active', state.spin);
+            
+            if (state.spin) {
+                vdata.viewer.spin('y', 0.5);
+            } else {
+                vdata.viewer.spin(false);
+            }
+        }
+        
+        initViewer('viewer-1', `46\nLattice="7.668573041968109 0.0 0.0 3.8342865209840546 6.641179065120891 0.0 0.0 0.0 36.261363669361494" Properties=species:S:1:pos:R:3:tags:I:1:forces:R:3 energy=-194.76620483398438 free_energy=-194.76620483398438 stress="0.0002491677878424525 4.1690753960210714e-08 4.769343036059581e-07 4.1690753960210714e-08 0.0002482354175299406 -6.739075502082414e-07 4.769343036059581e-07 -6.739075502082414e-07 -1.7101478078984655e-05" pbc="T T F"\nCu       0.00000000       0.00000000      15.00000000        4      -0.00008879      -0.00009522      -0.04568797\nCu       2.55619101       0.00000000      15.00000000        4       0.00005820       0.00001878      -0.04575515\nCu       5.11238203       0.00000000      15.00000000        4       0.00003143      -0.00008205      -0.04560575\nCu       1.27809551       2.21372636      15.00000000        4       0.00008161       0.00004248      -0.04571146\nCu       3.83428652       2.21372636      15.00000000        4      -0.00004316       0.00000269      -0.04570365\nCu       6.39047753       2.21372636      15.00000000        4      -0.00003924      -0.00009445      -0.04565660\nCu       2.55619101       4.42745271      15.00000000        4      -0.00001458       0.00006526      -0.04554749\nCu       5.11238203       4.42745271      15.00000000        4      -0.00012538       0.00004178      -0.04562445\nCu       7.66857304       4.42745271      15.00000000        4       0.00014029       0.00010032      -0.04557028\nCu       1.27809551       0.73790879      17.08712122        3      -0.00062983      -0.00009453       0.04114822\nCu       3.83428652       0.73790879      17.08712122        3       0.00029634      -0.00020641       0.04007063\nCu       6.39047753       0.73790879      17.08712122        3       0.00036451      -0.00027770       0.04091811\nCu       2.55619101       2.95163514      17.08712122        3      -0.00016661       0.00014985       0.03909432\nCu       5.11238203       2.95163514      17.08712122        3       0.00001208      -0.00030952       0.03915170\nCu       7.66857304       2.95163514      17.08712122        3       0.00022855      -0.00060939       0.04064906\nCu       3.83428652       5.16536150      17.08712122        3      -0.00017867       0.00052559       0.04044493\nCu       6.39047753       5.16536150      17.08712122        3      -0.00016416       0.00037112       0.04098421\nCu       8.94666855       5.16536150      17.08712122        3       0.00029463       0.00039107       0.04075273\nCu      -0.00032195       1.47533119      19.16863161        2      -0.00084364      -0.00360046       0.00993549\nCu       2.55637132       1.47595618      19.16813749        2       0.00071417       0.00002196       0.00363888\nCu       5.11255197       1.47554045      19.16796254        2       0.00036045      -0.00118679       0.00631524\nCu       1.27853718       3.68992561      19.16807905        2       0.00109699       0.00121916       0.00513819\nCu       3.83407306       3.68971295      19.16764350        2      -0.00033505      -0.00019322       0.00645141\nCu       6.39033489       3.68938218      19.16764917        2       0.00000633      -0.00054946       0.00412025\nCu       2.55631575       5.90323415      19.16834109        2       0.00221578       0.00096557       0.01287336\nCu       5.11181627       5.90332441      19.16840951        2      -0.00304878       0.00187979       0.01012971\nCu       7.66897983       5.90339624      19.16839228        2       0.00063489       0.00065655       0.00653532\nCu      -0.00018671       0.00000811      21.27470904        1      -0.00080141      -0.00037816       0.02321682\nCu       2.55614813       0.00039559      21.26525947        1      -0.00042358       0.00068663      -0.00156011\nCu       5.11242332      -0.00013690      21.26828841        1       0.00132979      -0.00222065       0.00657081\nCu       1.27785345       2.21394995      21.26356591        1      -0.00002006       0.00026892      -0.00549673\nCu       3.83515487       2.21260602      21.26604978        1       0.00171668      -0.00143441      -0.00040731\nCu       6.39006744       2.21430529      21.26655645        1      -0.00049566      -0.00053393       0.00166601\nCu       2.55692014       4.42701646      21.26828108        1       0.00260487      -0.00125215       0.00611149\nCu       5.11348633       4.42743264      21.26564758        1       0.00077537       0.00040728      -0.00075018\nCu       7.66794903       4.42686934      21.26512991        1       0.00063942      -0.00026443      -0.00250392\nO        0.01906260       0.01968546      25.25235738        0      -0.03002959      -0.02752852      -0.02539883\nC       -0.84918150      -0.84973662      25.26765508        0       0.01629543       0.01647151      -0.03368232\nC       -2.33070819      -0.52380628      25.26124282        0      -0.02417538       0.03412638       0.00041514\nC       -0.52229304      -2.33073059      25.26142155        0       0.03544903      -0.01883376       0.00216379\nH       -2.82183494      -0.93425037      24.36759288        0       0.01189819      -0.01610440       0.01248050\nH       -2.81694097      -0.94323518      26.15144054        0       0.02405216      -0.02470003      -0.00650657\nH       -2.45217408       0.56022850      25.26220351        0       0.00565419      -0.00480902       0.00080687\nH        0.56195383      -2.45076920      25.26194166        0      -0.00560433       0.00869879      -0.00080578\nH       -0.93393714      -2.82176025      24.36791416        0      -0.01740413       0.01288603       0.01248205\nH       -0.94211529      -2.81723020      26.15144390        0      -0.02231897       0.02536130      -0.00629067\n`, 1);
+        initViewer('viewer-2', `46\nLattice="7.668573041968109 0.0 0.0 3.8342865209840546 6.641179065120891 0.0 0.0 0.0 36.261363669361494" Properties=species:S:1:pos:R:3:tags:I:1:forces:R:3 energy=-194.76617431640625 free_energy=-194.76617431640625 stress="0.00024920323630794883 3.4332023890470964e-09 4.675485740790464e-07 3.4332023890470964e-09 0.0002481809351593256 6.946009989405866e-07 4.675485740790464e-07 6.946009989405866e-07 -1.7197628039866686e-05" pbc="T T F"\nCu       0.00000000       0.00000000      15.00000000        4      -0.00012774       0.00009809      -0.04568101\nCu       2.55619101       0.00000000      15.00000000        4       0.00003437       0.00005765      -0.04564445\nCu       5.11238203       0.00000000      15.00000000        4       0.00009435       0.00009093      -0.04555941\nCu       1.27809551       2.21372636      15.00000000        4      -0.00008193       0.00000549      -0.04574745\nCu       3.83428652       2.21372636      15.00000000        4       0.00009297      -0.00003499      -0.04568774\nCu       6.39047753       2.21372636      15.00000000        4      -0.00001255      -0.00009076      -0.04552548\nCu       2.55619101       4.42745271      15.00000000        4      -0.00002934       0.00003462      -0.04579917\nCu       5.11238203       4.42745271      15.00000000        4      -0.00000543      -0.00009174      -0.04564538\nCu       7.66857304       4.42745271      15.00000000        4       0.00003558      -0.00006973      -0.04560207\nCu       1.27809551       0.73790879      17.08712122        3      -0.00050613      -0.00031655       0.04040380\nCu       3.83428652       0.73790879      17.08712122        3       0.00043301      -0.00025313       0.03895601\nCu       6.39047753       0.73790879      17.08712122        3       0.00015631      -0.00052181       0.04075113\nCu       2.55619101       2.95163514      17.08712122        3      -0.00023849       0.00010582       0.03959669\nCu       5.11238203       2.95163514      17.08712122        3       0.00024782      -0.00015244       0.03923045\nCu       7.66857304       2.95163514      17.08712122        3      -0.00002704      -0.00035048       0.04074217\nCu       3.83428652       5.16536150      17.08712122        3      -0.00028494       0.00080299       0.04129237\nCu       6.39047753       5.16536150      17.08712122        3      -0.00015191       0.00030106       0.04086645\nCu       8.94666855       5.16536150      17.08712122        3       0.00042342       0.00047796       0.04108151\nCu      -0.00043829       1.47548945      19.16825351        2      -0.00034232      -0.00295788       0.01145449\nCu       2.55637427       1.47556037      19.16772434        2      -0.00005902      -0.00002457       0.00352735\nCu       5.11272497       1.47572953      19.16791934        2       0.00118806      -0.00002602       0.00779508\nCu       1.27797500       3.68967601      19.16813015        2       0.00020321      -0.00008583       0.00539072\nCu       3.83443835       3.68946799      19.16796291        2      -0.00129252       0.00017563       0.00341137\nCu       6.39044247       3.68916553      19.16799858        2       0.00114591      -0.00075202       0.00599000\nCu       2.55615762       5.90377491      19.16873210        2       0.00217858       0.00158237       0.01252472\nCu       5.11209404       5.90356965      19.16844449        2      -0.00333081       0.00240934       0.00890946\nCu       7.66888008       5.90360017      19.16798700        2       0.00107712       0.00061487       0.00603967\nCu      -0.00014066      -0.00000338      21.27470092        1      -0.00061979       0.00038485       0.02316363\nCu       2.55615977      -0.00045263      21.26521443        1      -0.00027148      -0.00047393      -0.00168947\nCu       5.11236644       0.00010254      21.26830138        1       0.00100152       0.00259594       0.00671227\nCu       1.27914812       2.21371819      21.26563688        1       0.00096397      -0.00082889      -0.00093853\nCu       3.83371054       2.21428396      21.26508766        1       0.00073882      -0.00005818      -0.00273661\nCu       6.39120327       2.21420221      21.26830299        1       0.00230670       0.00112857       0.00622786\nCu       2.55575948       4.42692747      21.26657429        1      -0.00014552       0.00056053       0.00160949\nCu       5.11218473       4.42722307      21.26355941        1      -0.00014391      -0.00031399      -0.00550749\nCu       7.66943227       4.42861091      21.26609310        1       0.00152207       0.00167428      -0.00018615\nO        0.01899574      -0.01975816      25.25235544        0      -0.02996886       0.02759445      -0.02542315\nC       -0.84957861       0.84933292      25.26765887        0       0.01621854      -0.01659870      -0.03362463\nC       -0.52328391       2.33045837      25.26142750        0       0.03510292       0.01831272       0.00201256\nC       -2.33096999       0.52280313      25.26127179        0      -0.02478740      -0.03445037       0.00060736\nH       -0.93511322       2.82133280      24.36792349        0      -0.01742622      -0.01284236       0.01246383\nH       -0.94329951       2.81673856      26.15146367        0      -0.02238401      -0.02508149      -0.00609834\nH        0.56090124       2.45089957      25.26194144        0      -0.00505728      -0.00856335      -0.00076696\nH       -2.45203716      -0.56129100      25.26220615        0       0.00582355       0.00530317       0.00085247\nH       -2.82229052       0.93306653      24.36765893        0       0.01190615       0.01607667       0.01275501\nH       -2.81743022       0.94204924      26.15144196        0       0.02439944       0.02455143      -0.00650447\n`, 2);
+        
+        // Modal viewer state
+        let modalViewer = null;
+        const modalState = { axes: false, pbc: false, spin: true };
+        let currentModalXyz = '';
+        
+        // All XYZ data (injected from Python)
+        const allXyzData = {"site0_rot135": "46\\nLattice=\"7.668573041968109 0.0 0.0 3.8342865209840546 6.641179065120891 0.0 0.0 0.0 36.261363669361494\" Properties=species:S:1:pos:R:3:tags:I:1:forces:R:3 energy=-194.76620483398438 free_energy=-194.76620483398438 stress=\"0.0002491677878424525 4.1690753960210714e-08 4.769343036059581e-07 4.1690753960210714e-08 0.0002482354175299406 -6.739075502082414e-07 4.769343036059581e-07 -6.739075502082414e-07 -1.7101478078984655e-05\" pbc=\"T T F\"\\nCu       0.00000000       0.00000000      15.00000000        4      -0.00008879      -0.00009522      -0.04568797\\nCu       2.55619101       0.00000000      15.00000000        4       0.00005820       0.00001878      -0.04575515\\nCu       5.11238203       0.00000000      15.00000000        4       0.00003143      -0.00008205      -0.04560575\\nCu       1.27809551       2.21372636      15.00000000        4       0.00008161       0.00004248      -0.04571146\\nCu       3.83428652       2.21372636      15.00000000        4      -0.00004316       0.00000269      -0.04570365\\nCu       6.39047753       2.21372636      15.00000000        4      -0.00003924      -0.00009445      -0.04565660\\nCu       2.55619101       4.42745271      15.00000000        4      -0.00001458       0.00006526      -0.04554749\\nCu       5.11238203       4.42745271      15.00000000        4      -0.00012538       0.00004178      -0.04562445\\nCu       7.66857304       4.42745271      15.00000000        4       0.00014029       0.00010032      -0.04557028\\nCu       1.27809551       0.73790879      17.08712122        3      -0.00062983      -0.00009453       0.04114822\\nCu       3.83428652       0.73790879      17.08712122        3       0.00029634      -0.00020641       0.04007063\\nCu       6.39047753       0.73790879      17.08712122        3       0.00036451      -0.00027770       0.04091811\\nCu       2.55619101       2.95163514      17.08712122        3      -0.00016661       0.00014985       0.03909432\\nCu       5.11238203       2.95163514      17.08712122        3       0.00001208      -0.00030952       0.03915170\\nCu       7.66857304       2.95163514      17.08712122        3       0.00022855      -0.00060939       0.04064906\\nCu       3.83428652       5.16536150      17.08712122        3      -0.00017867       0.00052559       0.04044493\\nCu       6.39047753       5.16536150      17.08712122        3      -0.00016416       0.00037112       0.04098421\\nCu       8.94666855       5.16536150      17.08712122        3       0.00029463       0.00039107       0.04075273\\nCu      -0.00032195       1.47533119      19.16863161        2      -0.00084364      -0.00360046       0.00993549\\nCu       2.55637132       1.47595618      19.16813749        2       0.00071417       0.00002196       0.00363888\\nCu       5.11255197       1.47554045      19.16796254        2       0.00036045      -0.00118679       0.00631524\\nCu       1.27853718       3.68992561      19.16807905        2       0.00109699       0.00121916       0.00513819\\nCu       3.83407306       3.68971295      19.16764350        2      -0.00033505      -0.00019322       0.00645141\\nCu       6.39033489       3.68938218      19.16764917        2       0.00000633      -0.00054946       0.00412025\\nCu       2.55631575       5.90323415      19.16834109        2       0.00221578       0.00096557       0.01287336\\nCu       5.11181627       5.90332441      19.16840951        2      -0.00304878       0.00187979       0.01012971\\nCu       7.66897983       5.90339624      19.16839228        2       0.00063489       0.00065655       0.00653532\\nCu      -0.00018671       0.00000811      21.27470904        1      -0.00080141      -0.00037816       0.02321682\\nCu       2.55614813       0.00039559      21.26525947        1      -0.00042358       0.00068663      -0.00156011\\nCu       5.11242332      -0.00013690      21.26828841        1       0.00132979      -0.00222065       0.00657081\\nCu       1.27785345       2.21394995      21.26356591        1      -0.00002006       0.00026892      -0.00549673\\nCu       3.83515487       2.21260602      21.26604978        1       0.00171668      -0.00143441      -0.00040731\\nCu       6.39006744       2.21430529      21.26655645        1      -0.00049566      -0.00053393       0.00166601\\nCu       2.55692014       4.42701646      21.26828108        1       0.00260487      -0.00125215       0.00611149\\nCu       5.11348633       4.42743264      21.26564758        1       0.00077537       0.00040728      -0.00075018\\nCu       7.66794903       4.42686934      21.26512991        1       0.00063942      -0.00026443      -0.00250392\\nO        0.01906260       0.01968546      25.25235738        0      -0.03002959      -0.02752852      -0.02539883\\nC       -0.84918150      -0.84973662      25.26765508        0       0.01629543       0.01647151      -0.03368232\\nC       -2.33070819      -0.52380628      25.26124282        0      -0.02417538       0.03412638       0.00041514\\nC       -0.52229304      -2.33073059      25.26142155        0       0.03544903      -0.01883376       0.00216379\\nH       -2.82183494      -0.93425037      24.36759288        0       0.01189819      -0.01610440       0.01248050\\nH       -2.81694097      -0.94323518      26.15144054        0       0.02405216      -0.02470003      -0.00650657\\nH       -2.45217408       0.56022850      25.26220351        0       0.00565419      -0.00480902       0.00080687\\nH        0.56195383      -2.45076920      25.26194166        0      -0.00560433       0.00869879      -0.00080578\\nH       -0.93393714      -2.82176025      24.36791416        0      -0.01740413       0.01288603       0.01248205\\nH       -0.94211529      -2.81723020      26.15144390        0      -0.02231897       0.02536130      -0.00629067\\n", "site0_rot45": "46\\nLattice=\"7.668573041968109 0.0 0.0 3.8342865209840546 6.641179065120891 0.0 0.0 0.0 36.261363669361494\" Properties=species:S:1:pos:R:3:tags:I:1:forces:R:3 energy=-194.76617431640625 free_energy=-194.76617431640625 stress=\"0.00024920323630794883 3.4332023890470964e-09 4.675485740790464e-07 3.4332023890470964e-09 0.0002481809351593256 6.946009989405866e-07 4.675485740790464e-07 6.946009989405866e-07 -1.7197628039866686e-05\" pbc=\"T T F\"\\nCu       0.00000000       0.00000000      15.00000000        4      -0.00012774       0.00009809      -0.04568101\\nCu       2.55619101       0.00000000      15.00000000        4       0.00003437       0.00005765      -0.04564445\\nCu       5.11238203       0.00000000      15.00000000        4       0.00009435       0.00009093      -0.04555941\\nCu       1.27809551       2.21372636      15.00000000        4      -0.00008193       0.00000549      -0.04574745\\nCu       3.83428652       2.21372636      15.00000000        4       0.00009297      -0.00003499      -0.04568774\\nCu       6.39047753       2.21372636      15.00000000        4      -0.00001255      -0.00009076      -0.04552548\\nCu       2.55619101       4.42745271      15.00000000        4      -0.00002934       0.00003462      -0.04579917\\nCu       5.11238203       4.42745271      15.00000000        4      -0.00000543      -0.00009174      -0.04564538\\nCu       7.66857304       4.42745271      15.00000000        4       0.00003558      -0.00006973      -0.04560207\\nCu       1.27809551       0.73790879      17.08712122        3      -0.00050613      -0.00031655       0.04040380\\nCu       3.83428652       0.73790879      17.08712122        3       0.00043301      -0.00025313       0.03895601\\nCu       6.39047753       0.73790879      17.08712122        3       0.00015631      -0.00052181       0.04075113\\nCu       2.55619101       2.95163514      17.08712122        3      -0.00023849       0.00010582       0.03959669\\nCu       5.11238203       2.95163514      17.08712122        3       0.00024782      -0.00015244       0.03923045\\nCu       7.66857304       2.95163514      17.08712122        3      -0.00002704      -0.00035048       0.04074217\\nCu       3.83428652       5.16536150      17.08712122        3      -0.00028494       0.00080299       0.04129237\\nCu       6.39047753       5.16536150      17.08712122        3      -0.00015191       0.00030106       0.04086645\\nCu       8.94666855       5.16536150      17.08712122        3       0.00042342       0.00047796       0.04108151\\nCu      -0.00043829       1.47548945      19.16825351        2      -0.00034232      -0.00295788       0.01145449\\nCu       2.55637427       1.47556037      19.16772434        2      -0.00005902      -0.00002457       0.00352735\\nCu       5.11272497       1.47572953      19.16791934        2       0.00118806      -0.00002602       0.00779508\\nCu       1.27797500       3.68967601      19.16813015        2       0.00020321      -0.00008583       0.00539072\\nCu       3.83443835       3.68946799      19.16796291        2      -0.00129252       0.00017563       0.00341137\\nCu       6.39044247       3.68916553      19.16799858        2       0.00114591      -0.00075202       0.00599000\\nCu       2.55615762       5.90377491      19.16873210        2       0.00217858       0.00158237       0.01252472\\nCu       5.11209404       5.90356965      19.16844449        2      -0.00333081       0.00240934       0.00890946\\nCu       7.66888008       5.90360017      19.16798700        2       0.00107712       0.00061487       0.00603967\\nCu      -0.00014066      -0.00000338      21.27470092        1      -0.00061979       0.00038485       0.02316363\\nCu       2.55615977      -0.00045263      21.26521443        1      -0.00027148      -0.00047393      -0.00168947\\nCu       5.11236644       0.00010254      21.26830138        1       0.00100152       0.00259594       0.00671227\\nCu       1.27914812       2.21371819      21.26563688        1       0.00096397      -0.00082889      -0.00093853\\nCu       3.83371054       2.21428396      21.26508766        1       0.00073882      -0.00005818      -0.00273661\\nCu       6.39120327       2.21420221      21.26830299        1       0.00230670       0.00112857       0.00622786\\nCu       2.55575948       4.42692747      21.26657429        1      -0.00014552       0.00056053       0.00160949\\nCu       5.11218473       4.42722307      21.26355941        1      -0.00014391      -0.00031399      -0.00550749\\nCu       7.66943227       4.42861091      21.26609310        1       0.00152207       0.00167428      -0.00018615\\nO        0.01899574      -0.01975816      25.25235544        0      -0.02996886       0.02759445      -0.02542315\\nC       -0.84957861       0.84933292      25.26765887        0       0.01621854      -0.01659870      -0.03362463\\nC       -0.52328391       2.33045837      25.26142750        0       0.03510292       0.01831272       0.00201256\\nC       -2.33096999       0.52280313      25.26127179        0      -0.02478740      -0.03445037       0.00060736\\nH       -0.93511322       2.82133280      24.36792349        0      -0.01742622      -0.01284236       0.01246383\\nH       -0.94329951       2.81673856      26.15146367        0      -0.02238401      -0.02508149      -0.00609834\\nH        0.56090124       2.45089957      25.26194144        0      -0.00505728      -0.00856335      -0.00076696\\nH       -2.45203716      -0.56129100      25.26220615        0       0.00582355       0.00530317       0.00085247\\nH       -2.82229052       0.93306653      24.36765893        0       0.01190615       0.01607667       0.01275501\\nH       -2.81743022       0.94204924      26.15144196        0       0.02439944       0.02455143      -0.00650447\\n", "site0_rot0": "46\\nLattice=\"7.668573041968109 0.0 0.0 3.8342865209840546 6.641179065120891 0.0 0.0 0.0 36.261363669361494\" Properties=species:S:1:pos:R:3:tags:I:1:forces:R:3 energy=-194.7646484375 free_energy=-194.7646484375 stress=\"0.00024457741528749466 1.2419020256615454e-09 -3.4162361828293797e-09 1.2419020256615454e-09 0.00024660321651026607 -2.3496269818679139e-07 -3.4162361828293797e-09 -2.3496269818679139e-07 -1.6256886738119647e-05\" pbc=\"T T F\"\\nCu       0.00000000       0.00000000      15.00000000        4       0.00000042       0.00013441      -0.04563431\\nCu       2.55619101       0.00000000      15.00000000        4      -0.00010801       0.00009273      -0.04561013\\nCu       5.11238203       0.00000000      15.00000000        4       0.00010811       0.00009295      -0.04561014\\nCu       1.27809551       2.21372636      15.00000000        4      -0.00009127      -0.00000559      -0.04553266\\nCu       3.83428652       2.21372636      15.00000000        4       0.00000035       0.00005104      -0.04569371\\nCu       6.39047753       2.21372636      15.00000000        4       0.00008981      -0.00000594      -0.04553300\\nCu       2.55619101       4.42745271      15.00000000        4       0.00000397      -0.00007910      -0.04571836\\nCu       5.11238203       4.42745271      15.00000000        4      -0.00000369      -0.00007938      -0.04571806\\nCu       7.66857304       4.42745271      15.00000000        4       0.00000064      -0.00020133      -0.04553573\\nCu       1.27809551       0.73790879      17.08712122        3      -0.00080588       0.00017848       0.04164138\\nCu       3.83428652       0.73790879      17.08712122        3      -0.00000102       0.00066170       0.03981297\\nCu       6.39047753       0.73790879      17.08712122        3       0.00080577       0.00017794       0.04163950\\nCu       2.55619101       2.95163514      17.08712122        3      -0.00039879      -0.00034240       0.03946006\\nCu       5.11238203       2.95163514      17.08712122        3       0.00039850      -0.00034138       0.03945520\\nCu       7.66857304       2.95163514      17.08712122        3       0.00000214      -0.00102138       0.04138853\\nCu       3.83428652       5.16536150      17.08712122        3       0.00000070       0.00080651       0.04098094\\nCu       6.39047753       5.16536150      17.08712122        3      -0.00082374      -0.00005963       0.04105682\\nCu       8.94666855       5.16536150      17.08712122        3       0.00082193      -0.00006069       0.04105945\\nCu      -0.00000006       1.47575990      19.16885162        2      -0.00000049      -0.00186784       0.01563436\\nCu       2.55568174       1.47596098      19.16795874        2      -0.00069273       0.00058375       0.00882864\\nCu       5.11289113       1.47596102      19.16795807        2       0.00069092       0.00058531       0.00883644\\nCu       1.27799379       3.68881284      19.16822751        2      -0.00016529      -0.00139743       0.00757084\\nCu       3.83428659       3.68928851      19.16791767        2      -0.00000147      -0.00093705       0.00453404\\nCu       6.39057914       3.68881276      19.16822696        2       0.00016733      -0.00139934       0.00757796\\nCu       2.55665675       5.90389854      19.16860720        2       0.00266190       0.00186208       0.01108517\\nCu       5.11191646       5.90389852      19.16860713        2      -0.00266119       0.00186406       0.01108738\\nCu       7.66857303       5.90351425      19.16742712        2      -0.00000083       0.00017191       0.00564284\\nCu       0.00000015       0.00011308      21.27605879        1       0.00000018       0.00040912       0.01951594\\nCu       2.55689444      -0.00050798      21.26628626        1      -0.00034434      -0.00028910      -0.00049220\\nCu       5.11167883      -0.00050913      21.26628454        1       0.00034471      -0.00028902      -0.00049399\\nCu       1.27819707       2.21347677      21.27013343        1      -0.00019971      -0.00079578       0.00772831\\nCu       3.83428456       2.21331356      21.26674715        1      -0.00000182      -0.00102990      -0.00037787\\nCu       6.39037411       2.21347605      21.27013349        1       0.00019283      -0.00079702       0.00772710\\nCu       2.55642646       4.42728558      21.26408883        1       0.00037304      -0.00061799      -0.00443164\\nCu       5.11214771       4.42728583      21.26408768        1      -0.00037091      -0.00061708      -0.00443242\\nCu       7.66857303       4.42822234      21.26522300        1      -0.00000167      -0.00082336      -0.00316098\\nO       -0.00004925      -0.02687140      25.25137859        0       0.00005156       0.00554669      -0.02999411\\nC       -0.00028361       1.20128704      25.26609655        0      -0.00020318      -0.00422752      -0.02259285\\nC        1.27722457       2.01796073      25.26090512        0       0.01914330       0.00323526      -0.00267708\\nC       -1.27812420       2.01745251      25.26089926        0      -0.01930052       0.00335148      -0.00258787\\nH        1.33372284       2.65666555      24.36852984        0      -0.01770194       0.01143888      -0.00962594\\nH        1.32347919       2.65904621      26.15012050        0      -0.03220881       0.00434501       0.01016895\\nH        2.12804484       1.33689508      25.26167810        0       0.01106720      -0.01696646      -0.00068757\\nH       -2.12868729       1.33605404      25.26167713        0      -0.01082940      -0.01687616      -0.00070942\\nH       -1.33486574       2.65612678      24.36851354        0       0.01768596       0.01137807      -0.00957487\\nH       -1.32465882       2.65855155      26.15010136        0       0.03230552       0.00416078       0.00999211\\n", "site1_rot0": "46\\nLattice=\"7.668573041968109 0.0 0.0 3.8342865209840546 6.641179065120891 0.0 0.0 0.0 36.261363669361494\" Properties=species:S:1:pos:R:3:tags:I:1:forces:R:3 energy=-194.7646484375 free_energy=-194.7646484375 stress=\"0.0002445775899104774 1.160686990964166e-09 -3.4363529799463777e-09 1.160686990964166e-09 0.00024660342023707926 -2.3477805655147677e-07 -3.4363529799463777e-09 -2.3477805655147677e-07 -1.6256895833066665e-05\" pbc=\"T T F\"\\nCu       0.00000000       0.00000000      15.00000000        4       0.00010839       0.00009230      -0.04561047\\nCu       2.55619101       0.00000000      15.00000000        4       0.00000009       0.00013502      -0.04563394\\nCu       5.11238203       0.00000000      15.00000000        4      -0.00010800       0.00009304      -0.04561016\\nCu       1.27809551       2.21372636      15.00000000        4       0.00009104      -0.00000565      -0.04553264\\nCu       3.83428652       2.21372636      15.00000000        4      -0.00009086      -0.00000590      -0.04553253\\nCu       6.39047753       2.21372636      15.00000000        4      -0.00000135       0.00005095      -0.04569395\\nCu       2.55619101       4.42745271      15.00000000        4       0.00000025      -0.00020166      -0.04553561\\nCu       5.11238203       4.42745271      15.00000000        4       0.00000401      -0.00007951      -0.04571798\\nCu       7.66857304       4.42745271      15.00000000        4      -0.00000326      -0.00007900      -0.04571826\\nCu       1.27809551       0.73790879      17.08712122        3       0.00080694       0.00017785       0.04163953\\nCu       3.83428652       0.73790879      17.08712122        3      -0.00080526       0.00017853       0.04164129\\nCu       6.39047753       0.73790879      17.08712122        3      -0.00000281       0.00066179       0.03981289\\nCu       2.55619101       2.95163514      17.08712122        3       0.00000160      -0.00102187       0.04138821\\nCu       5.11238203       2.95163514      17.08712122        3      -0.00039869      -0.00034194       0.03946000\\nCu       7.66857304       2.95163514      17.08712122        3       0.00039904      -0.00034092       0.03945525\\nCu       3.83428652       5.16536150      17.08712122        3       0.00082330      -0.00006120       0.04105953\\nCu       6.39047753       5.16536150      17.08712122        3      -0.00000097       0.00080657       0.04098094\\nCu       8.94666855       5.16536150      17.08712122        3      -0.00082328      -0.00005934       0.04105691\\nCu       0.00050919       1.47596103      19.16795820        2       0.00069090       0.00058457       0.00883769\\nCu       2.55619092       1.47575988      19.16885156        2      -0.00000142      -0.00186835       0.01563392\\nCu       5.11187272       1.47596099      19.16795871        2      -0.00069305       0.00058397       0.00882833\\nCu       1.27819726       3.68881272      19.16822700        2       0.00016764      -0.00139900       0.00757792\\nCu       3.83418472       3.68881283      19.16822755        2      -0.00016474      -0.00139716       0.00757118\\nCu       6.39047747       3.68928851      19.16791769        2      -0.00000153      -0.00093691       0.00453398\\nCu       2.55619097       5.90351421      19.16742722        2      -0.00000081       0.00017219       0.00564370\\nCu       5.11284784       5.90389858      19.16860712        2       0.00266160       0.00186197       0.01108471\\nCu       7.66810742       5.90389860      19.16860720        2      -0.00266131       0.00186384       0.01108694\\nCu      -0.00070308      -0.00050919      21.26628452        1       0.00034249      -0.00028761      -0.00049453\\nCu       2.55619110       0.00011310      21.27605867        1      -0.00000036       0.00041000       0.01951616\\nCu       5.11308549      -0.00050797      21.26628628        1      -0.00034191      -0.00028938      -0.00049226\\nCu       1.27799216       2.21347605      21.27013349        1       0.00019235      -0.00079793       0.00772667\\nCu       3.83438808       2.21347677      21.27013337        1      -0.00019947      -0.00079553       0.00772863\\nCu       6.39047549       2.21331359      21.26674715        1      -0.00000046      -0.00103088      -0.00037796\\nCu       2.55619100       4.42822237      21.26522294        1      -0.00000185      -0.00082225      -0.00316105\\nCu       5.11261746       4.42728558      21.26408884        1       0.00037286      -0.00061844      -0.00443198\\nCu       7.66833870       4.42728579      21.26408772        1      -0.00037085      -0.00061787      -0.00443240\\nO        2.55614180      -0.02687134      25.25137863        0       0.00005064       0.00554729      -0.02999399\\nC        2.55590750       1.20128712      25.26609660        0      -0.00020696      -0.00423026      -0.02259312\\nC        3.83341547       2.01796074      25.26090516        0       0.01915186       0.00323497      -0.00267715\\nC        1.27806689       2.01745263      25.26089907        0      -0.01931001       0.00333896      -0.00258366\\nH        3.88991382       2.65666551      24.36852970        0      -0.01770180       0.01143886      -0.00962584\\nH        3.87967022       2.65904616      26.15012061        0      -0.03220880       0.00434521       0.01016909\\nH        4.68423592       1.33689503      25.26167812        0       0.01106368      -0.01696326      -0.00068763\\nH        0.42750356       1.33605396      25.26167714        0      -0.01082043      -0.01686862      -0.00070927\\nH        1.22132527       2.65612665      24.36851356        0       0.01768596       0.01138146      -0.00957943\\nH        1.23153215       2.65855160      26.15010156        0       0.03230569       0.00416099       0.00999233\\n", "site0_rot90": "46\\nLattice=\"7.668573041968109 0.0 0.0 3.8342865209840546 6.641179065120891 0.0 0.0 0.0 36.261363669361494\" Properties=species:S:1:pos:R:3:tags:I:1:forces:R:3 energy=-194.76400756835938 free_energy=-194.76400756835938 stress=\"0.0002493358915671706 -1.9136189521873348e-08 -4.992792241864663e-07 -1.9136189521873348e-08 0.0002509978075977415 7.103254873186415e-09 -4.992792241864663e-07 7.103254873186415e-09 -1.9532169972080737e-05\" pbc=\"T T F\"\\nCu       0.00000000       0.00000000      15.00000000        4      -0.00013318       0.00001374      -0.04571284\\nCu       2.55619101       0.00000000      15.00000000        4       0.00007870       0.00004993      -0.04568601\\nCu       5.11238203       0.00000000      15.00000000        4       0.00005478       0.00000499      -0.04554386\\nCu       1.27809551       2.21372636      15.00000000        4       0.00000450       0.00002964      -0.04578441\\nCu       3.83428652       2.21372636      15.00000000        4       0.00002666      -0.00005029      -0.04570585\\nCu       6.39047753       2.21372636      15.00000000        4      -0.00003217      -0.00012141      -0.04560707\\nCu       2.55619101       4.42745271      15.00000000        4      -0.00005286       0.00006123      -0.04568784\\nCu       5.11238203       4.42745271      15.00000000        4      -0.00006294      -0.00002430      -0.04567507\\nCu       7.66857304       4.42745271      15.00000000        4       0.00011677       0.00003593      -0.04560518\\nCu       1.27809551       0.73790879      17.08712122        3      -0.00041519      -0.00043585       0.04151965\\nCu       3.83428652       0.73790879      17.08712122        3      -0.00019647      -0.00016078       0.03891500\\nCu       6.39047753       0.73790879      17.08712122        3       0.00059482       0.00000349       0.03993989\\nCu       2.55619101       2.95163514      17.08712122        3      -0.00019169       0.00015540       0.04000357\\nCu       5.11238203       2.95163514      17.08712122        3       0.00017431       0.00023793       0.03846592\\nCu       7.66857304       2.95163514      17.08712122        3       0.00000462      -0.00039809       0.04090669\\nCu       3.83428652       5.16536150      17.08712122        3       0.00034657       0.00042798       0.04030417\\nCu       6.39047753       5.16536150      17.08712122        3      -0.00058053       0.00025949       0.04051945\\nCu       8.94666855       5.16536150      17.08712122        3       0.00024101      -0.00007563       0.04031673\\nCu      -0.00024954       1.47545537      19.16851390        2       0.00037430      -0.00329447       0.01057996\\nCu       2.55636848       1.47587623      19.16820066        2      -0.00057695       0.00085196       0.00352461\\nCu       5.11243827       1.47568732      19.16755708        2       0.00003809      -0.00025761       0.00515641\\nCu       1.27808886       3.68966328      19.16831381        2       0.00029783      -0.00019610       0.00524762\\nCu       3.83443615       3.68959782      19.16781055        2       0.00004423       0.00040687       0.00381733\\nCu       6.39031552       3.68941137      19.16781341        2      -0.00049792      -0.00002055       0.00414326\\nCu       2.55634825       5.90358270      19.16803097        2       0.00265922       0.00166961       0.01021158\\nCu       5.11189864       5.90324876      19.16864599        2      -0.00368486       0.00105142       0.00944860\\nCu       7.66890497       5.90339227      19.16794684        2       0.00094806      -0.00015551       0.00414175\\nCu      -0.00009330      -0.00002303      21.27466034        1      -0.00074623      -0.00008402       0.02343754\\nCu       2.55614138      -0.00001759      21.26350765        1      -0.00042368       0.00001129      -0.00541053\\nCu       5.11235583      -0.00000748      21.26678261        1       0.00030912       0.00018815       0.00189155\\nCu       1.27812830       2.21425873      21.26638563        1      -0.00049813       0.00005097       0.00143492\\nCu       3.83351888       2.21446267      21.26525524        1      -0.00018016       0.00024431      -0.00208237\\nCu       6.39095722       2.21438990      21.26600789        1      -0.00030881      -0.00063881       0.00058976\\nCu       2.55666451       4.42685676      21.26600331        1       0.00025405       0.00076603       0.00045847\\nCu       5.11246833       4.42692544      21.26634699        1      -0.00058481      -0.00039181       0.00132878\\nCu       7.66776888       4.42668881      21.26530244        1      -0.00063535      -0.00014327      -0.00184041\\nO        0.02751294      -0.00004992      25.25232136        0      -0.03821504      -0.00002818      -0.02585362\\nC       -1.20125185      -0.00029272      25.26791253        0       0.02277374      -0.00004419      -0.03185175\\nC       -2.01794280       1.27799347      25.26184441        0       0.00954839       0.03942493       0.00288453\\nC       -2.01746567      -1.27888624      25.26175861        0       0.00957331      -0.03992963       0.00283621\\nH       -2.65584164       1.33471918      24.36850473        0      -0.00275034      -0.01902484       0.01557775\\nH       -2.65867822       1.32515802      26.15177257        0       0.00095923      -0.03311998      -0.00418057\\nH       -1.33741410       2.13053050      25.26249503        0       0.00152980      -0.00751558       0.00232239\\nH       -1.33658636      -2.13116651      25.26249121        0       0.00127928       0.00791873       0.00218775\\nH       -2.65523522      -1.33587995      24.36830300        0      -0.00244156       0.01898064       0.01505186\\nH       -2.65819857      -1.32634352      26.15170167        0       0.00097764       0.03326608      -0.00493635\\n"};
+        
+        function openStructureModal(configName, rank) {
+            const data = resultsData.find(r => r.name === configName);
+            if (!data) return;
+            
+            const xyz = allXyzData[configName];
+            if (!xyz) {
+                alert('Structure file not found: ' + configName);
+                return;
+            }
+            
+            currentModalXyz = xyz;
+            currentConfigName = configName;
+            
+            // Update modal info
+            document.getElementById('modalTitle').textContent = configName;
+            document.getElementById('modalEnergy').textContent = data.e_ads.toFixed(4);
+            document.getElementById('modalSite').textContent = data.site_type || 'unknown';
+            document.getElementById('modalSteps').textContent = data.steps;
+            document.getElementById('modalRank').textContent = '#' + rank;
+            
+            // Load trajectory data if available
+            const traj = trajectoryData[configName];
+            if (traj && traj.frames && traj.frames.length > 0) {
+                trajFrames = traj.frames;
+                trajEnergies = traj.energies;
+                trajSteps = traj.steps;
+                trajCurrentFrame = 0;
+                trajPlaying = false;
+                clearInterval(trajInterval);
+                
+                // Show controls
+                document.getElementById('trajControls').style.display = 'block';
+                document.getElementById('energyGraphContainer').style.display = 'block';
+                document.getElementById('trajFrameNum').textContent = '1';
+                document.getElementById('trajFrameTotal').textContent = trajFrames.length;
+                document.getElementById('trajSlider').max = trajFrames.length - 1;
+                document.getElementById('trajSlider').value = 0;
+                document.getElementById('trajPlayBtn').textContent = '▶️ Play';
+                
+                // Delay graph creation for DOM
+                setTimeout(() => showEnergyGraph(trajEnergies, trajSteps), 200);
+            } else {
+                // Hide controls if no trajectory
+                trajFrames = [];
+                trajEnergies = [];
+                trajSteps = [];
+                document.getElementById('trajControls').style.display = 'none';
+                document.getElementById('energyGraphContainer').style.display = 'none';
+            }
+            
+            // Show modal
+            document.getElementById('structureModal').classList.add('active');
+            
+            // Initialize modal viewer (delay for DOM update)
+            setTimeout(() => {
+                if (modalViewer) {
+                    modalViewer.removeAllModels();
+                    modalViewer.removeAllShapes();
+                } else {
+                    modalViewer = $3Dmol.createViewer('modalViewer', {
+                        backgroundColor: '#1a1a2e'
+                    });
+                }
+                
+                modalViewer.addModel(xyz.replace(/\\n/g, '\n'), 'xyz');
+                modalViewer.setStyle({}, {
+                    stick: { radius: 0.12, colorscheme: 'Jmol' },
+                    sphere: { scale: 0.25, colorscheme: 'Jmol' }
+                });
+                modalViewer.zoomTo();
+                modalViewer.render();
+                
+                // Reset state
+                modalState.axes = false;
+                modalState.pbc = false;
+                modalState.spin = true;
+                modalViewer.spin('y', 0.5);
+                
+                // Update button states
+                document.querySelectorAll('#structureModal .viewer-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent.includes('Spin')) btn.classList.add('active');
+                });
+            }, 100);
+        }
+        
+        function closeModal(event) {
+            if (event && event.target !== document.getElementById('structureModal')) return;
+            document.getElementById('structureModal').classList.remove('active');
+            if (modalViewer) {
+                modalViewer.spin(false);
+            }
+        }
+        
+        function toggleModalAxes() {
+            modalState.axes = !modalState.axes;
+            event.target.classList.toggle('active', modalState.axes);
+            
+            if (modalState.axes && cellParams) {
+                const origin = [0, 0, cellParams.zmin];
+                const a = cellParams.a, b = cellParams.b, c = cellParams.c || 10;
+                
+                modalViewer.addArrow({ start: {x:origin[0],y:origin[1],z:origin[2]}, end:{x:origin[0]+a[0],y:origin[1]+a[1],z:origin[2]}, radius:0.1, color:'#ff4444' });
+                modalViewer.addArrow({ start: {x:origin[0],y:origin[1],z:origin[2]}, end:{x:origin[0]+b[0],y:origin[1]+b[1],z:origin[2]}, radius:0.1, color:'#44ff44' });
+                modalViewer.addArrow({ start: {x:origin[0],y:origin[1],z:origin[2]}, end:{x:origin[0],y:origin[1],z:origin[2]+c}, radius:0.1, color:'#4444ff' });
+            } else {
+                modalViewer.removeAllShapes();
+            }
+            modalViewer.render();
+        }
+        
+        function toggleModalPBC() {
+            modalState.pbc = !modalState.pbc;
+            event.target.classList.toggle('active', modalState.pbc);
+            renderModalPBC();
+        }
+        
+        function updateModalPBC() {
+            if (modalState.pbc) {
+                renderModalPBC();
+            }
+        }
+        
+        function renderModalPBC() {
+            modalViewer.removeAllModels();
+            modalViewer.removeAllShapes();
+            
+            const xyz = currentModalXyz.replace(/\\n/g, '\n');
+            const repeatCount = parseInt(document.getElementById('pbcRepeat').value) || 3;
+            
+            if (modalState.pbc && cellParams) {
+                const a = cellParams.a, b = cellParams.b;
+                const half = Math.floor(repeatCount / 2);
+                
+                // Generate offsets based on repeat count
+                const offsets = [];
+                for (let i = -half; i <= half; i++) {
+                    for (let j = -half; j <= half; j++) {
+                        offsets.push([i, j]);
+                    }
+                }
+                
+                offsets.forEach(([i, j]) => {
+                    const dx = i * a[0] + j * b[0];
+                    const dy = i * a[1] + j * b[1];
+                    const translatedXyz = translateXyz(currentModalXyz, dx, dy, 0);
+                    
+                    const model = modalViewer.addModel(translatedXyz, 'xyz');
+                    const isCenter = (i === 0 && j === 0);
+                    const style = isCenter ? 
+                        { stick:{radius:0.12,colorscheme:'Jmol'}, sphere:{scale:0.25,colorscheme:'Jmol'} } :
+                        { stick:{radius:0.10,colorscheme:'Jmol',opacity:0.4}, sphere:{scale:0.20,colorscheme:'Jmol',opacity:0.4} };
+                    model.setStyle({}, style);
+                });
+            } else {
+                modalViewer.addModel(xyz, 'xyz');
+                modalViewer.setStyle({}, { stick:{radius:0.12,colorscheme:'Jmol'}, sphere:{scale:0.25,colorscheme:'Jmol'} });
+            }
+            
+            if (modalState.axes) { modalState.axes = false; toggleModalAxes(); }
+            modalViewer.zoomTo();
+            modalViewer.render();
+        }
+        
+        function toggleModalSpin() {
+            modalState.spin = !modalState.spin;
+            event.target.classList.toggle('active', modalState.spin);
+            modalViewer.spin(modalState.spin ? 'y' : false, 0.5);
+        }
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+        
+        // Table Filter
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#resultsTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+        
+        function filterByType(type) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const rows = document.querySelectorAll('#resultsTable tbody tr');
+            rows.forEach(row => {
+                if (type === 'all') {
+                    row.style.display = '';
+                } else {
+                    const siteType = row.querySelector('.badge')?.textContent.toLowerCase();
+                    row.style.display = siteType === type ? '' : 'none';
+                }
+            });
+        }
+        
+        // Table Sort
+        let sortDirection = {};
+        function sortTable(col) {
+            const table = document.getElementById('resultsTable');
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            sortDirection[col] = !sortDirection[col];
+            
+            rows.sort((a, b) => {
+                let aVal = a.cells[col].textContent.trim();
+                let bVal = b.cells[col].textContent.trim();
+                
+                if (!isNaN(parseFloat(aVal))) {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+                
+                if (sortDirection[col]) {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+            
+            const tbody = table.querySelector('tbody');
+            rows.forEach(row => tbody.appendChild(row));
+        }
+        
+        // Export
+        function exportCSV() {
+            let csv = 'name,site_type,e_ads,steps,converged\n';
+            resultsData.forEach(r => {
+                csv += `${r.name},${r.site_type},${r.e_ads},${r.steps},${r.converged}\n`;
+            });
+            downloadFile(csv, 'results.csv', 'text/csv');
+        }
+        
+        function exportJSON() {
+            const json = JSON.stringify(resultsData, null, 2);
+            downloadFile(json, 'results.json', 'application/json');
+        }
+        
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
