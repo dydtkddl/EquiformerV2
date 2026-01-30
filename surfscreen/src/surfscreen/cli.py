@@ -1126,6 +1126,165 @@ def surface_search_mp(formula, limit):
         console.print(f"[red]Error: {e}[/red]")
 
 
+# ============ Checkpoint Commands ============
+
+@main.group()
+def checkpoint():
+    """Checkpoint and resume management"""
+    pass
+
+
+@checkpoint.command("status")
+@click.argument("checkpoint_dir")
+def checkpoint_status(checkpoint_dir):
+    """Show checkpoint status"""
+    from surfscreen.checkpoint import CheckpointManager
+    
+    try:
+        manager = CheckpointManager(checkpoint_dir)
+        manager.print_status()
+    except FileNotFoundError:
+        console.print(f"[red]No checkpoint found in: {checkpoint_dir}[/red]")
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+
+
+@checkpoint.command("reset-failed")
+@click.argument("checkpoint_dir")
+@click.option("--confirm", is_flag=True, help="Skip confirmation")
+def checkpoint_reset_failed(checkpoint_dir, confirm):
+    """Reset failed tasks to pending"""
+    from surfscreen.checkpoint import CheckpointManager
+    
+    manager = CheckpointManager(checkpoint_dir)
+    failed = manager.get_failed_tasks()
+    
+    if not failed:
+        console.print("[yellow]No failed tasks to reset[/yellow]")
+        return
+        
+    console.print(f"Failed tasks: {len(failed)}")
+    for task_id in failed[:10]:
+        error = manager.state.tasks[task_id].get("error", "")
+        console.print(f"  - {task_id}: {error[:50]}...")
+        
+    if len(failed) > 10:
+        console.print(f"  ... and {len(failed) - 10} more")
+        
+    if not confirm:
+        if not click.confirm("Reset all failed tasks to pending?"):
+            return
+            
+    manager.reset_failed_tasks()
+    console.print(f"[green]✓[/green] Reset {len(failed)} tasks to pending")
+
+
+@checkpoint.command("list-pending")
+@click.argument("checkpoint_dir")
+@click.option("--limit", default=20, help="Max items to show")
+def checkpoint_list_pending(checkpoint_dir, limit):
+    """List pending tasks"""
+    from surfscreen.checkpoint import CheckpointManager
+    
+    manager = CheckpointManager(checkpoint_dir)
+    pending = manager.get_pending_tasks()
+    
+    console.print(f"\n[bold]Pending Tasks: {len(pending)}[/bold]")
+    
+    for task_id in pending[:limit]:
+        console.print(f"  ⏳ {task_id}")
+        
+    if len(pending) > limit:
+        console.print(f"  ... and {len(pending) - limit} more")
+
+
+@checkpoint.command("clean")
+@click.argument("checkpoint_dir")
+@click.option("--force", is_flag=True, help="Skip confirmation")
+def checkpoint_clean(checkpoint_dir, force):
+    """Delete checkpoint and start fresh"""
+    from pathlib import Path
+    
+    cp_path = Path(checkpoint_dir) / "checkpoint.json"
+    
+    if not cp_path.exists():
+        console.print(f"[yellow]No checkpoint found[/yellow]")
+        return
+        
+    if not force:
+        if not click.confirm(f"Delete checkpoint at {cp_path}?"):
+            return
+            
+    cp_path.unlink()
+    console.print(f"[green]✓[/green] Checkpoint deleted")
+
+
+# ============ Multi-molecule Screening ============
+
+@screen.command("multi")
+@click.option("-s", "--surface", "surface_file", required=True, help="Surface structure")
+@click.option("-m", "--molecules", multiple=True, required=True, help="Molecule files (can repeat)")
+@click.option("-o", "--output", required=True, help="Output directory")
+@click.option("--engine", default="mace", type=click.Choice(["mace", "xtb"]))
+@click.option("--parallel", default=1, help="Parallel workers per molecule")
+def screen_multi(surface_file, molecules, output, engine, parallel):
+    """Screen multiple molecules on a surface"""
+    from pathlib import Path
+    import subprocess
+    
+    console.print(f"\n[bold]Multi-molecule Screening[/bold]")
+    console.print(f"Surface: {surface_file}")
+    console.print(f"Molecules: {len(molecules)}")
+    console.print(f"Engine: {engine}")
+    
+    output_dir = Path(output)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    results = []
+    for i, mol_file in enumerate(molecules, 1):
+        mol_name = Path(mol_file).stem
+        mol_output = output_dir / mol_name
+        
+        console.print(f"\n[{i}/{len(molecules)}] Processing: {mol_name}")
+        
+        cmd = [
+            "surfscreen", "screen", "run",
+            "-s", surface_file,
+            "-m", mol_file,
+            "-o", str(mol_output),
+            "--engine", engine,
+            "-n", str(parallel)
+        ]
+        
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
+            if result.returncode == 0:
+                console.print(f"  [green]✓[/green] {mol_name} completed")
+                results.append({"molecule": mol_name, "status": "success"})
+            else:
+                console.print(f"  [red]✗[/red] {mol_name} failed")
+                results.append({"molecule": mol_name, "status": "failed", "error": result.stderr[:200]})
+        except subprocess.TimeoutExpired:
+            console.print(f"  [yellow]⏰[/yellow] {mol_name} timeout")
+            results.append({"molecule": mol_name, "status": "timeout"})
+        except Exception as e:
+            console.print(f"  [red]✗[/red] {mol_name} error: {e}")
+            results.append({"molecule": mol_name, "status": "error", "error": str(e)})
+    
+    # Summary
+    console.print("\n" + "=" * 50)
+    console.print("[bold]Summary[/bold]")
+    success = sum(1 for r in results if r["status"] == "success")
+    console.print(f"Success: {success}/{len(molecules)}")
+    
+    # Save results
+    import json
+    with open(output_dir / "multi_results.json", "w") as f:
+        json.dump(results, f, indent=2)
+    console.print(f"\n[green]✓[/green] Results saved: {output_dir}/multi_results.json")
+
+
 if __name__ == "__main__":
     main()
+
 

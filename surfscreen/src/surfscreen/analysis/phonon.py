@@ -48,28 +48,55 @@ class PhononAnalyzer:
         if calculator:
             self.atoms.calc = calculator
             
-    def calculate_vibrations(self, indices: Optional[List[int]] = None) -> PhononResult:
-        """진동 주파수 계산"""
+    def calculate_vibrations(self, indices: Optional[List[int]] = None, 
+                              cleanup: bool = True) -> PhononResult:
+        """진동 주파수 계산
+        
+        Args:
+            indices: 진동을 계산할 원자 인덱스 (None=전체)
+            cleanup: 임시 파일 정리 여부
+            
+        Returns:
+            PhononResult
+        """
         from ase.vibrations import Vibrations
+        import os
+        import tempfile
         
-        vib = Vibrations(self.atoms, indices=indices, delta=self.delta)
-        vib.run()
-        freq_cm1 = vib.get_frequencies()
+        # 임시 디렉토리 사용
+        work_dir = tempfile.mkdtemp(prefix="phonon_")
+        original_dir = os.getcwd()
         
-        real_freqs = []
-        n_imaginary = 0
-        for f in freq_cm1:
-            if np.isreal(f) and f.real > 0:
-                real_freqs.append(f.real)
-            else:
-                n_imaginary += 1
+        try:
+            os.chdir(work_dir)
+            vib = Vibrations(self.atoms, indices=indices, delta=self.delta)
+            vib.run()
+            freq_cm1 = vib.get_frequencies()
+            
+            real_freqs = []
+            n_imaginary = 0
+            for f in freq_cm1:
+                if np.isreal(f) and f.real > 0:
+                    real_freqs.append(f.real)
+                else:
+                    n_imaginary += 1
+                    
+            freq_cm1 = np.array(real_freqs)
+            freq_meV = freq_cm1 * 0.12398
+            zpe = 0.5 * np.sum(freq_cm1 * 1.23984e-4)
+            
+            if cleanup:
+                vib.clean()
                 
-        freq_cm1 = np.array(real_freqs)
-        freq_meV = freq_cm1 * 0.12398
-        zpe = 0.5 * np.sum(freq_cm1 * 1.23984e-4)
-        vib.clean()
-        
-        return PhononResult(freq_cm1, freq_meV, zpe, n_imaginary)
+            return PhononResult(freq_cm1, freq_meV, zpe, n_imaginary)
+        finally:
+            os.chdir(original_dir)
+            if cleanup:
+                import shutil
+                try:
+                    shutil.rmtree(work_dir)
+                except:
+                    pass
     
     def calculate_thermodynamics(self, temperature: float = 298.15, 
                                   pressure: float = 1.0,

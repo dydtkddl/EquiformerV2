@@ -185,8 +185,18 @@ class MPIntegration:
                     
             # 결정계 필터
             if crystal_system:
-                # TODO: 결정계 필터 구현
-                pass
+                sg = result.get("spacegroup") or ""
+                crystal_sys_map = {
+                    "cubic": ["Pm-3m", "Fm-3m", "Im-3m", "Fd-3m", "Pa-3"],
+                    "hexagonal": ["P6", "P63", "R3", "R-3"],
+                    "tetragonal": ["P4", "I4", "P42"],
+                    "orthorhombic": ["Pnma", "Cmcm", "Pbca"],
+                    "monoclinic": ["P21", "C2"],
+                    "triclinic": ["P1", "P-1"],
+                }
+                valid_sgs = crystal_sys_map.get(crystal_system.lower(), [])
+                if not any(v in str(sg) for v in valid_sgs):
+                    continue
                 
             results.append(result)
             

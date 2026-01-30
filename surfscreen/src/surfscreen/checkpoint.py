@@ -6,11 +6,15 @@ SurfScreen Checkpoint Module
 
 import json
 import time
+import fcntl
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Set
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from enum import Enum
+
+logger = logging.getLogger(__name__)
 
 
 class TaskStatus(Enum):
@@ -96,10 +100,24 @@ class CheckpointManager:
         return CheckpointState(**data)
     
     def save(self):
-        """체크포인트 저장"""
+        """체크포인트 저장 (파일 락 사용)"""
         self.state.last_update = datetime.now().isoformat()
-        with open(self.checkpoint_path, "w") as f:
-            json.dump(asdict(self.state), f, indent=2)
+        try:
+            with open(self.checkpoint_path, "w") as f:
+                # 파일 락 (UNIX only, Windows에서는 무시)
+                try:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except (AttributeError, OSError):
+                    pass  # Windows 또는 락 실패
+                json.dump(asdict(self.state), f, indent=2)
+                try:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                except (AttributeError, OSError):
+                    pass
+            logger.debug(f"Checkpoint saved: {self.checkpoint_path}")
+        except Exception as e:
+            logger.error(f"Failed to save checkpoint: {e}")
+            raise
             
     def register_tasks(self, task_ids: List[str], config: Optional[Dict] = None):
         """작업 등록
