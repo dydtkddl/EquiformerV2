@@ -83,7 +83,7 @@ def mol_from_smiles(smiles, output, name, optimize, conformers):
 @molecule.command("from-pubchem")
 @click.argument("query")
 @click.option("--output", "-o", default=None, help="Output file path")
-@click.option("--by", type=click.Choice(["cid", "name", "formula"]), default="cid")
+@click.option("--by", type=click.Choice(["cid", "name", "formula"]), default="name")
 def mol_from_pubchem(query, output, by):
     """Fetch molecule from PubChem database"""
     from surfscreen.molecule import MoleculeBuilder
