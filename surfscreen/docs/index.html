@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SurfScreen Documentation</title>
+    <style>
+      :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --secondary: #64748b;
+        --bg: #ffffff;
+        --bg-alt: #f8fafc;
+        --text: #1e293b;
+        --text-light: #64748b;
+        --border: #e2e8f0;
+        --code-bg: #f1f5f9;
+        --success: #10b981;
+        --warning: #f59e0b;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.6;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      /* Header */
+      header {
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .logo span {
+        color: var(--text);
+      }
+
+      nav a {
+        color: var(--text-light);
+        text-decoration: none;
+        margin-left: 2rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      nav a:hover {
+        color: var(--primary);
+      }
+
+      /* Hero */
+      .hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: white;
+        padding: 4rem 2rem;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero p {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+      }
+
+      .version-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+
+      .btn-primary {
+        background: white;
+        color: var(--primary);
+      }
+
+      .btn-primary:hover {
+        background: var(--bg-alt);
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+      }
+
+      .btn-secondary:hover {
+        border-color: white;
+      }
+
+      /* Main Content */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3rem 2rem;
+      }
+
+      /* Section Cards */
+      .section-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+
+      .section-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+      }
+
+      .section-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .section-card .icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .section-card h3 {
+        font-size: 1.125rem;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+      }
+
+      .section-card p {
+        font-size: 0.875rem;
+        color: var(--text-light);
+      }
+
+      /* Table of Contents */
+      .toc {
+        background: var(--bg-alt);
+        border-radius: 0.75rem;
+        padding: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .toc h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--text);
+      }
+
+      .toc-list {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 0.5rem;
+      }
+
+      .toc-list li {
+        padding: 0.5rem 0;
+      }
+
+      .toc-list a {
+        color: var(--primary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .toc-list a:hover {
+        text-decoration: underline;
+      }
+
+      .toc-number {
+        background: var(--primary);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      /* Quick Start */
+      .quick-start {
+        background: var(--bg-alt);
+        border-radius: 0.75rem;
+        padding: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .quick-start h2 {
+        margin-bottom: 1.5rem;
+      }
+
+      .code-block {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        font-family: "Consolas", "Monaco", monospace;
+        font-size: 0.875rem;
+        line-height: 1.7;
+      }
+
+      .code-block .comment {
+        color: #64748b;
+      }
+      .code-block .command {
+        color: #94a3b8;
+      }
+      .code-block .highlight {
+        color: #38bdf8;
+      }
+
+      /* Features */
+      .features {
+        margin-bottom: 3rem;
+      }
+
+      .features h2 {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .feature {
+        text-align: center;
+        padding: 1.5rem;
+      }
+
+      .feature .icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .feature h4 {
+        margin-bottom: 0.5rem;
+      }
+
+      .feature p {
+        font-size: 0.875rem;
+        color: var(--text-light);
+      }
+
+      /* Footer */
+      footer {
+        background: var(--bg-alt);
+        border-top: 1px solid var(--border);
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-light);
+        font-size: 0.875rem;
+      }
+
+      footer a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+        .hero-buttons {
+          flex-direction: column;
+        }
+        nav {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-content">
+        <a href="index.html" class="logo">Surf<span>Screen</span></a>
+        <nav>
+          <a href="01_introduction.html">소개</a>
+          <a href="02_installation.html">설치</a>
+          <a href="03_quickstart.html">빠른 시작</a>
+          <a href="05_cli_reference.html">CLI</a>
+          <a href="06_api_reference.html">API</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="version-badge">v0.2.0</div>
+      <h1>SurfScreen Documentation</h1>
+      <p>
+        Enterprise-grade Surface Adsorption Screening Platform with ML
+        Interatomic Potentials
+      </p>
+      <div class="hero-buttons">
+        <a href="03_quickstart.html" class="btn btn-primary">🚀 시작하기</a>
+        <a href="https://github.com/user/surfscreen" class="btn btn-secondary"
+          >GitHub</a
+        >
+      </div>
+    </section>
+
+    <div class="container">
+      <!-- Table of Contents -->
+      <div class="toc">
+        <h2>📚 문서 목차</h2>
+        <ul class="toc-list">
+          <li>
+            <a href="01_introduction.html"
+              ><span class="toc-number">1</span> 소개 (Introduction)</a
+            >
+          </li>
+          <li>
+            <a href="02_installation.html"
+              ><span class="toc-number">2</span> 설치 (Installation)</a
+            >
+          </li>
+          <li>
+            <a href="03_quickstart.html"
+              ><span class="toc-number">3</span> 빠른 시작 (Quick Start)</a
+            >
+          </li>
+          <li>
+            <a href="04_core_modules.html"
+              ><span class="toc-number">4</span> 핵심 모듈 (Core Modules)</a
+            >
+          </li>
+          <li>
+            <a href="05_cli_reference.html"
+              ><span class="toc-number">5</span> CLI 명령 참조</a
+            >
+          </li>
+          <li>
+            <a href="06_api_reference.html"
+              ><span class="toc-number">6</span> API 참조</a
+            >
+          </li>
+          <li>
+            <a href="07_tutorials.html"
+              ><span class="toc-number">7</span> 튜토리얼</a
+            >
+          </li>
+          <li>
+            <a href="08_faq.html"><span class="toc-number">8</span> FAQ</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Section Cards -->
+      <div class="section-grid">
+        <a href="01_introduction.html" class="section-card">
+          <div class="icon">📖</div>
+          <h3>소개</h3>
+          <p>SurfScreen이 무엇인지, 어떤 문제를 해결하는지 알아보세요.</p>
+        </a>
+        <a href="02_installation.html" class="section-card">
+          <div class="icon">⚙️</div>
+          <h3>설치</h3>
+          <p>시스템 요구사항과 설치 방법을 확인하세요.</p>
+        </a>
+        <a href="03_quickstart.html" class="section-card">
+          <div class="icon">🚀</div>
+          <h3>빠른 시작</h3>
+          <p>5분 안에 첫 번째 스크리닝을 실행해보세요.</p>
+        </a>
+        <a href="04_core_modules.html" class="section-card">
+          <div class="icon">🧩</div>
+          <h3>핵심 모듈</h3>
+          <p>Molecule, Surface, Adsorption, MD, Analysis 모듈 상세.</p>
+        </a>
+        <a href="05_cli_reference.html" class="section-card">
+          <div class="icon">💻</div>
+          <h3>CLI 명령</h3>
+          <p>모든 CLI 명령과 옵션을 참조하세요.</p>
+        </a>
+        <a href="06_api_reference.html" class="section-card">
+          <div class="icon">📦</div>
+          <h3>API 참조</h3>
+          <p>Python API로 프로그래밍 방식 접근.</p>
+        </a>
+        <a href="07_tutorials.html" class="section-card">
+          <div class="icon">📝</div>
+          <h3>튜토리얼</h3>
+          <p>단계별 가이드로 실제 워크플로우 학습.</p>
+        </a>
+        <a href="08_faq.html" class="section-card">
+          <div class="icon">❓</div>
+          <h3>FAQ</h3>
+          <p>자주 묻는 질문과 문제 해결.</p>
+        </a>
+      </div>
+
+      <!-- Quick Start Preview -->
+      <div class="quick-start">
+        <h2>🚀 빠른 시작</h2>
+        <div class="code-block">
+          <span class="comment"># 1. 설치</span>
+          pip install surfscreen
+
+          <span class="comment"># 2. 표면 생성</span>
+          surfscreen surface create Cu --miller 111 --supercell 3x3x1 --layers 4
+
+          <span class="comment"># 3. 분자 준비</span>
+          surfscreen molecule from-pubchem acetone -o acetone.xyz
+
+          <span class="comment"># 4. 스크리닝 실행</span>
+          surfscreen screen run -s Cu111.extxyz -m acetone.xyz --engine mace -o
+          results/
+
+          <span class="comment"># 5. 리포트 생성</span>
+          surfscreen screen report results/ -o report.html
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="features">
+        <h2>✨ 주요 기능</h2>
+        <div class="feature-grid">
+          <div class="feature">
+            <div class="icon">🔬</div>
+            <h4>ML 포텐셜</h4>
+            <p>MACE, xTB, EquiformerV2 지원</p>
+          </div>
+          <div class="feature">
+            <div class="icon">⚡</div>
+            <h4>고속 스크리닝</h4>
+            <p>GPU 가속 병렬 계산</p>
+          </div>
+          <div class="feature">
+            <div class="icon">🎯</div>
+            <h4>자동 사이트 감지</h4>
+            <p>Top/Bridge/Hollow 자동 분류</p>
+          </div>
+          <div class="feature">
+            <div class="icon">📊</div>
+            <h4>인터랙티브 분석</h4>
+            <p>HTML 리포트 및 시각화</p>
+          </div>
+          <div class="feature">
+            <div class="icon">🔄</div>
+            <h4>MD 시뮬레이션</h4>
+            <p>NVT/NPT/NVE 앙상블</p>
+          </div>
+          <div class="feature">
+            <div class="icon">📈</div>
+            <h4>분석 스위트</h4>
+            <p>MSD, RDF, 확산, 전도도</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        SurfScreen v0.2.0 | Enterprise Surface Adsorption Screening Platform
+      </p>
+      <p>Built with ❤️ for Computational Chemistry</p>
+    </footer>
+  </body>
+</html>
