@@ -5,5 +5,6 @@ SurfScreen MD Module
 """
 
 from .engine import MDEngine, MDConfig, MDState, MDLogger
+from .md_report import MDReportGenerator
 
-__all__ = ["MDEngine", "MDConfig", "MDState", "MDLogger"]
+__all__ = ["MDEngine", "MDConfig", "MDState", "MDLogger", "MDReportGenerator"]

@@ -354,6 +354,9 @@ class MDEngine:
         final_path = self.output_dir / "final.xyz"
         write(str(final_path), self.atoms, format="extxyz")
         
+        # 다중 포맷 궤적 저장
+        self._export_trajectory_formats()
+        
         # 요약 저장
         summary = self.logger.get_summary()
         summary_path = self.output_dir / "summary.json"
@@ -367,6 +370,31 @@ class MDEngine:
         print(f"   Output: {self.output_dir}")
         
         return summary
+    
+    def _export_trajectory_formats(self):
+        """다양한 포맷으로 궤적 내보내기 (OVITO 등 호환)"""
+        traj_path = self.output_dir / "trajectory.traj"
+        
+        if not traj_path.exists():
+            return
+            
+        # ASE trajectory 읽기
+        frames = read(str(traj_path), index=":")
+        
+        if not frames:
+            return
+            
+        print(f"   📁 Exporting {len(frames)} frames...")
+        
+        # 1. Extended XYZ (권장 - cell 정보 포함)
+        extxyz_path = self.output_dir / "trajectory.extxyz"
+        write(str(extxyz_path), frames, format="extxyz")
+        print(f"   ✓ trajectory.extxyz (OVITO/ASE compatible)")
+        
+        # 2. XYZ multi-frame
+        xyz_path = self.output_dir / "trajectory.xyz"
+        write(str(xyz_path), frames, format="xyz")
+        print(f"   ✓ trajectory.xyz (VMD/Jmol compatible)")
     
     @classmethod
     def continue_from_checkpoint(cls, 

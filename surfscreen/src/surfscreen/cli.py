@@ -609,6 +609,26 @@ def md_status(output_dir):
             console.print("[red]No MD data found[/red]")
 
 
+@md.command("report")
+@click.argument("output_dir")
+@click.option("--output", "-o", default=None, help="Output HTML file")
+def md_report(output_dir, output):
+    """Generate interactive MD report with trajectory playback"""
+    from surfscreen.md.md_report import MDReportGenerator
+    
+    console.print(f"\n[bold]📊 Generating MD Report: {output_dir}[/bold]\n")
+    
+    out_path = output or f"{Path(output_dir).name}_report.html"
+    
+    gen = MDReportGenerator(output_dir)
+    gen.generate(out_path)
+    
+    console.print(f"\n[bold green]✓ Report generated: {out_path}[/bold green]")
+    console.print("   - Interactive trajectory playback (3Dmol.js)")
+    console.print("   - Energy/Temperature plots (Plotly)")
+    console.print("   - Download links for OVITO/VMD/ASE")
+
+
 # ============ Analysis Commands ============
 
 @main.group()
