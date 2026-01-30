@@ -56,6 +56,7 @@ class MDConfig:
     engine: str = "mace"
     model: str = "medium"
     device: str = "cuda"
+    force_xtb: bool = False  # Force xTB even with PBC (may fail)
     
     @classmethod
     def from_dict(cls, d: dict) -> "MDConfig":
@@ -188,6 +189,26 @@ class MDEngine:
                 default_dtype="float64"
             )
         elif self.config.engine == "xtb":
+            # PBC 체크 - xTB는 주기적 경계 조건에서 제한이 있음
+            if self.atoms.pbc.any():
+                import warnings
+                warnings.warn(
+                    "\n⚠️  WARNING: xTB with PBC (Periodic Boundary Conditions) detected!\n"
+                    "   xTB does not fully support multipole calculations with PBC.\n"
+                    "   This may cause 'Multipoles not available with PBC' errors.\n"
+                    "\n"
+                    "   Recommended solutions:\n"
+                    "   1. Use MACE instead: --engine mace\n"
+                    "   2. For molecules without PBC, xTB works fine\n"
+                    "   3. Use --force-xtb to proceed anyway (may fail)\n",
+                    UserWarning
+                )
+                if not getattr(self.config, 'force_xtb', False):
+                    raise RuntimeError(
+                        "xTB + PBC is not supported. Use --engine mace for surface/periodic systems, "
+                        "or use --force-xtb to attempt anyway."
+                    )
+            
             from xtb.ase.calculator import XTB
             self.calculator = XTB(method="GFN2-xTB")
         else:

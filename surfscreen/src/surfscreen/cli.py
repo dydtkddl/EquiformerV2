@@ -522,9 +522,10 @@ def md():
 @click.option("--engine", default="mace", type=click.Choice(["mace", "xtb"]))
 @click.option("--model", default="medium", help="MACE model size")
 @click.option("--device", default="cuda", type=click.Choice(["cuda", "cpu"]))
+@click.option("--force-xtb", is_flag=True, help="Force xTB with PBC (may fail)")
 @click.option("--output", "-o", default="md_output", help="Output directory")
 def md_run(structure, ensemble, temperature, pressure, timestep, steps, 
-           thermostat, engine, model, device, output):
+           thermostat, engine, model, device, force_xtb, output):
     """Run molecular dynamics simulation"""
     from ase.io import read
     from surfscreen.md import MDEngine, MDConfig
@@ -550,7 +551,8 @@ def md_run(structure, ensemble, temperature, pressure, timestep, steps,
         thermostat=thermostat,
         engine=engine,
         model=model,
-        device=device
+        device=device,
+        force_xtb=force_xtb
     )
     
     # Run

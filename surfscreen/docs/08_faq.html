@@ -218,6 +218,31 @@ surfscreen screen run ... --fmax 0.1 --max-steps 500
                         <p>초기 구조가 매우 불안정할 경우 먼저 xTB로 pre-optimization을 수행하세요.</p>
                     </div>
                 </div>
+
+                <div class="faq-item">
+                    <h3>Q: "xTB + PBC is not supported" 오류</h3>
+                    <div class="faq-answer">
+                        <p><strong>A:</strong> xTB는 주기적 경계 조건(PBC)이 있는 표면 시스템에서 제한이 있습니다:</p>
+                        <div class="code-block">
+# 오류 메시지:
+# RuntimeError: xTB + PBC is not supported. 
+# Use --engine mace for surface/periodic systems
+                        </div>
+                        <p><strong>해결 방법:</strong></p>
+                        <ul>
+                            <li><strong>권장:</strong> MACE 사용 (<code>--engine mace</code>)</li>
+                            <li>xTB는 분자(클러스터) 계산에만 사용</li>
+                            <li>강제 실행: <code>--force-xtb</code> (실패할 수 있음)</li>
+                        </ul>
+                        <div class="code-block">
+# 표면/주기적 시스템 → MACE 사용
+surfscreen md run surface.xyz --engine mace --steps 100
+
+# 분자 시스템 → xTB OK
+surfscreen md run benzene.xyz --engine xtb --steps 100
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section id="advanced">
