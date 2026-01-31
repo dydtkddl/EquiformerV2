@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9. v0.3.0 신규 기능 - SurfScreen Documentation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">Surf<span>Screen</span></a>
+            <nav>
+                <a href="01_introduction.html">소개</a>
+                <a href="02_installation.html">설치</a>
+                <a href="03_quickstart.html">빠른 시작</a>
+                <a href="05_cli_reference.html">CLI</a>
+                <a href="09_new_features.html" class="active">v0.3.0</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="doc-container">
+        <aside class="sidebar">
+            <h3>v0.3.0 기능</h3>
+            <ul class="sidebar-nav">
+                <li><a href="#export">📦 Export</a></li>
+                <li><a href="#checkpoint">💾 Checkpoint</a></li>
+                <li><a href="#templates">📝 Templates</a></li>
+                <li><a href="#mp">🔗 Materials Project</a></li>
+                <li><a href="#phonon">🔊 Phonon</a></li>
+                <li><a href="#coverage">📏 Coverage</a></li>
+                <li><a href="#multi">🔢 Multi-molecule</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="breadcrumb">
+                <a href="index.html">홈</a> / <span>9. v0.3.0 신규 기능</span>
+            </div>
+
+            <h1>9. v0.3.0 신규 기능</h1>
+            <p>SurfScreen v0.3.0에서 추가된 새로운 기능들을 소개합니다.</p>
+
+            <section id="export">
+                <h2>📦 Export - 결과 내보내기</h2>
+                <p>스크리닝 및 MD 결과를 다양한 포맷으로 내보냅니다.</p>
+
+                <h3>지원 포맷</h3>
+                <ul>
+                    <li><strong>CSV</strong>: 간단한 테이블 형식</li>
+                    <li><strong>JSON</strong>: 전체 데이터 (메타데이터 포함)</li>
+                    <li><strong>Excel</strong>: 다중 시트 (요약, 결과, 통계)</li>
+                    <li><strong>ZIP</strong>: 전체 아카이브 (구조, 궤적, 리포트 포함)</li>
+                </ul>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">CLI 사용법</div>
+                    <div class="cli-command-body">
+                        <div class="code-block"># CSV 내보내기
+surfscreen export csv results/ -o results.csv
+
+# JSON 내보내기
+surfscreen export json results/ -o results.json
+
+# Excel 내보내기 (pandas, openpyxl 필요)
+surfscreen export excel results/ -o results.xlsx
+
+# ZIP 아카이브
+surfscreen export zip results/ -o archive.zip --structures --trajectories</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">Python API</div>
+                    <div class="cli-command-body">
+                        <div class="code-block">from surfscreen import ExportManager, ExportConfig
+
+# 기본 내보내기
+manager = ExportManager("results/")
+manager.to_csv("results.csv")
+manager.to_excel("results.xlsx")
+
+# 설정 포함
+config = ExportConfig(
+    include_structures=True,
+    include_trajectories=True,
+    decimal_places=4
+)
+manager = ExportManager("results/", config)
+manager.to_zip("full_archive.zip")</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="checkpoint">
+                <h2>💾 Checkpoint - 작업 중단/재개</h2>
+                <p>대규모 스크리닝 및 MD 작업의 진행 상태를 저장하고 재개합니다.</p>
+
+                <h3>주요 기능</h3>
+                <ul>
+                    <li>작업 상태 자동 저장 (pending/running/completed/failed)</li>
+                    <li>중단 후 재개 시 완료된 작업 건너뛰기</li>
+                    <li>실패한 작업 리셋 및 재시도</li>
+                    <li>진행률 실시간 모니터링</li>
+                </ul>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">CLI 사용법</div>
+                    <div class="cli-command-body">
+                        <div class="code-block"># 체크포인트 상태 확인
+surfscreen checkpoint status results/
+
+# 실패한 작업 목록
+surfscreen checkpoint list-pending results/
+
+# 실패한 작업 리셋
+surfscreen checkpoint reset-failed results/ --confirm
+
+# 체크포인트 삭제 (처음부터 재시작)
+surfscreen checkpoint clean results/ --force</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">Python API</div>
+                    <div class="cli-command-body">
+                        <div class="code-block">from surfscreen import ScreeningCheckpoint
+
+# 체크포인트 생성
+cp = ScreeningCheckpoint("results/")
+cp.register_configurations(["config1.xyz", "config2.xyz"], {"engine": "mace"})
+
+# 작업 진행
+cp.start_task("config1")
+cp.complete_task("config1", {"energy": -1.5})
+
+# 진행률 확인
+progress = cp.get_progress()
+print(f"진행률: {progress['progress_pct']:.1f}%")</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="templates">
+                <h2>📝 Templates - 워크플로우 템플릿</h2>
+                <p>반복적인 워크플로우를 템플릿으로 정의하고 실행합니다.</p>
+
+                <h3>내장 템플릿</h3>
+                <ul>
+                    <li><strong>basic_screening</strong>: 기본 흡착 스크리닝</li>
+                    <li><strong>md_simulation</strong>: MD 시뮬레이션 + 분석</li>
+                </ul>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">CLI 사용법</div>
+                    <div class="cli-command-body">
+                        <div class="code-block"># 기본 템플릿 설치
+surfscreen template install-defaults
+
+# 템플릿 목록
+surfscreen template list
+
+# 템플릿 실행
+surfscreen template run basic_screening -v element=Cu -v molecule=acetone
+
+# 드라이런 (명령어 미리보기)
+surfscreen template run md_simulation --dry-run -v temperature=500</div>
+                    </div>
+                </div>
+
+                <h3>사용자 정의 템플릿</h3>
+                <div class="code-block"># ~/.surfscreen/templates/my_workflow.yaml
+name: my_workflow
+description: Custom screening workflow
+version: "1.0"
+variables:
+  element: Pt
+  miller: "111"
+steps:
+  - name: Create surface
+    command: surfscreen surface create ${element} --miller ${miller} -o surface.xyz
+  - name: Run screening
+    command: surfscreen screen run -s surface.xyz -m mol.xyz -o results/
+  - name: Generate report
+    command: surfscreen screen report results/ -o report.html</div>
+            </section>
+
+            <section id="mp">
+                <h2>🔗 Materials Project 연동</h2>
+                <p>Materials Project API를 통해 실제 재료 구조를 가져와 표면을 생성합니다.</p>
+
+                <h3>사전 설정</h3>
+                <div class="code-block"># 환경 변수 설정
+export MP_API_KEY=your_api_key_here
+
+# 의존성 설치
+pip install mp-api</div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">CLI 사용법</div>
+                    <div class="cli-command-body">
+                        <div class="code-block"># MP에서 표면 생성
+surfscreen surface from-mp mp-30 --miller 111 --layers 4 -o Cu_111.xyz
+
+# 재료 검색
+surfscreen surface search-mp Cu --limit 10
+surfscreen surface search-mp TiO2 --limit 5</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">Python API</div>
+                    <div class="cli-command-body">
+                        <div class="code-block">from surfscreen.integrations import MPIntegration
+
+mp = MPIntegration()
+
+# 구조 가져오기
+bulk = mp.get_structure("mp-30")
+
+# 표면 생성
+slab = mp.create_surface("mp-30", miller=(1,1,1), layers=4, vacuum=15.0)
+
+# 재료 검색
+results = mp.search_materials(formula="Cu", is_stable=True)
+for r in results:
+    print(f"{r['material_id']}: {r['formula']}")</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="phonon">
+                <h2>🔊 Phonon Analysis - 진동 분석</h2>
+                <p>분자의 진동 주파수, ZPE, Gibbs 자유에너지를 계산합니다.</p>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">CLI 사용법</div>
+                    <div class="cli-command-body">
+                        <div class="code-block"># 진동 주파수 계산
+surfscreen analysis phonon molecule.xyz --engine xtb
+
+# Gibbs 자유에너지
+surfscreen analysis gibbs molecule.xyz -T 298.15 --engine mace</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">Python API</div>
+                    <div class="cli-command-body">
+                        <div class="code-block">from surfscreen.analysis import PhononAnalyzer, calculate_zpe, calculate_gibbs
+from ase.io import read
+
+atoms = read("molecule.xyz")
+
+# 진동 분석
+analyzer = PhononAnalyzer(atoms, calc)
+result = analyzer.calculate_vibrations()
+print(f"ZPE: {result.zpe:.4f} eV")
+print(f"허수 진동수: {result.n_imaginary}")
+
+# 열역학 계산
+thermo = analyzer.calculate_thermodynamics(temperature=300)
+print(f"G: {thermo.G:.4f} eV")
+
+# 편의 함수
+zpe = calculate_zpe(atoms, calc)
+G = calculate_gibbs(atoms, calc, temperature=298.15)</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="coverage">
+                <h2>📏 Coverage Analysis - 피복도 분석</h2>
+                <p>표면 위 흡착 분자의 피복도를 계산합니다.</p>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">CLI 사용법</div>
+                    <div class="cli-command-body">
+                        <div class="code-block"># 피복도 계산
+surfscreen analysis coverage structure.xyz --n-surface 36 --mol-area 10.0</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">Python API</div>
+                    <div class="cli-command-body">
+                        <div class="code-block">from surfscreen.analysis import CoverageAnalyzer
+
+atoms = read("surface_with_molecules.xyz")
+analyzer = CoverageAnalyzer(atoms, n_surface_atoms=36)
+result = analyzer.calculate_coverage(molecular_area=10.0)
+
+print(f"표면적: {result.surface_area:.2f} Å²")
+print(f"흡착 분자: {result.n_adsorbates}")
+print(f"피복도 (ML): {result.coverage_ml:.2%}")</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="multi">
+                <h2>🔢 Multi-molecule Screening</h2>
+                <p>여러 분자를 순차적으로 스크리닝합니다.</p>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">CLI 사용법</div>
+                    <div class="cli-command-body">
+                        <div class="code-block"># 다중 분자 스크리닝
+surfscreen screen multi \
+    -s surface.xyz \
+    -m acetone.xyz \
+    -m ethanol.xyz \
+    -m water.xyz \
+    -o multi_results/ \
+    --engine mace</div>
+                    </div>
+                </div>
+
+                <p>각 분자별로 별도 디렉토리에 결과가 저장되며, <code>multi_results.json</code>에 요약 정보가 저장됩니다.</p>
+            </section>
+
+            <div class="nav-buttons">
+                <a href="08_faq.html" class="btn-nav">← 이전: FAQ</a>
+                <a href="index.html" class="btn-nav btn-next">홈으로 →</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>SurfScreen v0.3.0 Documentation</p>
+    </footer>
+</body>
+</html>

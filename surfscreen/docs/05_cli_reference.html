@@ -30,6 +30,9 @@
                 <li><a href="#adsorb">adsorb</a></li>
                 <li><a href="#md">md</a></li>
                 <li><a href="#analysis">analysis</a></li>
+                <li><a href="#export">export (v0.3.0)</a></li>
+                <li><a href="#checkpoint">checkpoint (v0.3.0)</a></li>
+                <li><a href="#template">template (v0.3.0)</a></li>
                 <li><a href="#plot">plot</a></li>
                 <li><a href="#config">config</a></li>
             </ul>
@@ -462,6 +465,160 @@ Options:
                         <div class="code-block">surfscreen analysis boltzmann results/ -T 300 -o boltzmann.html</div>
                     </div>
                 </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen analysis coverage</div>
+                    <div class="cli-command-body">
+                        <p>표면 피복도 계산</p>
+                        <div class="cli-option">
+                            <span class="cli-option-name">STRUCTURE</span>
+                            <span class="cli-option-desc">구조 파일</span>
+                        </div>
+                        <div class="cli-option">
+                            <span class="cli-option-name">--n-surface</span>
+                            <span class="cli-option-desc">표면 원자 수</span>
+                        </div>
+                        <div class="code-block">surfscreen analysis coverage structure.xyz --n-surface 36</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen analysis phonon</div>
+                    <div class="cli-command-body">
+                        <p>진동 분석 및 ZPE 계산</p>
+                        <div class="cli-option">
+                            <span class="cli-option-name">STRUCTURE</span>
+                            <span class="cli-option-desc">구조 파일</span>
+                        </div>
+                        <div class="cli-option">
+                            <span class="cli-option-name">--engine</span>
+                            <span class="cli-option-desc">계산 엔진 (mace/xtb)</span>
+                        </div>
+                        <div class="code-block">surfscreen analysis phonon molecule.xyz --engine xtb</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen analysis gibbs</div>
+                    <div class="cli-command-body">
+                        <p>Gibbs 자유에너지 계산</p>
+                        <div class="cli-option">
+                            <span class="cli-option-name">-T, --temperature</span>
+                            <span class="cli-option-desc">온도 (K, 기본: 298.15)</span>
+                        </div>
+                        <div class="code-block">surfscreen analysis gibbs molecule.xyz -T 298.15</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="export">
+                <h2>export - 결과 내보내기 (v0.3.0)</h2>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen export csv/json/excel/zip</div>
+                    <div class="cli-command-body">
+                        <p>스크리닝 결과를 다양한 포맷으로 내보내기</p>
+                        <div class="cli-option">
+                            <span class="cli-option-name">RESULTS_DIR</span>
+                            <span class="cli-option-desc">결과 디렉토리</span>
+                        </div>
+                        <div class="cli-option">
+                            <span class="cli-option-name">-o, --output</span>
+                            <span class="cli-option-desc">출력 파일</span>
+                        </div>
+                        <div class="code-block">surfscreen export csv results/ -o data.csv
+surfscreen export excel results/ -o data.xlsx
+surfscreen export zip results/ -o archive.zip --structures</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="checkpoint">
+                <h2>checkpoint - 작업 관리 (v0.3.0)</h2>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen checkpoint status/reset-failed/list-pending/clean</div>
+                    <div class="cli-command-body">
+                        <p>체크포인트 관리</p>
+                        <div class="code-block"># 상태 확인
+surfscreen checkpoint status results/
+
+# 실패한 작업 리셋
+surfscreen checkpoint reset-failed results/ --confirm
+
+# 대기 작업 목록
+surfscreen checkpoint list-pending results/
+
+# 체크포인트 삭제
+surfscreen checkpoint clean results/ --force</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="template">
+                <h2>template - 워크플로우 (v0.3.0)</h2>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen template install-defaults/list/run</div>
+                    <div class="cli-command-body">
+                        <p>워크플로우 템플릿 관리</p>
+                        <div class="code-block"># 기본 템플릿 설치
+surfscreen template install-defaults
+
+# 템플릿 목록
+surfscreen template list
+
+# 템플릿 실행
+surfscreen template run basic_screening -v element=Cu
+
+# 드라이런
+surfscreen template run md_simulation --dry-run</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="surface-mp">
+                <h2>surface from-mp - Materials Project (v0.3.0)</h2>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen surface from-mp</div>
+                    <div class="cli-command-body">
+                        <p>Materials Project에서 표면 생성</p>
+                        <div class="cli-option">
+                            <span class="cli-option-name">MATERIAL_ID</span>
+                            <span class="cli-option-desc">MP ID (예: mp-30)</span>
+                        </div>
+                        <div class="cli-option">
+                            <span class="cli-option-name">--miller</span>
+                            <span class="cli-option-desc">밀러 지수</span>
+                        </div>
+                        <div class="code-block">surfscreen surface from-mp mp-30 --miller 111 -o Cu_111.xyz</div>
+                    </div>
+                </div>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen surface search-mp</div>
+                    <div class="cli-command-body">
+                        <p>Materials Project 재료 검색</p>
+                        <div class="code-block">surfscreen surface search-mp Cu --limit 10</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="screen-multi">
+                <h2>screen multi - 다중 분자 (v0.3.0)</h2>
+
+                <div class="cli-command">
+                    <div class="cli-command-header">surfscreen screen multi</div>
+                    <div class="cli-command-body">
+                        <p>다중 분자 순차 스크리닝</p>
+                        <div class="cli-option">
+                            <span class="cli-option-name">-m, --molecules</span>
+                            <span class="cli-option-desc">분자 파일 (반복 가능)</span>
+                        </div>
+                        <div class="code-block">surfscreen screen multi -s surf.xyz -m mol1.xyz -m mol2.xyz -o results/</div>
+                    </div>
+                </div>
             </section>
 
             <section id="plot">
@@ -511,7 +668,8 @@ Options:
     </div>
 
     <footer>
-        <p>SurfScreen v0.2.0 Documentation</p>
+        <p>SurfScreen v0.3.0 Documentation</p>
     </footer>
 </body>
 </html>
+
