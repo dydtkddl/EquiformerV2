@@ -17,6 +17,8 @@ from ase import Atoms
 from ase.io import write
 from ase.constraints import FixAtoms
 
+from surfscreen.logging_utils import adsorption_logger as logger
+
 if TYPE_CHECKING:
     from surfscreen.surface.builder import Surface
     from surfscreen.molecule.builder import Molecule
@@ -82,6 +84,8 @@ class AdsorptionSystem:
         # 생성된 구성
         self.configurations: List[Atoms] = []
         self.config_info: List[dict] = []
+        
+        logger.debug(f"AdsorptionSystem initialized: surface={len(surface.atoms)} atoms, molecule={len(molecule.atoms)} atoms")
     
     def generate_configurations(self,
                                sites: Union[str, List["AdsorptionSite"]] = "auto",

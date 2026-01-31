@@ -14,6 +14,7 @@ from ase.build import add_adsorbate
 import json
 
 from ..surface.builder import Surface
+from surfscreen.logging_utils import adsorption_logger as logger
 
 
 @dataclass
@@ -52,6 +53,7 @@ class AdsorptionGenerator:
         self.surface = surface
         self.molecule = molecule
         self.configs: List[AdsorptionConfig] = []
+        logger.debug(f"AdsorptionGenerator initialized: surface={len(surface.atoms)} atoms, molecule={len(molecule)} atoms")
         
     def detect_adsorption_sites(self, 
                                  site_types: List[str] = ["top", "bridge", "hollow"],
@@ -67,6 +69,8 @@ class AdsorptionGenerator:
         """
         from pymatgen.io.ase import AseAtomsAdaptor
         from pymatgen.analysis.adsorption import AdsorbateSiteFinder
+        
+        logger.step(f"Detecting adsorption sites: types={site_types}, symmetry_reduce={symmetry_reduce}")
         
         try:
             adaptor = AseAtomsAdaptor()
@@ -84,6 +88,8 @@ class AdsorptionGenerator:
                     site_positions = asf.find_adsorption_sites()["hollow"]
                 else:
                     continue
+                
+                logger.detail(f"  {site_type}: {len(site_positions)} sites")
                     
                 for i, pos in enumerate(site_positions):
                     sites.append({
@@ -91,10 +97,12 @@ class AdsorptionGenerator:
                         "type": site_type,
                         "position": (pos[0], pos[1], pos[2])
                     })
-                    
+            
+            logger.success(f"Found {len(sites)} adsorption sites")
             return sites
             
-        except Exception:
+        except Exception as e:
+            logger.warning(f"PyMatGen failed, using fallback: {e}")
             # Fallback: 표면 원자 위 top 사이트만
             return self._detect_top_sites_simple()
     

@@ -15,6 +15,8 @@ import numpy as np
 from ase import Atoms
 from ase.io import read, write
 
+from surfscreen.logging_utils import molecule_logger as logger
+
 try:
     from rdkit import Chem
     from rdkit.Chem import AllChem, Descriptors

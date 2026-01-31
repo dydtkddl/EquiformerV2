@@ -16,6 +16,8 @@ from ase.io import read, write
 from ase.constraints import FixAtoms
 from ase.build import fcc111, bcc110, hcp0001, surface as ase_surface
 
+from surfscreen.logging_utils import surface_logger as logger
+
 try:
     from pymatgen.core import Structure
     from pymatgen.core.surface import SlabGenerator

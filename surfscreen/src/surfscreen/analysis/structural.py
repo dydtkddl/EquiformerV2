@@ -12,6 +12,8 @@ from ase import Atoms
 from ase.io import read
 from scipy.spatial.distance import cdist
 
+from surfscreen.logging_utils import analysis_logger as logger
+
 
 @dataclass
 class StructuralAnalysisResult:
@@ -48,8 +50,12 @@ class StructuralAnalyzer:
         self.atoms = atoms
         self.n_surface_atoms = n_surface_atoms
         
+        logger.debug(f"StructuralAnalyzer initialized: {len(atoms)} atoms")
+        
         if n_surface_atoms == 0:
             self._detect_surface_boundary()
+        else:
+            logger.detail(f"Surface atoms: {n_surface_atoms} (user specified)")
     
     def _detect_surface_boundary(self):
         """표면/분자 경계 자동 감지"""
@@ -64,8 +70,10 @@ class StructuralAnalyzer:
             gap_idx = np.argmax(z_diff)
             z_threshold = (z_sorted[gap_idx] + z_sorted[gap_idx + 1]) / 2
             self.n_surface_atoms = np.sum(z_coords < z_threshold)
+            logger.detail(f"Auto-detected boundary: z={z_threshold:.2f} Å, n_surface={self.n_surface_atoms}")
         else:
             self.n_surface_atoms = len(self.atoms)
+            logger.warning("Could not detect surface-molecule boundary")
     
     def get_surface_atoms(self) -> Atoms:
         """표면 원자 반환"""

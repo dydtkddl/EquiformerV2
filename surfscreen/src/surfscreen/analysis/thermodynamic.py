@@ -13,6 +13,8 @@ from dataclasses import dataclass
 from ase import Atoms
 from ase.io import read
 
+from surfscreen.logging_utils import analysis_logger as logger, physics_logger
+
 
 # 물리 상수
 kB_eV = 8.617333262e-5  # eV/K
@@ -75,6 +77,7 @@ class ThermodynamicAnalyzer:
             results: 스크리닝 결과 리스트 [{"name": str, "energy": float}, ...]
         """
         self.results = results or []
+        logger.debug(f"ThermodynamicAnalyzer initialized with {len(self.results)} results")
         
     def add_result(self, name: str, energy: float, atoms: Optional[Atoms] = None):
         """결과 추가"""
@@ -83,12 +86,14 @@ class ThermodynamicAnalyzer:
             "energy": energy,
             "atoms": atoms
         })
+        logger.detail(f"Added result: {name}, E={energy:.6f} eV")
         
     def load_from_directory(self, results_dir: str):
         """결과 디렉토리에서 로드"""
         import json
         
         results_path = Path(results_dir)
+        logger.step(f"Loading results from: {results_path}")
         
         # results.json 찾기
         json_file = results_path / "results.json"
@@ -101,6 +106,9 @@ class ThermodynamicAnalyzer:
                     name=entry.get("name", ""),
                     energy=entry.get("adsorption_energy", entry.get("energy", 0))
                 )
+            logger.success(f"Loaded {len(self.results)} results from {json_file.name}")
+        else:
+            logger.warning(f"results.json not found in {results_path}")
     
     def calculate_boltzmann(self, temperature: float = 300.0) -> BoltzmannResult:
         """Boltzmann 분포 계산
@@ -114,33 +122,59 @@ class ThermodynamicAnalyzer:
         Returns:
             BoltzmannResult
         """
-        if not self.results:
-            raise ValueError("No results to analyze")
+        with logger.section("Boltzmann Distribution"):
+            if not self.results:
+                logger.error("No results to analyze")
+                raise ValueError("No results to analyze")
             
-        names = [r["name"] for r in self.results]
-        energies = np.array([r["energy"] for r in self.results])
-        
-        # 최저 에너지를 기준으로
-        E_ref = energies.min()
-        E_rel = energies - E_ref
-        
-        # Boltzmann 인자
-        beta = 1.0 / (kB_eV * temperature)
-        boltzmann_factors = np.exp(-E_rel * beta)
-        
-        # 분배 함수
-        Z = np.sum(boltzmann_factors)
-        
-        # 확률
-        probabilities = boltzmann_factors / Z
-        
-        return BoltzmannResult(
-            names=names,
-            energies=energies.tolist(),
-            probabilities=probabilities.tolist(),
-            temperature=temperature,
-            partition_function=Z
-        )
+            logger.info(f"Temperature: {temperature} K")
+            logger.info(f"Configurations: {len(self.results)}")
+            
+            names = [r["name"] for r in self.results]
+            energies = np.array([r["energy"] for r in self.results])
+            
+            # 최저 에너지를 기준으로
+            E_ref = energies.min()
+            E_rel = energies - E_ref
+            
+            logger.detail(f"Reference energy: {E_ref:.6f} eV")
+            
+            # Boltzmann 인자
+            beta = 1.0 / (kB_eV * temperature)
+            physics_logger.log_formula(
+                "Boltzmann factor",
+                "β = 1/(kB*T)",
+                {"kB": kB_eV, "T": temperature},
+                beta
+            )
+            
+            boltzmann_factors = np.exp(-E_rel * beta)
+            
+            # 분배 함수
+            Z = np.sum(boltzmann_factors)
+            logger.calc(f"Partition function Z = {Z:.6f}")
+            
+            # 확률
+            probabilities = boltzmann_factors / Z
+            
+            # 상위 3개 출력
+            top_indices = np.argsort(probabilities)[::-1][:3]
+            for idx in top_indices:
+                logger.data(
+                    f"Top config: {names[idx]}",
+                    E_rel_eV=E_rel[idx],
+                    probability=probabilities[idx]
+                )
+            
+            logger.success(f"Calculated Boltzmann distribution for {len(names)} configurations")
+            
+            return BoltzmannResult(
+                names=names,
+                energies=energies.tolist(),
+                probabilities=probabilities.tolist(),
+                temperature=temperature,
+                partition_function=Z
+            )
     
     def calculate_free_energy(self,
                                atoms: Atoms,

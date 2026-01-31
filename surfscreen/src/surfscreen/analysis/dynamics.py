@@ -19,6 +19,8 @@ from ase.io.trajectory import Trajectory
 from scipy import stats
 from scipy.ndimage import uniform_filter1d
 
+from surfscreen.logging_utils import analysis_logger as logger, physics_logger
+
 
 @dataclass
 class MSDResult:
@@ -124,18 +126,23 @@ class DynamicsAnalyzer:
         self.timestep = timestep
         self.frames: List[Atoms] = []
         
+        logger.debug(f"DynamicsAnalyzer initialized: timestep={timestep} fs")
         self._load_trajectory()
         
     def _load_trajectory(self):
         """트라젝토리 로드"""
+        logger.step(f"Loading trajectory: {self.trajectory_path}")
+        
         if self.trajectory_path.suffix == ".traj":
             self.frames = read(str(self.trajectory_path), index=":")
         elif self.trajectory_path.suffix in [".xyz", ".extxyz"]:
             self.frames = read(str(self.trajectory_path), index=":")
         else:
+            logger.error(f"Unknown trajectory format: {self.trajectory_path.suffix}")
             raise ValueError(f"Unknown trajectory format: {self.trajectory_path.suffix}")
-            
-        print(f"Loaded {len(self.frames)} frames from {self.trajectory_path}")
+        
+        logger.success(f"Loaded {len(self.frames)} frames from {self.trajectory_path.name}")
+        logger.detail(f"Total simulation time: {len(self.frames) * self.timestep:.1f} fs")
     
     def get_species_indices(self, species: str) -> List[int]:
         """특정 종의 원자 인덱스"""
