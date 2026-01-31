@@ -21,6 +21,8 @@ from ase.md.nvtberendsen import NVTBerendsen
 from ase.md.nptberendsen import NPTBerendsen
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution
 
+from surfscreen.logging_utils import md_logger as slog, VerboseLevel, get_verbose
+
 
 @dataclass
 class MDConfig:
@@ -324,52 +326,74 @@ class MDEngine:
         """
         if steps is None:
             steps = self.config.steps
-            
-        print(f"🚀 Starting {self.config.ensemble.upper()} MD simulation")
-        print(f"   Temperature: {self.config.temperature} K")
-        print(f"   Steps: {steps}")
-        print(f"   Timestep: {self.config.timestep} fs")
-        print()
         
-        try:
-            for i in range(steps):
-                self.dynamics.run(1)
-                
-                if callback:
-                    callback(self.state)
+        with slog.section(f"MD Simulation ({self.config.ensemble.upper()})"):
+            slog.info(f"System: {len(self.atoms)} atoms", icon='atom')
+            slog.info(f"Temperature: {self.config.temperature} K")
+            slog.info(f"Steps: {steps}, Timestep: {self.config.timestep} fs")
+            slog.detail(f"Total time: {steps * self.config.timestep:.1f} fs")
+            slog.debug(f"Engine: {self.config.engine}, Model: {self.config.model}")
+            slog.debug(f"Thermostat: {self.config.thermostat}, Friction: {self.config.friction}")
+            
+            if self.config.ensemble == "npt":
+                slog.info(f"Pressure: {self.config.pressure} bar")
+                slog.debug(f"Barostat: {self.config.barostat}, taup: {self.config.taup} fs")
+            
+            # 진행률 로깅 간격 설정
+            log_interval = max(1, steps // 10)
+            
+            try:
+                for i in range(steps):
+                    self.dynamics.run(1)
                     
-                # 진행 상황 출력
-                if (i + 1) % (steps // 10) == 0:
-                    progress = (i + 1) / steps * 100
-                    print(f"   Progress: {progress:.0f}% | T: {self.state.temperature:.1f} K | "
-                          f"E: {self.state.total_energy:.4f} eV")
-                          
-        except KeyboardInterrupt:
-            print("\n⚠️ MD interrupted by user")
+                    if callback:
+                        callback(self.state)
+                    
+                    # 진행 상황 출력 (verbose 레벨에 따라)
+                    if (i + 1) % log_interval == 0:
+                        progress = (i + 1) / steps * 100
+                        slog.progress(
+                            f"T={self.state.temperature:.1f}K, E={self.state.total_energy:.4f}eV",
+                            current=i+1, total=steps
+                        )
+                    
+                    # 상세 로깅 (HIGH 이상)
+                    if (i + 1) % (log_interval * 2) == 0 and get_verbose() >= VerboseLevel.HIGH:
+                        slog.data(
+                            f"Thermodynamics at step {i+1}",
+                            T_K=self.state.temperature,
+                            E_pot_eV=self.state.potential_energy,
+                            E_kin_eV=self.state.kinetic_energy,
+                            E_tot_eV=self.state.total_energy
+                        )
+                        if self.config.ensemble == "npt":
+                            slog.detail(f"Volume: {self.state.volume:.2f} Å³")
+                            
+            except KeyboardInterrupt:
+                slog.warning("MD interrupted by user")
+                
+            finally:
+                self.trajectory.close()
             
-        finally:
-            self.trajectory.close()
+            # 최종 구조 저장
+            final_path = self.output_dir / "final.xyz"
+            write(str(final_path), self.atoms, format="extxyz")
+            slog.detail(f"Final structure saved: {final_path}")
             
-        # 최종 구조 저장
-        final_path = self.output_dir / "final.xyz"
-        write(str(final_path), self.atoms, format="extxyz")
-        
-        # 다중 포맷 궤적 저장
-        self._export_trajectory_formats()
-        
-        # 요약 저장
-        summary = self.logger.get_summary()
-        summary_path = self.output_dir / "summary.json"
-        with open(summary_path, "w") as f:
-            json.dump(summary, f, indent=2)
+            # 다중 포맷 궤적 저장
+            self._export_trajectory_formats()
             
-        print()
-        print(f"✅ MD completed!")
-        print(f"   Total time: {summary.get('total_time_fs', 0):.1f} fs")
-        print(f"   Avg temperature: {summary.get('avg_temperature_K', 0):.1f} K")
-        print(f"   Output: {self.output_dir}")
-        
-        return summary
+            # 요약 저장
+            summary = self.logger.get_summary()
+            summary_path = self.output_dir / "summary.json"
+            with open(summary_path, "w") as f:
+                json.dump(summary, f, indent=2)
+            
+            slog.success(f"MD completed! Total time: {summary.get('total_time_fs', 0):.1f} fs")
+            slog.info(f"Avg temperature: {summary.get('avg_temperature_K', 0):.1f} K")
+            slog.info(f"Output: {self.output_dir}", icon='file')
+            
+            return summary
     
     def _export_trajectory_formats(self):
         """다양한 포맷으로 궤적 내보내기 (OVITO 등 호환)"""

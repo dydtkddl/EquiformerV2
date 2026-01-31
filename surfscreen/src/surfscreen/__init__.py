@@ -2,12 +2,18 @@
 SurfScreen: Enterprise-grade surface adsorption screening platform
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 from surfscreen.molecule import MoleculeBuilder
 from surfscreen.surface import SurfaceBuilder
 from surfscreen.calculator import Calculator, CalculatorFactory
 from surfscreen.adsorption import AdsorptionSystem
+
+# Logging utilities
+from surfscreen.logging_utils import (
+    set_verbose, get_verbose, get_logger, 
+    SurfScreenLogger, VerboseLevel
+)
 
 # MD Engine
 from surfscreen.md import MDEngine, MDConfig, MDReportGenerator

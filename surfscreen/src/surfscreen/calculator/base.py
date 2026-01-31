@@ -13,6 +13,8 @@ from ase import Atoms
 from ase.optimize import BFGS, FIRE
 from ase.io.trajectory import Trajectory
 
+from surfscreen.logging_utils import calc_logger as logger
+
 if TYPE_CHECKING:
     from ase.calculators.calculator import Calculator as ASECalculator
 
@@ -40,6 +42,7 @@ class Calculator(ABC):
     def __init__(self, **kwargs):
         self.options = kwargs
         self._ase_calc = None
+        logger.debug(f"Calculator initialized: {self.name}", options=kwargs)
     
     @abstractmethod
     def get_ase_calculator(self) -> "ASECalculator":
@@ -48,15 +51,33 @@ class Calculator(ABC):
     
     def get_energy(self, atoms: Atoms) -> float:
         """단일 포인트 에너지 계산"""
+        logger.detail(f"Calculating single-point energy for {len(atoms)} atoms")
+        logger.debug(f"  Symbols: {atoms.get_chemical_formula()}")
+        logger.debug(f"  PBC: {atoms.pbc.tolist()}")
+        
         atoms = atoms.copy()
         atoms.calc = self.get_ase_calculator()
-        return atoms.get_potential_energy()
+        energy = atoms.get_potential_energy()
+        
+        logger.energy(f"E = {energy:.6f} eV", 
+                     formula=atoms.get_chemical_formula(),
+                     n_atoms=len(atoms))
+        return energy
     
     def get_forces(self, atoms: Atoms) -> np.ndarray:
         """힘 계산"""
+        logger.detail(f"Calculating forces for {len(atoms)} atoms")
+        
         atoms = atoms.copy()
         atoms.calc = self.get_ase_calculator()
-        return atoms.get_forces()
+        forces = atoms.get_forces()
+        
+        fmax = np.sqrt((forces**2).sum(axis=1)).max()
+        frms = np.sqrt((forces**2).mean())
+        logger.calc(f"Forces: max={fmax:.4f} eV/Å, rms={frms:.4f} eV/Å")
+        logger.debug(f"Force shape: {forces.shape}")
+        
+        return forces
     
     def optimize(self,
                  atoms: Atoms,
@@ -78,40 +99,70 @@ class Calculator(ABC):
         Returns:
             OptimizationResult
         """
-        # Save constraints BEFORE copy (copy() doesn't preserve them in ASE)
-        original_constraints = list(atoms.constraints) if atoms.constraints else []
-        
-        atoms = atoms.copy()
-        atoms.calc = self.get_ase_calculator()
-        
-        # Re-apply constraints
-        if original_constraints:
-            atoms.set_constraint(original_constraints)
-        
-        initial_energy = atoms.get_potential_energy()
-        
-        # 최적화 알고리즘 선택
-        opt_cls = BFGS if optimizer == "BFGS" else FIRE
-        
-        kwargs = {}
-        if trajectory:
-            kwargs["trajectory"] = trajectory
-        if logfile:
-            kwargs["logfile"] = logfile
+        with logger.section(f"Structure Optimization ({optimizer})"):
+            logger.info(f"Formula: {atoms.get_chemical_formula()}, N={len(atoms)}")
+            logger.detail(f"fmax={fmax} eV/Å, max_steps={steps}")
+            logger.debug(f"Trajectory: {trajectory}, Logfile: {logfile}")
             
-        opt = opt_cls(atoms, **kwargs)
-        converged = opt.run(fmax=fmax, steps=steps)
-        
-        final_energy = atoms.get_potential_energy()
-        
-        return OptimizationResult(
-            atoms=atoms,
-            initial_energy=initial_energy,
-            final_energy=final_energy,
-            steps=opt.nsteps,
-            converged=converged,
-            trajectory=trajectory
-        )
+            # Save constraints BEFORE copy (copy() doesn't preserve them in ASE)
+            original_constraints = list(atoms.constraints) if atoms.constraints else []
+            if original_constraints:
+                logger.detail(f"Constraints: {len(original_constraints)} constraint(s)")
+            
+            atoms = atoms.copy()
+            atoms.calc = self.get_ase_calculator()
+            
+            # Re-apply constraints
+            if original_constraints:
+                atoms.set_constraint(original_constraints)
+            
+            initial_energy = atoms.get_potential_energy()
+            logger.energy(f"Initial: E = {initial_energy:.6f} eV")
+            
+            # 최적화 알고리즘 선택
+            opt_cls = BFGS if optimizer == "BFGS" else FIRE
+            logger.debug(f"Optimizer class: {opt_cls.__name__}")
+            
+            kwargs = {}
+            if trajectory:
+                kwargs["trajectory"] = trajectory
+            if logfile:
+                kwargs["logfile"] = logfile
+                
+            opt = opt_cls(atoms, **kwargs)
+            
+            # 최적화 콜백 (HIGH 이상에서 매 스텝 로깅)
+            def _step_callback():
+                step = opt.nsteps
+                e = atoms.get_potential_energy()
+                f = atoms.get_forces()
+                fmax_curr = np.sqrt((f**2).sum(axis=1)).max()
+                logger.detail(f"Step {step:4d}: E={e:.6f} eV, fmax={fmax_curr:.4f} eV/Å")
+            
+            opt.attach(_step_callback)
+            
+            logger.step("Running optimization...")
+            converged = opt.run(fmax=fmax, steps=steps)
+            
+            final_energy = atoms.get_potential_energy()
+            delta_e = final_energy - initial_energy
+            
+            logger.energy(f"Final: E = {final_energy:.6f} eV")
+            logger.info(f"Steps: {opt.nsteps}, ΔE = {delta_e:.6f} eV")
+            
+            if converged:
+                logger.success(f"Converged in {opt.nsteps} steps")
+            else:
+                logger.warning(f"Not converged after {opt.nsteps} steps")
+            
+            return OptimizationResult(
+                atoms=atoms,
+                initial_energy=initial_energy,
+                final_energy=final_energy,
+                steps=opt.nsteps,
+                converged=converged,
+                trajectory=trajectory
+            )
 
 
 class CalculatorFactory:

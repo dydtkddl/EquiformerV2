@@ -31,10 +31,36 @@ from rich.progress import Progress, SpinnerColumn, TextColumn
 console = Console()
 
 
+# Verbose 레벨 설정을 위한 콜백
+def _setup_verbose(ctx, param, value):
+    """Verbose 레벨 설정 콜백"""
+    from surfscreen.logging_utils import set_verbose
+    set_verbose(value)
+    return value
+
+
 @click.group()
-@click.version_option(version="0.1.0", prog_name="surfscreen")
+@click.version_option(version="0.3.0", prog_name="surfscreen")
+@click.option(
+    "--verbose", "-v",
+    type=click.Choice(['0', '1', '2', '3', '4', 'silent', 'low', 'medium', 'high', 'debug'],
+                      case_sensitive=False),
+    default='2',
+    callback=_setup_verbose,
+    expose_value=False,
+    is_eager=True,
+    help="Verbosity level: 0=silent, 1=low, 2=medium, 3=high, 4=debug"
+)
 def main():
-    """SurfScreen: Enterprise Surface Adsorption Screening Platform"""
+    """SurfScreen: Enterprise Surface Adsorption Screening Platform
+    
+    Use --verbose/-v to control output detail level:
+      0/silent : Only errors
+      1/low    : Main steps only  
+      2/medium : Progress info (default)
+      3/high   : Detailed calculations
+      4/debug  : Full debugging output
+    """
     pass
 
 
