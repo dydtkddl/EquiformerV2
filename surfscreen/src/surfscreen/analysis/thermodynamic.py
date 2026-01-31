@@ -147,9 +147,14 @@ class ThermodynamicAnalyzer:
                                name: str,
                                temperature: float = 300.0,
                                pressure: float = 1.0) -> FreeEnergyResult:
-        """자유 에너지 계산 (진동 분석 기반)
+        """자유 에너지 계산 (진동 분석 기반, Harmonic Approximation)
         
-        G = E_elec + E_ZPE + E_thermal - T*S_vib + PV
+        G = E_elec + ZPE + U_vib - T*S_vib
+        
+        where:
+            ZPE = (1/2) Σ ℏω
+            U_vib = Σ ℏω * n(ω,T)  [Bose-Einstein]
+            S_vib from vibrational partition function
         
         Args:
             atoms: Atoms 객체 (calculator 포함)
@@ -171,24 +176,35 @@ class ThermodynamicAnalyzer:
         
         try:
             vib.run()
-            frequencies = vib.get_frequencies()  # meV
+            # ASE Vibrations.get_frequencies() returns cm⁻¹
+            frequencies_cm = vib.get_frequencies()
             vib.clean()
         except Exception:
             # Vibration 계산 실패 시
-            frequencies = []
+            frequencies_cm = []
             
         # 유효 진동 모드만 (허수 제거)
-        real_freqs = [f for f in frequencies if np.isreal(f) and f.real > 0]
-        freqs_cm = np.array([f.real / 0.12398 for f in real_freqs])  # meV -> cm⁻¹
+        # ASE returns complex numbers for imaginary frequencies
+        real_freqs_cm = []
+        for f in frequencies_cm:
+            if np.isreal(f) and f.real > 0:
+                real_freqs_cm.append(f.real)
+            elif hasattr(f, 'real') and f.real > 0:
+                real_freqs_cm.append(f.real)
         
-        if len(freqs_cm) > 0:
-            # 열역학 계산
+        real_freqs_cm = np.array(real_freqs_cm)
+        
+        # cm⁻¹ → eV: 1 cm⁻¹ = 1.23984×10⁻⁴ eV
+        freqs_eV = real_freqs_cm * 1.23984e-4
+        
+        if len(freqs_eV) > 0:
+            # 열역학 계산 (ASE HarmonicThermo expects eV)
             thermo = HarmonicThermo(
-                vib_energies=np.array(real_freqs) / 1000,  # meV -> eV
+                vib_energies=freqs_eV,
                 potentialenergy=E_elec
             )
             
-            # 자유 에너지
+            # Helmholtz 자유 에너지 (고체/흡착 시스템에 적합)
             G = thermo.get_helmholtz_energy(temperature)
             
             # ZPE
@@ -201,8 +217,8 @@ class ThermodynamicAnalyzer:
             U = thermo.get_internal_energy(temperature)
             E_thermal = U - E_elec - E_zpe
             
-            # 엔탈피 (이상기체 근사)
-            H = U + kB_eV * temperature  # PV ≈ kT
+            # 엔탈피 (고체의 경우 PV ≈ 0, 기체의 경우 PV ≈ kT)
+            H = U
             
         else:
             # 진동 계산 없이 근사
@@ -221,7 +237,7 @@ class ThermodynamicAnalyzer:
             H=H,
             G=G,
             temperature=temperature,
-            frequencies=freqs_cm.tolist()
+            frequencies=real_freqs_cm.tolist() if len(real_freqs_cm) > 0 else []
         )
     
     def get_ranking(self, by: str = "energy") -> List[Dict]:

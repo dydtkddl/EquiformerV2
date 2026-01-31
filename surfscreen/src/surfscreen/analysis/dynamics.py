@@ -146,12 +146,19 @@ class DynamicsAnalyzer:
     
     def calculate_msd(self, 
                       species: str,
-                      unwrap: bool = True) -> MSDResult:
-        """MSD 계산
+                      unwrap: bool = True,
+                      time_averaged: bool = True) -> MSDResult:
+        """MSD 계산 (Mean Square Displacement)
+        
+        MSD(t) = <|r(t) - r(0)|²>
+        
+        For time-averaged MSD (더 정확한 통계):
+        MSD(τ) = (1/(N-τ)) Σ_{t=0}^{N-τ-1} |r(t+τ) - r(t)|²
         
         Args:
             species: 원자 종류 (예: "Li", "O")
             unwrap: PBC unwrapping 여부
+            time_averaged: 시간 평균 MSD 사용 여부 (권장)
             
         Returns:
             MSDResult
@@ -168,20 +175,41 @@ class DynamicsAnalyzer:
         for i, frame in enumerate(self.frames):
             positions[i] = frame.positions[indices]
             
-        # PBC unwrapping
+        # PBC unwrapping (연속 궤적으로 변환)
         if unwrap and self.frames[0].pbc.any():
             positions = self._unwrap_positions(positions, self.frames[0].get_cell())
+        
+        if time_averaged:
+            # Time-averaged MSD: 더 나은 통계를 위해 모든 시간 원점에서 평균
+            max_lag = n_frames // 2  # 최대 lag는 전체 시간의 절반
+            msd = np.zeros(max_lag)
+            msd_x = np.zeros(max_lag)
+            msd_y = np.zeros(max_lag)
+            msd_z = np.zeros(max_lag)
             
-        # MSD 계산
-        initial_pos = positions[0]
-        displacements = positions - initial_pos
-        
-        msd = np.mean(np.sum(displacements**2, axis=2), axis=1)
-        msd_x = np.mean(displacements[:, :, 0]**2, axis=1)
-        msd_y = np.mean(displacements[:, :, 1]**2, axis=1)
-        msd_z = np.mean(displacements[:, :, 2]**2, axis=1)
-        
-        time = np.arange(n_frames) * self.timestep
+            for lag in range(1, max_lag):
+                # 모든 시간 원점에서 displacement 계산
+                displacements = positions[lag:] - positions[:-lag]  # (N-lag, n_atoms, 3)
+                
+                # 제곱 변위의 원자 및 시간 평균
+                sq_disp = displacements ** 2
+                msd[lag] = np.mean(np.sum(sq_disp, axis=2))
+                msd_x[lag] = np.mean(sq_disp[:, :, 0])
+                msd_y[lag] = np.mean(sq_disp[:, :, 1])
+                msd_z[lag] = np.mean(sq_disp[:, :, 2])
+            
+            time = np.arange(max_lag) * self.timestep
+        else:
+            # Simple MSD from initial frame
+            initial_pos = positions[0]
+            displacements = positions - initial_pos
+            
+            msd = np.mean(np.sum(displacements**2, axis=2), axis=1)
+            msd_x = np.mean(displacements[:, :, 0]**2, axis=1)
+            msd_y = np.mean(displacements[:, :, 1]**2, axis=1)
+            msd_z = np.mean(displacements[:, :, 2]**2, axis=1)
+            
+            time = np.arange(n_frames) * self.timestep
         
         return MSDResult(
             time=time,
@@ -215,12 +243,19 @@ class DynamicsAnalyzer:
                             fit_end: float = 0.8) -> DiffusionResult:
         """확산 계수 계산 (Einstein relation)
         
-        D = lim(t→∞) MSD / (2*d*t)
+        Einstein Relation (3D):
+            MSD(t) = 6 * D * t  →  D = MSD / (6t)
+        
+        For each direction (1D):
+            MSD_x(t) = 2 * D_x * t  →  D_x = MSD_x / (2t)
+        
+        Unit conversion:
+            1 Å²/fs = 10⁻¹⁶ cm² / 10⁻¹⁵ s = 0.1 cm²/s
         
         Args:
             species: 원자 종류
-            fit_start: 피팅 시작점 (전체 시간의 비율)
-            fit_end: 피팅 끝점 (전체 시간의 비율)
+            fit_start: 피팅 시작점 (전체 시간의 비율, 0-1)
+            fit_end: 피팅 끝점 (전체 시간의 비율, 0-1)
             
         Returns:
             DiffusionResult (cm²/s 단위)
@@ -230,10 +265,13 @@ class DynamicsAnalyzer:
         time = msd_result.time
         msd = msd_result.msd
         
-        # 피팅 범위
+        # 피팅 범위 (선형 영역에서 피팅)
         n_points = len(time)
         start_idx = int(n_points * fit_start)
-        end_idx = int(n_points * fit_end)
+        end_idx = min(int(n_points * fit_end), n_points - 1)
+        
+        if end_idx <= start_idx:
+            raise ValueError(f"Invalid fit range: start_idx={start_idx}, end_idx={end_idx}")
         
         t_fit = time[start_idx:end_idx]
         msd_fit = msd[start_idx:end_idx]
@@ -241,14 +279,12 @@ class DynamicsAnalyzer:
         # 선형 피팅: MSD = 6*D*t (3D)
         slope, intercept, r_value, p_value, std_err = stats.linregress(t_fit, msd_fit)
         
-        # D = slope / 6 (3D)
-        # 단위 변환: Å²/fs -> cm²/s
-        # 1 Å² = 1e-16 cm², 1 fs = 1e-15 s
-        # D [Å²/fs] * 1e-16 / 1e-15 = D * 0.1 [cm²/s]
+        # D = slope / 6 (3D Einstein relation)
+        # Unit: Å²/fs → cm²/s: multiply by 0.1
         D = slope / 6.0 * 0.1  # cm²/s
         D_error = std_err / 6.0 * 0.1
         
-        # 각 축 방향 확산 계수
+        # 각 축 방향 확산 계수 (1D: MSD = 2*D*t)
         slope_x, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_x[start_idx:end_idx])
         slope_y, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_y[start_idx:end_idx])
         slope_z, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_z[start_idx:end_idx])
@@ -265,7 +301,7 @@ class DynamicsAnalyzer:
             D_z=D_z,
             r_squared=r_value**2,
             fit_start=time[start_idx],
-            fit_end=time[end_idx],
+            fit_end=time[end_idx - 1] if end_idx > 0 else time[0],
             species=species
         )
     

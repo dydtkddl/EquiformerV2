@@ -101,26 +101,43 @@ class PhononAnalyzer:
     def calculate_thermodynamics(self, temperature: float = 298.15, 
                                   pressure: float = 1.0,
                                   phonon_result: Optional[PhononResult] = None) -> ThermoResult:
-        """열역학량 계산"""
+        """열역학량 계산 (Harmonic approximation)
+        
+        ZPE = (1/2) Σ ℏω
+        U_vib = Σ ℏω [1/2 + n(ω,T)]  where n = 1/(exp(ℏω/kT) - 1)
+        S_vib = kB Σ [(ℏω/kT)n(ω,T) - ln(1 - exp(-ℏω/kT))]
+        G = E_pot + U_vib - T*S_vib
+        """
         if phonon_result is None:
             phonon_result = self.calculate_vibrations()
             
         E_pot = self.atoms.get_potential_energy() if self.atoms.calc else 0.0
+        
+        # Convert cm⁻¹ to eV: 1 cm⁻¹ = 1.23984×10⁻⁴ eV
         freqs_eV = phonon_result.frequencies_cm1 * 1.23984e-4
         
         T = temperature
-        beta = 1.0 / (KB * T) if T > 0 else float('inf')
-        U_vib = S_vib = 0.0
+        U_vib = 0.0
+        S_vib = 0.0
         
         for omega in freqs_eV:
             if omega > 0 and T > 0:
-                x = omega * beta
-                if x < 700:
+                # ℏω / kT
+                x = omega / (KB * T)
+                
+                if x < 700:  # Avoid overflow
+                    # Bose-Einstein occupation number
                     n_bose = 1.0 / (np.exp(x) - 1)
+                    
+                    # Internal energy contribution: ℏω(1/2 + n)
                     U_vib += omega * (0.5 + n_bose)
-                    S_vib += omega * n_bose / T - KB * np.log(1 - np.exp(-x))
+                    
+                    # Entropy contribution: kB[(x*n) - ln(1 - exp(-x))]
+                    S_vib += KB * (x * n_bose - np.log(1 - np.exp(-x)))
                 else:
+                    # High frequency limit: only ZPE contribution
                     U_vib += omega * 0.5
+                    # S → 0 as x → ∞
                     
         H = E_pot + U_vib
         G = H - T * S_vib
