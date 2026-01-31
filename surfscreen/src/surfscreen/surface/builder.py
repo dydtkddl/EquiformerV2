@@ -172,11 +172,16 @@ class SurfaceBuilder:
         elif structure == "bcc" and miller_index == (1, 1, 0):
             atoms = bcc110(element, size=(supercell[0], supercell[1], layers),
                           a=a, vacuum=vacuum, orthogonal=orthogonal)
-        elif structure == "hcp" and miller_index == (0, 0, 0, 1):
+        elif structure == "hcp" and miller_index in [(0, 0, 0, 1), (0, 0, 1)]:
+            # HCP (0001) 표면: 4-index (h,k,i,l) 또는 3-index (h,k,l) 모두 지원
             atoms = hcp0001(element, size=(supercell[0], supercell[1], layers),
                            a=a, vacuum=vacuum, orthogonal=orthogonal)
         else:
-            # pymatgen 사용
+            # pymatgen 사용 - 4-index를 3-index로 변환
+            if len(miller_index) == 4:
+                # 4-index (h,k,i,l) → 3-index (h,k,l) 변환
+                h, k, i, l = miller_index
+                miller_index = (h, k, l)
             atoms = cls._build_with_pymatgen(
                 element, structure, a, miller_index, 
                 layers, vacuum, supercell

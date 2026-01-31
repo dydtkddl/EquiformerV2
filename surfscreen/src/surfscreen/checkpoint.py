@@ -6,8 +6,14 @@ SurfScreen Checkpoint Module
 
 import json
 import time
-import fcntl
 import logging
+
+# fcntl은 Unix/Linux 전용 - Windows 호환성을 위해 조건부 import
+try:
+    import fcntl
+    HAS_FCNTL = True
+except ImportError:
+    HAS_FCNTL = False
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Set
 from dataclasses import dataclass, field, asdict
@@ -104,16 +110,20 @@ class CheckpointManager:
         self.state.last_update = datetime.now().isoformat()
         try:
             with open(self.checkpoint_path, "w") as f:
-                # 파일 락 (UNIX only, Windows에서는 무시)
-                try:
-                    fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                except (AttributeError, OSError):
-                    pass  # Windows 또는 락 실패
+                # 파일 락 (Unix/Linux only)
+                if HAS_FCNTL:
+                    try:
+                        fcntl.flock(f.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    except OSError:
+                        pass  # 락 실패시 무시
+                
                 json.dump(asdict(self.state), f, indent=2)
-                try:
-                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-                except (AttributeError, OSError):
-                    pass
+                
+                if HAS_FCNTL:
+                    try:
+                        fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                    except OSError:
+                        pass
             logger.debug(f"Checkpoint saved: {self.checkpoint_path}")
         except Exception as e:
             logger.error(f"Failed to save checkpoint: {e}")

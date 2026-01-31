@@ -147,20 +147,42 @@ class XTBASECalculator(ASECalculator):
             self.results['forces'] = forces
     
     def _parse_energy(self, output: str) -> float:
-        """xTB 출력에서 에너지 추출"""
+        """xTB 출력에서 에너지 추출
+        
+        xTB output format: "          | TOTAL ENERGY              -XX.XXXXXX Eh   |"
+        Unit conversion: 1 Hartree = 27.211386245988 eV
+        """
+        import re
+        
+        # 정규식으로 TOTAL ENERGY 값 추출
+        pattern = r'TOTAL ENERGY\s+([-\d.]+)\s*Eh'
+        match = re.search(pattern, output)
+        
+        if match:
+            energy_hartree = float(match.group(1))
+            return energy_hartree * 27.211386245988  # Hartree to eV (정확한 상수)
+        
+        # 대체 패턴 (구버전 xTB 출력 호환)
         for line in output.split('\n'):
             if 'TOTAL ENERGY' in line:
                 parts = line.split()
                 for i, part in enumerate(parts):
-                    if part == 'TOTAL' and i + 2 < len(parts):
-                        try:
-                            return float(parts[i + 2]) * 27.2114  # Hartree to eV
-                        except ValueError:
-                            pass
+                    try:
+                        val = float(part)
+                        if -1000 < val < 0:  # 합리적인 에너지 범위
+                            return val * 27.211386245988
+                    except ValueError:
+                        continue
+        
         raise ValueError("Could not parse energy from xTB output")
     
     def _parse_forces(self, gradient_file: Path) -> np.ndarray:
-        """Gradient 파일에서 힘 추출"""
+        """Gradient 파일에서 힘 추출
+        
+        Unit conversion: 
+            1 Hartree/Bohr = 51.42208619 eV/Å
+            Force = -Gradient
+        """
         if not gradient_file.exists():
             return np.zeros((len(self.atoms), 3))
         
@@ -184,12 +206,14 @@ class XTBASECalculator(ASECalculator):
         # 좌표 라인 건너뛰기
         start_idx += n_atoms
         
+        # Hartree/Bohr → eV/Å (정확한 상수)
+        HARTREE_BOHR_TO_EV_ANG = 51.42208619
+        
         for i in range(n_atoms):
             if start_idx + i < len(lines):
                 parts = lines[start_idx + i].split()
                 if len(parts) >= 3:
-                    # Hartree/Bohr to eV/Å
-                    forces[i] = -np.array([float(x) for x in parts[:3]]) * 51.4221
+                    forces[i] = -np.array([float(x) for x in parts[:3]]) * HARTREE_BOHR_TO_EV_ANG
         
         return forces
 
