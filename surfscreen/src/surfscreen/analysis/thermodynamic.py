@@ -202,77 +202,127 @@ class ThermodynamicAnalyzer:
         from ase.vibrations import Vibrations
         from ase.thermochemistry import HarmonicThermo
         
-        # 전자 에너지
-        E_elec = atoms.get_potential_energy()
-        
-        # 진동 계산
-        vib = Vibrations(atoms)
-        
-        try:
-            vib.run()
-            # ASE Vibrations.get_frequencies() returns cm⁻¹
-            frequencies_cm = vib.get_frequencies()
-            vib.clean()
-        except Exception:
-            # Vibration 계산 실패 시
-            frequencies_cm = []
+        with logger.section(f"Free Energy ({name})"):
+            logger.info(f"Temperature: {temperature} K, Pressure: {pressure} bar")
             
-        # 유효 진동 모드만 (허수 제거)
-        # ASE returns complex numbers for imaginary frequencies
-        real_freqs_cm = []
-        for f in frequencies_cm:
-            if np.isreal(f) and f.real > 0:
-                real_freqs_cm.append(f.real)
-            elif hasattr(f, 'real') and f.real > 0:
-                real_freqs_cm.append(f.real)
-        
-        real_freqs_cm = np.array(real_freqs_cm)
-        
-        # cm⁻¹ → eV: 1 cm⁻¹ = 1.23984×10⁻⁴ eV
-        freqs_eV = real_freqs_cm * 1.23984e-4
-        
-        if len(freqs_eV) > 0:
-            # 열역학 계산 (ASE HarmonicThermo expects eV)
-            thermo = HarmonicThermo(
-                vib_energies=freqs_eV,
-                potentialenergy=E_elec
+            # 전자 에너지
+            E_elec = atoms.get_potential_energy()
+            logger.energy(f"Electronic energy: E_elec = {E_elec:.6f} eV")
+            
+            # 진동 계산
+            logger.step("Computing vibrational frequencies...")
+            vib = Vibrations(atoms)
+            
+            try:
+                vib.run()
+                # ASE Vibrations.get_frequencies() returns cm⁻¹
+                frequencies_cm = vib.get_frequencies()
+                vib.clean()
+                logger.detail(f"Found {len(frequencies_cm)} vibrational modes")
+            except Exception as e:
+                # Vibration 계산 실패 시
+                logger.warning(f"Vibration calculation failed: {e}")
+                frequencies_cm = []
+                
+            # 유효 진동 모드만 (허수 제거)
+            # ASE returns complex numbers for imaginary frequencies
+            real_freqs_cm = []
+            n_imaginary = 0
+            for f in frequencies_cm:
+                if np.isreal(f) and f.real > 0:
+                    real_freqs_cm.append(f.real)
+                elif hasattr(f, 'real') and f.real > 0:
+                    real_freqs_cm.append(f.real)
+                else:
+                    n_imaginary += 1
+            
+            if n_imaginary > 0:
+                logger.warning(f"Removed {n_imaginary} imaginary modes (transition state?)")
+            
+            real_freqs_cm = np.array(real_freqs_cm)
+            logger.detail(f"Valid modes: {len(real_freqs_cm)}, range: {real_freqs_cm.min():.1f} - {real_freqs_cm.max():.1f} cm⁻¹" 
+                         if len(real_freqs_cm) > 0 else "No valid vibrational modes")
+            
+            # cm⁻¹ → eV: 1 cm⁻¹ = 1.23984×10⁻⁴ eV
+            freqs_eV = real_freqs_cm * 1.23984e-4
+            
+            physics_logger.log_formula(
+                "Unit Conversion",
+                "E(eV) = ν(cm⁻¹) × 1.23984e-4",
+                {"cm_to_eV_factor": 1.23984e-4},
+                freqs_eV.sum() if len(freqs_eV) > 0 else 0
             )
             
-            # Helmholtz 자유 에너지 (고체/흡착 시스템에 적합)
-            G = thermo.get_helmholtz_energy(temperature)
+            if len(freqs_eV) > 0:
+                # 열역학 계산 (ASE HarmonicThermo expects eV)
+                thermo = HarmonicThermo(
+                    vib_energies=freqs_eV,
+                    potentialenergy=E_elec
+                )
+                
+                # ZPE
+                E_zpe = thermo.get_ZPE_correction()
+                physics_logger.log_formula(
+                    "Zero Point Energy",
+                    "ZPE = (1/2) × Σ ℏω",
+                    {"n_modes": len(freqs_eV), "sum_hbar_omega": freqs_eV.sum()},
+                    E_zpe
+                )
+                logger.calc(f"ZPE = {E_zpe:.6f} eV")
+                
+                # 엔트로피 (Bose-Einstein statistics)
+                S = thermo.get_entropy(temperature)
+                logger.calc(f"Vibrational entropy: S = {S:.6e} eV/K = {S*1e3:.4f} meV/K")
+                
+                # 내부 에너지
+                U = thermo.get_internal_energy(temperature)
+                E_thermal = U - E_elec - E_zpe
+                
+                physics_logger.log_formula(
+                    "Thermal Energy",
+                    "E_thermal = U - E_elec - ZPE",
+                    {"U": U, "E_elec": E_elec, "ZPE": E_zpe},
+                    E_thermal
+                )
+                logger.calc(f"Thermal energy: E_thermal = {E_thermal:.6f} eV")
+                
+                # 엔탈피 (고체의 경우 PV ≈ 0, 기체의 경우 PV ≈ kT)
+                H = U
+                logger.calc(f"Enthalpy: H = {H:.6f} eV")
+                
+                # Helmholtz 자유 에너지 (고체/흡착 시스템에 적합)
+                G = thermo.get_helmholtz_energy(temperature)
+                
+                physics_logger.log_formula(
+                    "Gibbs Free Energy",
+                    "G = H - T×S = E_elec + ZPE + E_thermal - T×S",
+                    {"H": H, "T": temperature, "S": S, "T_S": temperature * S},
+                    G
+                )
+                
+            else:
+                # 진동 계산 없이 근사
+                logger.warning("No vibrational modes - using electronic energy only")
+                E_zpe = 0.0
+                E_thermal = 0.0
+                S = 0.0
+                H = E_elec
+                G = E_elec
             
-            # ZPE
-            E_zpe = thermo.get_ZPE_correction()
+            logger.energy(f"Gibbs free energy: G = {G:.6f} eV")
+            logger.success(f"Free energy calculation complete: G = {G:.6f} eV at T = {temperature} K")
             
-            # 엔트로피
-            S = thermo.get_entropy(temperature)
-            
-            # 내부 에너지
-            U = thermo.get_internal_energy(temperature)
-            E_thermal = U - E_elec - E_zpe
-            
-            # 엔탈피 (고체의 경우 PV ≈ 0, 기체의 경우 PV ≈ kT)
-            H = U
-            
-        else:
-            # 진동 계산 없이 근사
-            E_zpe = 0.0
-            E_thermal = 0.0
-            S = 0.0
-            H = E_elec
-            G = E_elec
-            
-        return FreeEnergyResult(
-            name=name,
-            E_electronic=E_elec,
-            E_zpe=E_zpe,
-            E_thermal=E_thermal,
-            S_vib=S,
-            H=H,
-            G=G,
-            temperature=temperature,
-            frequencies=real_freqs_cm.tolist() if len(real_freqs_cm) > 0 else []
-        )
+            return FreeEnergyResult(
+                name=name,
+                E_electronic=E_elec,
+                E_zpe=E_zpe,
+                E_thermal=E_thermal,
+                S_vib=S,
+                H=H,
+                G=G,
+                temperature=temperature,
+                frequencies=real_freqs_cm.tolist() if len(real_freqs_cm) > 0 else []
+            )
     
     def get_ranking(self, by: str = "energy") -> List[Dict]:
         """에너지/확률 순위"""

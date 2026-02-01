@@ -170,62 +170,83 @@ class DynamicsAnalyzer:
         Returns:
             MSDResult
         """
-        indices = self.get_species_indices(species)
-        if not indices:
-            raise ValueError(f"No atoms of species {species} found")
+        with logger.section(f"MSD Calculation ({species})"):
+            logger.info(f"Species: {species}, unwrap={unwrap}, time_averaged={time_averaged}")
             
-        n_frames = len(self.frames)
-        n_atoms = len(indices)
-        
-        # 위치 추출
-        positions = np.zeros((n_frames, n_atoms, 3))
-        for i, frame in enumerate(self.frames):
-            positions[i] = frame.positions[indices]
+            indices = self.get_species_indices(species)
+            if not indices:
+                logger.error(f"No atoms of species {species} found")
+                raise ValueError(f"No atoms of species {species} found")
             
-        # PBC unwrapping (연속 궤적으로 변환)
-        if unwrap and self.frames[0].pbc.any():
-            positions = self._unwrap_positions(positions, self.frames[0].get_cell())
-        
-        if time_averaged:
-            # Time-averaged MSD: 더 나은 통계를 위해 모든 시간 원점에서 평균
-            max_lag = n_frames // 2  # 최대 lag는 전체 시간의 절반
-            msd = np.zeros(max_lag)
-            msd_x = np.zeros(max_lag)
-            msd_y = np.zeros(max_lag)
-            msd_z = np.zeros(max_lag)
+            n_frames = len(self.frames)
+            n_atoms = len(indices)
             
-            for lag in range(1, max_lag):
-                # 모든 시간 원점에서 displacement 계산
-                displacements = positions[lag:] - positions[:-lag]  # (N-lag, n_atoms, 3)
+            logger.detail(f"Tracking {n_atoms} atoms over {n_frames} frames")
+            logger.debug(f"Atom indices: {indices[:5]}..." if len(indices) > 5 else f"Atom indices: {indices}")
+            
+            # 위치 추출
+            positions = np.zeros((n_frames, n_atoms, 3))
+            for i, frame in enumerate(self.frames):
+                positions[i] = frame.positions[indices]
                 
-                # 제곱 변위의 원자 및 시간 평균
-                sq_disp = displacements ** 2
-                msd[lag] = np.mean(np.sum(sq_disp, axis=2))
-                msd_x[lag] = np.mean(sq_disp[:, :, 0])
-                msd_y[lag] = np.mean(sq_disp[:, :, 1])
-                msd_z[lag] = np.mean(sq_disp[:, :, 2])
+            # PBC unwrapping (연속 궤적으로 변환)
+            if unwrap and self.frames[0].pbc.any():
+                logger.detail("Applying PBC unwrapping...")
+                positions = self._unwrap_positions(positions, self.frames[0].get_cell())
             
-            time = np.arange(max_lag) * self.timestep
-        else:
-            # Simple MSD from initial frame
-            initial_pos = positions[0]
-            displacements = positions - initial_pos
+            if time_averaged:
+                # Time-averaged MSD: 더 나은 통계를 위해 모든 시간 원점에서 평균
+                max_lag = n_frames // 2  # 최대 lag는 전체 시간의 절반
+                msd = np.zeros(max_lag)
+                msd_x = np.zeros(max_lag)
+                msd_y = np.zeros(max_lag)
+                msd_z = np.zeros(max_lag)
+                
+                logger.step(f"Computing time-averaged MSD (max_lag={max_lag})...")
+                log_interval = max(1, max_lag // 10)
+                
+                for lag in range(1, max_lag):
+                    # 모든 시간 원점에서 displacement 계산
+                    displacements = positions[lag:] - positions[:-lag]  # (N-lag, n_atoms, 3)
+                    
+                    # 제곱 변위의 원자 및 시간 평균
+                    sq_disp = displacements ** 2
+                    msd[lag] = np.mean(np.sum(sq_disp, axis=2))
+                    msd_x[lag] = np.mean(sq_disp[:, :, 0])
+                    msd_y[lag] = np.mean(sq_disp[:, :, 1])
+                    msd_z[lag] = np.mean(sq_disp[:, :, 2])
+                    
+                    # 진행률 로깅 (10% 마다)
+                    if lag % log_interval == 0:
+                        logger.progress(f"MSD lag={lag}", current=lag, total=max_lag)
+                
+                time = np.arange(max_lag) * self.timestep
+            else:
+                # Simple MSD from initial frame
+                logger.detail("Computing simple MSD from initial frame...")
+                initial_pos = positions[0]
+                displacements = positions - initial_pos
+                
+                msd = np.mean(np.sum(displacements**2, axis=2), axis=1)
+                msd_x = np.mean(displacements[:, :, 0]**2, axis=1)
+                msd_y = np.mean(displacements[:, :, 1]**2, axis=1)
+                msd_z = np.mean(displacements[:, :, 2]**2, axis=1)
+                
+                time = np.arange(n_frames) * self.timestep
             
-            msd = np.mean(np.sum(displacements**2, axis=2), axis=1)
-            msd_x = np.mean(displacements[:, :, 0]**2, axis=1)
-            msd_y = np.mean(displacements[:, :, 1]**2, axis=1)
-            msd_z = np.mean(displacements[:, :, 2]**2, axis=1)
+            # 결과 로깅
+            logger.calc(f"MSD range: {msd.min():.4f} - {msd.max():.4f} Ų")
+            logger.detail(f"Time range: {time.min():.1f} - {time.max():.1f} fs")
+            logger.success(f"MSD calculation complete: final MSD = {msd[-1]:.4f} Ų at t = {time[-1]:.1f} fs")
             
-            time = np.arange(n_frames) * self.timestep
-        
-        return MSDResult(
-            time=time,
-            msd=msd,
-            msd_x=msd_x,
-            msd_y=msd_y,
-            msd_z=msd_z,
-            species=species
-        )
+            return MSDResult(
+                time=time,
+                msd=msd,
+                msd_x=msd_x,
+                msd_y=msd_y,
+                msd_z=msd_z,
+                species=species
+            )
     
     def _unwrap_positions(self, 
                           positions: np.ndarray, 
@@ -267,50 +288,79 @@ class DynamicsAnalyzer:
         Returns:
             DiffusionResult (cm²/s 단위)
         """
-        msd_result = self.calculate_msd(species)
-        
-        time = msd_result.time
-        msd = msd_result.msd
-        
-        # 피팅 범위 (선형 영역에서 피팅)
-        n_points = len(time)
-        start_idx = int(n_points * fit_start)
-        end_idx = min(int(n_points * fit_end), n_points - 1)
-        
-        if end_idx <= start_idx:
-            raise ValueError(f"Invalid fit range: start_idx={start_idx}, end_idx={end_idx}")
-        
-        t_fit = time[start_idx:end_idx]
-        msd_fit = msd[start_idx:end_idx]
-        
-        # 선형 피팅: MSD = 6*D*t (3D)
-        slope, intercept, r_value, p_value, std_err = stats.linregress(t_fit, msd_fit)
-        
-        # D = slope / 6 (3D Einstein relation)
-        # Unit: Å²/fs → cm²/s: multiply by 0.1
-        D = slope / 6.0 * 0.1  # cm²/s
-        D_error = std_err / 6.0 * 0.1
-        
-        # 각 축 방향 확산 계수 (1D: MSD = 2*D*t)
-        slope_x, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_x[start_idx:end_idx])
-        slope_y, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_y[start_idx:end_idx])
-        slope_z, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_z[start_idx:end_idx])
-        
-        D_x = slope_x / 2.0 * 0.1
-        D_y = slope_y / 2.0 * 0.1
-        D_z = slope_z / 2.0 * 0.1
-        
-        return DiffusionResult(
-            D=D,
-            D_error=D_error,
-            D_x=D_x,
-            D_y=D_y,
-            D_z=D_z,
-            r_squared=r_value**2,
-            fit_start=time[start_idx],
-            fit_end=time[end_idx - 1] if end_idx > 0 else time[0],
-            species=species
-        )
+        with logger.section(f"Diffusion Coefficient ({species})"):
+            logger.info(f"Fit range: {fit_start*100:.0f}% - {fit_end*100:.0f}%")
+            
+            msd_result = self.calculate_msd(species)
+            
+            time = msd_result.time
+            msd = msd_result.msd
+            
+            # 피팅 범위 (선형 영역에서 피팅)
+            n_points = len(time)
+            start_idx = int(n_points * fit_start)
+            end_idx = min(int(n_points * fit_end), n_points - 1)
+            
+            if end_idx <= start_idx:
+                logger.error(f"Invalid fit range: start_idx={start_idx}, end_idx={end_idx}")
+                raise ValueError(f"Invalid fit range: start_idx={start_idx}, end_idx={end_idx}")
+            
+            logger.detail(f"Fitting indices: [{start_idx}:{end_idx}] ({end_idx-start_idx} points)")
+            logger.detail(f"Fitting time range: {time[start_idx]:.1f} - {time[end_idx-1]:.1f} fs")
+            
+            t_fit = time[start_idx:end_idx]
+            msd_fit = msd[start_idx:end_idx]
+            
+            # 선형 피팅: MSD = 6*D*t (3D)
+            slope, intercept, r_value, p_value, std_err = stats.linregress(t_fit, msd_fit)
+            
+            logger.calc(f"Linear fit: slope = {slope:.6e} Ų/fs, R² = {r_value**2:.6f}")
+            logger.debug(f"Intercept = {intercept:.4f} Ų, p-value = {p_value:.2e}")
+            
+            # D = slope / 6 (3D Einstein relation)
+            # Unit: Å²/fs → cm²/s: multiply by 0.1
+            physics_logger.log_formula(
+                "Einstein Relation",
+                "D = slope / 6",
+                {"slope": slope, "factor": "1/6"},
+                slope / 6.0
+            )
+            
+            D_raw = slope / 6.0  # Å²/fs
+            D = D_raw * 0.1  # cm²/s
+            D_error = std_err / 6.0 * 0.1
+            
+            physics_logger.log_formula(
+                "Unit Conversion",
+                "D(cm²/s) = D(Ų/fs) × 0.1",
+                {"D_raw": D_raw, "factor": 0.1},
+                D
+            )
+            
+            # 각 축 방향 확산 계수 (1D: MSD = 2*D*t)
+            slope_x, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_x[start_idx:end_idx])
+            slope_y, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_y[start_idx:end_idx])
+            slope_z, _, _, _, _ = stats.linregress(t_fit, msd_result.msd_z[start_idx:end_idx])
+            
+            D_x = slope_x / 2.0 * 0.1
+            D_y = slope_y / 2.0 * 0.1
+            D_z = slope_z / 2.0 * 0.1
+            
+            logger.detail(f"Directional D: Dx={D_x:.4e}, Dy={D_y:.4e}, Dz={D_z:.4e} cm²/s")
+            logger.energy(f"Diffusion coefficient: D = {D:.4e} ± {D_error:.4e} cm²/s")
+            logger.success(f"Diffusion calculation complete: D = {D:.4e} cm²/s (R² = {r_value**2:.4f})")
+            
+            return DiffusionResult(
+                D=D,
+                D_error=D_error,
+                D_x=D_x,
+                D_y=D_y,
+                D_z=D_z,
+                r_squared=r_value**2,
+                fit_start=time[start_idx],
+                fit_end=time[end_idx - 1] if end_idx > 0 else time[0],
+                species=species
+            )
     
     def calculate_conductivity(self,
                                species: str,
@@ -328,41 +378,65 @@ class DynamicsAnalyzer:
         Returns:
             ConductivityResult (S/cm 단위)
         """
-        diffusion = self.calculate_diffusion(species)
-        
-        indices = self.get_species_indices(species)
-        n_carriers = len(indices)
-        
-        # 부피 계산
-        volume = self.frames[0].get_volume()  # Å³
-        
-        # 상수
-        e = 1.602176634e-19  # C
-        kB = 1.380649e-23  # J/K
-        
-        # 농도 n (1/cm³)
-        # volume: Å³ = 1e-24 cm³
-        n = n_carriers / (volume * 1e-24)  # 1/cm³
-        
-        # D: cm²/s
-        D = diffusion.D
-        D_error = diffusion.D_error
-        
-        # σ = n * z² * e² * D / (kB * T)
-        # 단위: (1/cm³) * C² * (cm²/s) / (J/K * K) = S/cm
-        z = abs(charge)
-        sigma = n * z**2 * e**2 * D / (kB * temperature)
-        sigma_error = n * z**2 * e**2 * D_error / (kB * temperature)
-        
-        return ConductivityResult(
-            sigma=sigma,
-            sigma_error=sigma_error,
-            temperature=temperature,
-            n_carriers=n_carriers,
-            charge=charge,
-            volume=volume,
-            species=species
-        )
+        with logger.section(f"Ionic Conductivity ({species})"):
+            logger.info(f"Species: {species}, charge={charge:+d}, T={temperature} K")
+            
+            diffusion = self.calculate_diffusion(species)
+            
+            indices = self.get_species_indices(species)
+            n_carriers = len(indices)
+            
+            # 부피 계산
+            volume = self.frames[0].get_volume()  # Å³
+            logger.detail(f"Cell volume: {volume:.2f} ų")
+            
+            # 상수 (CODATA 2018)
+            e = 1.602176634e-19  # C (elementary charge)
+            kB = 1.380649e-23  # J/K (Boltzmann constant)
+            
+            logger.debug(f"Physical constants: e = {e:.6e} C, kB = {kB:.6e} J/K")
+            
+            # 농도 n (1/cm³)
+            # volume: Å³ = 1e-24 cm³
+            n = n_carriers / (volume * 1e-24)  # 1/cm³
+            
+            physics_logger.log_formula(
+                "Carrier Concentration",
+                "n = N / V",
+                {"N": n_carriers, "V_A3": volume, "V_cm3": volume * 1e-24},
+                n
+            )
+            logger.calc(f"Carrier concentration: n = {n:.4e} cm⁻³")
+            
+            # D: cm²/s
+            D = diffusion.D
+            D_error = diffusion.D_error
+            
+            # σ = n * z² * e² * D / (kB * T)
+            # 단위: (1/cm³) * C² * (cm²/s) / (J/K * K) = S/cm
+            z = abs(charge)
+            sigma = n * z**2 * e**2 * D / (kB * temperature)
+            sigma_error = n * z**2 * e**2 * D_error / (kB * temperature)
+            
+            physics_logger.log_formula(
+                "Nernst-Einstein",
+                "σ = (n × z² × e² × D) / (kB × T)",
+                {"n": n, "z": z, "e": e, "D": D, "kB": kB, "T": temperature},
+                sigma
+            )
+            
+            logger.energy(f"Ionic conductivity: σ = {sigma:.4e} ± {sigma_error:.4e} S/cm")
+            logger.success(f"Conductivity calculation complete: σ = {sigma:.4e} S/cm")
+            
+            return ConductivityResult(
+                sigma=sigma,
+                sigma_error=sigma_error,
+                temperature=temperature,
+                n_carriers=n_carriers,
+                charge=charge,
+                volume=volume,
+                species=species
+            )
     
     def calculate_rdf(self,
                       pair: Tuple[str, str],

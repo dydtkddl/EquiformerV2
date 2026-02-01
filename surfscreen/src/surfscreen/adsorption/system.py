@@ -108,52 +108,78 @@ class AdsorptionSystem:
         from surfscreen.surface.sites import SiteDetector
         from surfscreen.molecule.builder import MoleculeAnalyzer
         
-        # 사이트 감지
-        if sites == "auto":
-            detector = SiteDetector(self.surface)
-            sites = detector.detect_all()
-        
-        # 분자 중심 원자 감지
-        if center_atoms is None:
-            center_atoms = MoleculeAnalyzer.get_adsorption_centers(self.molecule)
-            if not center_atoms:
-                # 기본값: 첫 번째 무거운 원자
-                heavy = [i for i, s in enumerate(self.molecule.symbols) 
-                        if s not in ['H']]
-                center_atoms = [heavy[0]] if heavy else [0]
-        
-        self.configurations = []
-        self.config_info = []
-        
-        # 모든 조합 생성
-        count = 0
-        for site_idx, site in enumerate(sites):
-            for rot in rotations:
-                for height in heights:
-                    for center in center_atoms:
-                        if count >= max_configs:
-                            break
-                        
-                        config = self._place_molecule(
-                            site.position[:2],
-                            site.position[2] + height - self.surface.atoms.positions[:, 2].max(),
-                            rotation=rot,
-                            center_atom=center
-                        )
-                        
-                        # 충돌 체크
-                        if not self._check_overlap(config):
-                            self.configurations.append(config)
-                            self.config_info.append({
-                                'site_idx': site_idx,
-                                'site_type': site.site_type.value,
-                                'rotation': rot,
-                                'height': height,
-                                'center_atom': center
-                            })
-                            count += 1
-        
-        return self.configurations
+        with logger.section("Configuration Generation"):
+            logger.info(f"Max configs: {max_configs}, rotations: {rotations}°, heights: {heights} Å")
+            
+            # 사이트 감지
+            if sites == "auto":
+                logger.step("Auto-detecting adsorption sites...")
+                detector = SiteDetector(self.surface)
+                sites = detector.detect_all()
+            
+            logger.detail(f"Sites: {len(sites)}")
+            
+            # 분자 중심 원자 감지
+            if center_atoms is None:
+                center_atoms = MoleculeAnalyzer.get_adsorption_centers(self.molecule)
+                if not center_atoms:
+                    # 기본값: 첫 번째 무거운 원자
+                    heavy = [i for i, s in enumerate(self.molecule.symbols) 
+                            if s not in ['H']]
+                    center_atoms = [heavy[0]] if heavy else [0]
+            
+            logger.detail(f"Center atoms: {center_atoms}")
+            
+            # 총 조합 수 계산
+            n_combinations = len(sites) * len(rotations) * len(heights) * len(center_atoms)
+            logger.info(f"Total combinations: {n_combinations} (capped at {max_configs})")
+            
+            self.configurations = []
+            self.config_info = []
+            
+            # 모든 조합 생성
+            count = 0
+            n_rejected = 0
+            log_interval = max(1, min(n_combinations, max_configs) // 10)
+            
+            for site_idx, site in enumerate(sites):
+                for rot in rotations:
+                    for height in heights:
+                        for center in center_atoms:
+                            if count >= max_configs:
+                                break
+                            
+                            config = self._place_molecule(
+                                site.position[:2],
+                                site.position[2] + height - self.surface.atoms.positions[:, 2].max(),
+                                rotation=rot,
+                                center_atom=center
+                            )
+                            
+                            # 충돌 체크
+                            if not self._check_overlap(config):
+                                self.configurations.append(config)
+                                self.config_info.append({
+                                    'site_idx': site_idx,
+                                    'site_type': site.site_type.value,
+                                    'rotation': rot,
+                                    'height': height,
+                                    'center_atom': center
+                                })
+                                count += 1
+                                
+                                # 진행률 로깅
+                                if count % log_interval == 0:
+                                    logger.progress(f"Generating configs", current=count, total=max_configs)
+                            else:
+                                n_rejected += 1
+            
+            if n_rejected > 0:
+                logger.detail(f"Rejected {n_rejected} overlapping configurations")
+            
+            logger.success(f"Generated {len(self.configurations)} valid configurations")
+            
+            return self.configurations
     
     def _place_molecule(self,
                         xy: Tuple[float, float],
@@ -236,74 +262,99 @@ class AdsorptionSystem:
         Returns:
             AdsorptionResult 목록
         """
-        if output_dir:
-            output_dir = Path(output_dir)
-            output_dir.mkdir(parents=True, exist_ok=True)
+        from surfscreen.logging_utils import physics_logger
         
-        # 참조 에너지 계산
-        if self._e_surface is None:
-            self._e_surface = calculator.get_energy(self.surface.atoms)
-        if self._e_molecule is None:
-            self._e_molecule = calculator.get_energy(self.molecule.atoms)
-        
-        results = []
-        n_configs = len(self.configurations)
-        
-        for i, (config, info) in enumerate(zip(self.configurations, self.config_info)):
-            name = f"site{info['site_idx']}_rot{int(info['rotation'])}"
+        with logger.section("Adsorption Optimization"):
+            if output_dir:
+                output_dir = Path(output_dir)
+                output_dir.mkdir(parents=True, exist_ok=True)
+                logger.detail(f"Output directory: {output_dir}")
             
-            if progress:
-                print(f"\n=== {name} ({i+1}/{n_configs}) ===")
-                print(f"  Site: {info['site_type']}, Rotation: {info['rotation']}°")
+            logger.info(f"fmax={fmax} eV/Å, max_steps={steps}")
             
-            try:
-                # 초기 에너지
-                initial_e = calculator.get_energy(config)
+            # 참조 에너지 계산
+            logger.step("Computing reference energies...")
+            if self._e_surface is None:
+                self._e_surface = calculator.get_energy(self.surface.atoms)
+            if self._e_molecule is None:
+                self._e_molecule = calculator.get_energy(self.molecule.atoms)
+            
+            logger.energy(f"E_surface (reference) = {self._e_surface:.6f} eV")
+            logger.energy(f"E_molecule (reference) = {self._e_molecule:.6f} eV")
+            
+            results = []
+            n_configs = len(self.configurations)
+            logger.info(f"Optimizing {n_configs} configurations...")
+            
+            for i, (config, info) in enumerate(zip(self.configurations, self.config_info)):
+                name = f"site{info['site_idx']}_rot{int(info['rotation'])}"
                 
-                # 최적화
-                traj_file = str(output_dir / f"{name}.traj") if output_dir else None
-                opt_result = calculator.optimize(
-                    config,
-                    fmax=fmax,
-                    steps=steps,
-                    trajectory=traj_file
-                )
+                logger.step(f"[{i+1}/{n_configs}] {name} ({info['site_type']}, rot={info['rotation']}°)")
                 
-                # 흡착 에너지
-                e_ads = opt_result.final_energy - self._e_surface - self._e_molecule
-                
-                if progress:
-                    print(f"  Initial E: {initial_e:.4f} eV")
-                    print(f"  Final E: {opt_result.final_energy:.4f} eV ({opt_result.steps} steps)")
-                    print(f"  E_ads: {e_ads:.4f} eV")
-                
-                result = AdsorptionResult(
-                    config_name=name,
-                    atoms=opt_result.atoms,
-                    site_idx=info['site_idx'],
-                    site_type=info['site_type'],
-                    rotation=info['rotation'],
-                    center_atom=info['center_atom'],
-                    initial_energy=initial_e,
-                    final_energy=opt_result.final_energy,
-                    adsorption_energy=e_ads,
-                    steps=opt_result.steps,
-                    converged=opt_result.converged
-                )
-                
-                if output_dir:
-                    result.save(str(output_dir / f"{name}.xyz"))
-                
-                results.append(result)
-                
-            except Exception as e:
-                if progress:
-                    print(f"  Error: {e}")
-        
-        # 결과 정렬 (흡착 에너지 기준)
-        results.sort(key=lambda x: x.adsorption_energy)
-        
-        return results
+                try:
+                    # 초기 에너지
+                    initial_e = calculator.get_energy(config)
+                    logger.detail(f"Initial E = {initial_e:.4f} eV")
+                    
+                    # 최적화
+                    traj_file = str(output_dir / f"{name}.traj") if output_dir else None
+                    opt_result = calculator.optimize(
+                        config,
+                        fmax=fmax,
+                        steps=steps,
+                        trajectory=traj_file
+                    )
+                    
+                    # 흡착 에너지
+                    e_ads = opt_result.final_energy - self._e_surface - self._e_molecule
+                    
+                    physics_logger.log_formula(
+                        "Adsorption Energy",
+                        "E_ads = E_system - E_surface - E_molecule",
+                        {"E_system": opt_result.final_energy, 
+                         "E_surface": self._e_surface, 
+                         "E_molecule": self._e_molecule},
+                        e_ads
+                    )
+                    
+                    logger.detail(f"Optimization: {opt_result.steps} steps, converged={opt_result.converged}")
+                    logger.calc(f"E_final = {opt_result.final_energy:.4f} eV → E_ads = {e_ads:.4f} eV")
+                    
+                    result = AdsorptionResult(
+                        config_name=name,
+                        atoms=opt_result.atoms,
+                        site_idx=info['site_idx'],
+                        site_type=info['site_type'],
+                        rotation=info['rotation'],
+                        center_atom=info['center_atom'],
+                        initial_energy=initial_e,
+                        final_energy=opt_result.final_energy,
+                        adsorption_energy=e_ads,
+                        steps=opt_result.steps,
+                        converged=opt_result.converged
+                    )
+                    
+                    if output_dir:
+                        result.save(str(output_dir / f"{name}.xyz"))
+                    
+                    results.append(result)
+                    
+                    # 진행률 표시
+                    logger.progress(f"Optimization", current=i+1, total=n_configs)
+                    
+                except Exception as e:
+                    logger.error(f"Optimization failed for {name}: {e}")
+            
+            # 결과 정렬 (흡착 에너지 기준)
+            results.sort(key=lambda x: x.adsorption_energy)
+            
+            # 결과 요약
+            if results:
+                best = results[0]
+                logger.success(f"Optimization complete: {len(results)} configs")
+                logger.energy(f"Best: {best.config_name}, E_ads = {best.adsorption_energy:.4f} eV")
+            
+            return results
     
     def get_best_result(self, results: List[AdsorptionResult]) -> AdsorptionResult:
         """가장 안정적인 구성 반환"""
