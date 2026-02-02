@@ -8,7 +8,13 @@ import functools
 import hashlib
 import json
 import logging
-from typing import Any, Callable, Optional, List, Union, TypeVar, ParamSpec
+from typing import Any, Callable, Optional, List, Union, TypeVar
+
+# Python 3.8 compatibility: ParamSpec is only available in Python 3.10+
+try:
+    from typing import ParamSpec
+except ImportError:
+    from typing_extensions import ParamSpec
 
 from .cache_manager import get_cache_manager, CacheManager
 
@@ -16,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 P = ParamSpec('P')
 T = TypeVar('T')
+
+
 
 
 def cache_result(
