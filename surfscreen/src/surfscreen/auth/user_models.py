@@ -8,7 +8,10 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, EmailStr, validator
+try:
+    from pydantic import BaseModel, Field, EmailStr, field_validator
+except ImportError:
+    from pydantic import BaseModel, Field, EmailStr, validator as field_validator
 import secrets
 import string
 
@@ -176,7 +179,8 @@ class UserCreate(BaseModel):
     role: UserRole = UserRole.USER
     team_id: Optional[str] = None
     
-    @validator("password")
+    @field_validator("password")
+    @classmethod
     def validate_password(cls, v):
         if not any(c.isupper() for c in v):
             raise ValueError("Password must contain uppercase letter")
