@@ -1,0 +1,66 @@
+# ============================================
+# SurfScreen API Dockerfile
+# ============================================
+# Build: docker build -f Dockerfile.api -t surfscreen-api .
+# Run:   docker run -p 8000:8000 surfscreen-api
+
+FROM python:3.11-slim AS base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ============================================
+# Dependencies Stage
+# ============================================
+FROM base AS dependencies
+
+# Copy only requirements first for caching
+COPY pyproject.toml ./
+COPY src/surfscreen/__init__.py ./src/surfscreen/
+
+# Install dependencies
+RUN pip install --upgrade pip && \
+    pip install build && \
+    pip install uvicorn[standard] fastapi pydantic numpy scipy ase
+
+# ============================================
+# Production Stage
+# ============================================
+FROM base AS production
+
+# Copy installed packages from dependencies stage
+COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=dependencies /usr/local/bin /usr/local/bin
+
+# Copy application code
+COPY src/ ./src/
+COPY pyproject.toml ./
+
+# Install the package
+RUN pip install -e .
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash surfscreen && \
+    chown -R surfscreen:surfscreen /app
+USER surfscreen
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command
+CMD ["uvicorn", "surfscreen.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

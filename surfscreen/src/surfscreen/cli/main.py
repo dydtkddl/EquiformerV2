@@ -46,6 +46,8 @@ def _register_commands():
     from surfscreen.cli.export import export_group, plot_group
     from surfscreen.cli.adsorb import config_group, adsorb_group
     from surfscreen.cli.template import template_group, checkpoint_group
+    from surfscreen.cli.api import api_group
+    from surfscreen.cli.validate import validate as validate_group
     
     cli.add_command(molecule_group, "molecule")
     cli.add_command(surface_group, "surface")
@@ -58,6 +60,8 @@ def _register_commands():
     cli.add_command(adsorb_group, "adsorb")
     cli.add_command(template_group, "template")
     cli.add_command(checkpoint_group, "checkpoint")
+    cli.add_command(api_group, "api")
+    cli.add_command(validate_group, "validate")
 
 
 # Register on import

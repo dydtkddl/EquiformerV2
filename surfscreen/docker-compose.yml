@@ -1,0 +1,95 @@
+# ============================================
+# SurfScreen Docker Compose - Production
+# ============================================
+# Usage: docker-compose up -d
+
+version: "3.9"
+
+services:
+  # ============================================
+  # API Service
+  # ============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: surfscreen-api:latest
+    container_name: surfscreen-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      - SURFSCREEN_API_KEY=${SURFSCREEN_API_KEY:-changeme}
+      - SURFSCREEN_CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000}
+      - SURFSCREEN_RESULTS_DIR=/data/results
+      - SURFSCREEN_LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      - surfscreen-results:/data/results
+      - surfscreen-uploads:/data/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - surfscreen-network
+
+  # ============================================
+  # Dashboard Service
+  # ============================================
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: ../Dockerfile.dashboard
+    image: surfscreen-dashboard:latest
+    container_name: surfscreen-dashboard
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_PORT:-3000}:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:8000
+      - NODE_ENV=production
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - surfscreen-network
+
+  # ============================================
+  # Redis (Job Queue)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: surfscreen-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - surfscreen-network
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  surfscreen-results:
+    name: surfscreen-results
+  surfscreen-uploads:
+    name: surfscreen-uploads
+  redis-data:
+    name: surfscreen-redis-data
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  surfscreen-network:
+    name: surfscreen-network
+    driver: bridge

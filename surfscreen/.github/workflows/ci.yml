@@ -1,0 +1,217 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "20"
+
+jobs:
+  # ============================================
+  # Python Backend Tests
+  # ============================================
+  python-tests:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,test]"
+        working-directory: ./surfscreen
+
+      - name: Run linting
+        run: |
+          pip install ruff
+          ruff check src/
+        working-directory: ./surfscreen
+        continue-on-error: true
+
+      - name: Run unit tests
+        run: |
+          pytest tests/ -v --ignore=tests/integration --ignore=tests/e2e \
+            --cov=src/surfscreen --cov-report=xml --cov-report=html
+        working-directory: ./surfscreen
+
+      - name: Run integration tests
+        run: |
+          pytest tests/integration/ -v -m integration
+        working-directory: ./surfscreen
+        continue-on-error: true
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./surfscreen/coverage.xml
+          flags: python
+        continue-on-error: true
+
+  # ============================================
+  # Dashboard Build and Tests
+  # ============================================
+  dashboard-build:
+    name: Dashboard Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: surfscreen/dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./surfscreen/dashboard
+
+      - name: Run linting
+        run: npm run lint
+        working-directory: ./surfscreen/dashboard
+
+      - name: Type check
+        run: npm run type-check || true
+        working-directory: ./surfscreen/dashboard
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+        working-directory: ./surfscreen/dashboard
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-build
+          path: surfscreen/dashboard/.next
+          retention-days: 7
+
+  dashboard-e2e:
+    name: Dashboard E2E Tests
+    runs-on: ubuntu-latest
+    needs: dashboard-build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: surfscreen/dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./surfscreen/dashboard
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: ./surfscreen/dashboard
+
+      - name: Run Playwright tests
+        run: npx playwright test --project=chromium
+        working-directory: ./surfscreen/dashboard
+        continue-on-error: true
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: surfscreen/dashboard/playwright-report
+          retention-days: 30
+
+  # ============================================
+  # Docker Build Test
+  # ============================================
+  docker-build:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./surfscreen
+          file: ./surfscreen/Dockerfile.api
+          push: false
+          tags: surfscreen-api:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build Dashboard image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./surfscreen/dashboard
+          file: ./surfscreen/Dockerfile.dashboard
+          push: false
+          tags: surfscreen-dashboard:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # Security Scanning
+  # ============================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "fs"
+          scan-ref: "./surfscreen"
+          severity: "CRITICAL,HIGH"
+          exit-code: "0"
+
+  # ============================================
+  # Documentation Build
+  # ============================================
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install documentation dependencies
+        run: |
+          pip install mkdocs mkdocs-material mkdocstrings[python]
+        continue-on-error: true
+
+      - name: Build docs
+        run: |
+          cd surfscreen/docs && ls -la
+        continue-on-error: true

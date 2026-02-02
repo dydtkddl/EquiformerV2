@@ -119,21 +119,26 @@ def md_status(output_dir):
 @md_group.command("report")
 @click.argument("output_dir")
 @click.option("--output", "-o", default=None, help="Output HTML file")
-def md_report(output_dir, output):
+@click.option("--theme", type=click.Choice(["dark", "light"]), default="dark", help="Report theme")
+@click.option("--max-frames", default=100, help="Max frames to include (for performance)")
+def md_report(output_dir, output, theme, max_frames):
     """Generate interactive MD report with trajectory playback"""
-    from surfscreen.md.md_report import MDReportGenerator
+    from surfscreen.report import MDReportGenerator
     
     console.print(f"\n[bold]📊 Generating MD Report: {output_dir}[/bold]\n")
     
     out_path = output or f"{Path(output_dir).name}_report.html"
     
-    gen = MDReportGenerator(output_dir)
+    gen = MDReportGenerator(output_dir, theme=theme, max_frames=max_frames)
     gen.generate(out_path)
     
     console.print(f"\n[bold green]✓ Report generated: {out_path}[/bold green]")
-    console.print("   - Interactive trajectory playback (3Dmol.js)")
-    console.print("   - Energy/Temperature plots (Plotly)")
+    console.print("   Features:")
+    console.print("   - Trajectory playback with speed control (3Dmol.js)")
+    console.print("   - Energy/Temperature time series (Plotly)")
+    console.print("   - Theme toggle (Dark/Light)")
     console.print("   - Download links for OVITO/VMD/ASE")
+    console.print(f"[dim]Open in browser: file://{Path(out_path).absolute()}[/dim]")
 
 
 __all__ = ["md_group"]

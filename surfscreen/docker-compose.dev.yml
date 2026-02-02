@@ -1,0 +1,80 @@
+# ============================================
+# SurfScreen Docker Compose - Development
+# ============================================
+# Usage: docker-compose -f docker-compose.dev.yml up
+
+version: "3.9"
+
+services:
+  # ============================================
+  # API Service (Development)
+  # ============================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      target: dependencies
+    container_name: surfscreen-api-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - SURFSCREEN_API_KEY=dev-api-key-12345
+      - SURFSCREEN_CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+      - SURFSCREEN_RESULTS_DIR=/data/results
+      - SURFSCREEN_LOG_LEVEL=DEBUG
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src:ro
+      - ./pyproject.toml:/app/pyproject.toml:ro
+      - surfscreen-results:/data/results
+      - surfscreen-uploads:/data/uploads
+    command: uvicorn surfscreen.api.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - surfscreen-dev
+
+  # ============================================
+  # Dashboard Service (Development)
+  # ============================================
+  dashboard:
+    image: node:20-alpine
+    container_name: surfscreen-dashboard-dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NODE_ENV=development
+    volumes:
+      - ./dashboard:/app
+      - dashboard-node-modules:/app/node_modules
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - api
+    networks:
+      - surfscreen-dev
+
+  # ============================================
+  # Redis (Development)
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    container_name: surfscreen-redis-dev
+    ports:
+      - "6379:6379"
+    networks:
+      - surfscreen-dev
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  surfscreen-results:
+  surfscreen-uploads:
+  dashboard-node-modules:
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  surfscreen-dev:
+    driver: bridge

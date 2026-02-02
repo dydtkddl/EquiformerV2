@@ -127,16 +127,23 @@ def screen_results(results_file, sort, top):
 
 @screen_group.command("report")
 @click.argument("results_dir")
-@click.option("--output", "-o", default="report.html", help="Output HTML file")
-def screen_report(results_dir, output):
-    """Generate interactive HTML report"""
-    from surfscreen.report import ReportGenerator
+@click.option("--output", "-o", default="screening_report.html", help="Output HTML file")
+@click.option("--theme", type=click.Choice(["dark", "light"]), default="dark", help="Report theme")
+@click.option("--top", "-n", default=20, help="Top N results to display")
+def screen_report(results_dir, output, theme, top):
+    """Generate interactive HTML report with 3D viewer and charts"""
+    from surfscreen.report import ScreeningReportGenerator
     
-    with console.status("[bold green]Generating report..."):
-        gen = ReportGenerator(results_dir)
+    with console.status("[bold green]Generating interactive report..."):
+        gen = ScreeningReportGenerator(results_dir, theme=theme, top_n=top)
         out_path = gen.generate(output)
     
     console.print(f"[green]✓[/green] Report generated: {out_path}")
+    console.print("   Features:")
+    console.print("   - Interactive 3D structure viewer (3Dmol.js)")
+    console.print("   - Energy distribution & Boltzmann analysis (Plotly)")
+    console.print("   - Theme toggle (Dark/Light)")
+    console.print("   - CSV/JSON/XYZ downloads")
     console.print(f"[dim]Open in browser: file://{Path(out_path).absolute()}[/dim]")
 
 
