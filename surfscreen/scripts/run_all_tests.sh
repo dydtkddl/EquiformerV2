@@ -25,6 +25,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 TEST_DIR="$PROJECT_ROOT/tests"
 LOG_DIR="$PROJECT_ROOT/test_outputs"
+
+# Create log directory immediately
+mkdir -p "$LOG_DIR"
+
 DATE_TAG=$(date +"%Y%m%d_%H%M%S")
 MAIN_LOG="$LOG_DIR/test_run_${DATE_TAG}.log"
 SUMMARY_LOG="$LOG_DIR/test_summary_${DATE_TAG}.log"
