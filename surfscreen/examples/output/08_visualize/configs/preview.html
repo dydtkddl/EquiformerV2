@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adsorption Configurations Preview</title>
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        .sidebar {
+            width: 300px;
+            background: rgba(0,0,0,0.2);
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .config-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .config-item:hover {
+            background: rgba(100,200,255,0.3);
+            transform: translateX(5px);
+        }
+        .config-item.active {
+            background: rgba(100,200,255,0.5);
+            border-left: 3px solid #00ff88;
+        }
+        .viewer-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #viewer {
+            flex: 1;
+            background: #1a1a2e;
+        }
+        .info-bar {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            text-align: center;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔬 Adsorption Configurations Preview</h1>
+        <p>Surface: Cu111 | Total Configs: 0</p>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <h3 style="padding: 10px;">Configurations</h3>
+            
+        </div>
+        
+        <div class="viewer-container">
+            <div id="viewer"></div>
+            <div class="info-bar">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="siteName">-</div>
+                        <div>Site</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="rotation">-</div>
+                        <div>Rotation</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="height">-</div>
+                        <div>Height</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const xyzData = {};
+        const configInfo = [];
+        
+        let viewer = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            viewer = $3Dmol.createViewer('viewer', {
+                backgroundColor: '#1a1a2e'
+            });
+            
+            // Show first config
+            if (Object.keys(xyzData).length > 0) {
+                showConfig(Object.keys(xyzData)[0]);
+            }
+        });
+        
+        function showConfig(name) {
+            if (!viewer) return;
+            
+            const xyz = xyzData[name];
+            if (!xyz) return;
+            
+            // Update active state
+            document.querySelectorAll('.config-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.textContent.includes(name)) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Update viewer
+            viewer.removeAllModels();
+            viewer.addModel(xyz, 'xyz');
+            viewer.setStyle({}, {
+                stick: { radius: 0.12, colorscheme: 'Jmol' },
+                sphere: { scale: 0.25, colorscheme: 'Jmol' }
+            });
+            viewer.zoomTo();
+            viewer.render();
+            
+            // Update info
+            const info = configInfo.find(c => c.name === name);
+            if (info) {
+                document.getElementById('siteName').textContent = info.site_type;
+                document.getElementById('rotation').textContent = info.rotation + '°';
+                document.getElementById('height').textContent = info.height + 'Å';
+            }
+        }
+    </script>
+</body>
+</html>

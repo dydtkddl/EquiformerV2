@@ -1,0 +1,2328 @@
+========================================================
+🧪 SurfScreen Complete Test Suite
+========================================================
+
+Start Time: Fri Jan 30 19:18:53 KST 2026
+Hostname: ga00
+User: yongsang
+Python: Python 3.8.13
+Working Dir: /home/yongsang/20260129_Equiformer/surfscreen/examples
+
+Testing Environment:
+-------------------
+Name: surfscreen
+Version: 0.1.0
+Location: /home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages
+
+/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen
+surfscreen, version 0.1.0
+
+
+========================================================
+Starting 20 tests...
+========================================================
+
+========================================================
+[1/20] Running: 01_molecule_from_pubchem.sh
+Start: Fri Jan 30 19:18:56 KST 2026
+========================================================
+========================================
+Example 01: PubChem Molecule Download
+========================================
+
+[1/4] Fetching water by name...
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 962
+✓ Saved: 962.mol
+✓ Formula: H2O
+✓ Atoms: 3
+✓ Saved: water.xyz
+✓ water.xyz created
+
+[2/4] Fetching ethanol by name...
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 702
+✓ Saved: 702.mol
+✓ Formula: C2H6O
+✓ Atoms: 9
+✓ Saved: ethanol.xyz
+✓ ethanol.xyz created
+
+[3/4] Fetching CO2 by formula...
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 97, in mol_from_pubchem
+    mol = MoleculeBuilder.from_pubchem(formula=query)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/molecule/builder.py", line 204, in from_pubchem
+    cid = fetcher.search_by_formula(formula)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/molecule/pubchem.py", line 90, in search_by_formula
+    raise ValueError(f"No compound found with formula: {formula}")
+ValueError: No compound found with formula: CO2
+
+✅ PASSED: 01_molecule_from_pubchem.sh (30s)
+
+========================================================
+[2/20] Running: 02_molecule_from_smiles.sh
+Start: Fri Jan 30 19:19:26 KST 2026
+========================================================
+========================================
+Example 02: SMILES to 3D Molecule
+========================================
+
+[1/4] Creating methane from SMILES...
+✓ Formula: CH4
+✓ Atoms: 5
+✓ Saved: methane.xyz
+✓ methane.xyz created
+
+[2/4] Creating ethanol from SMILES...
+✓ Formula: C2H6O
+✓ Atoms: 9
+✓ Saved: ethanol_smiles.xyz
+✓ ethanol_smiles.xyz created
+
+[3/4] Creating benzene from SMILES...
+✓ Formula: C6H6
+✓ Atoms: 12
+✓ Saved: benzene.xyz
+✓ benzene.xyz created
+
+[4/4] Creating acetone with optimization...
+✓ Formula: C3H6O
+✓ Atoms: 10
+✓ Saved: acetone_opt.xyz
+✓ acetone_opt.xyz created (optimized)
+
+========================================
+✅ Example 02 completed!
+Output files:
+-rw-rw-r-- 1 yongsang yongsang 724 Jan 30 19:19 acetone_opt.xyz
+-rw-rw-r-- 1 yongsang yongsang 868 Jan 30 19:19 benzene.xyz
+-rw-rw-r-- 1 yongsang yongsang 651 Jan 30 19:19 ethanol_smiles.xyz
+-rw-rw-r-- 1 yongsang yongsang 363 Jan 30 19:19 methane.xyz
+========================================
+
+✅ PASSED: 02_molecule_from_smiles.sh (11s)
+
+========================================================
+[3/20] Running: 03_molecule_conformers.sh
+Start: Fri Jan 30 19:19:37 KST 2026
+========================================================
+========================================
+Example 03: Conformer Generation
+========================================
+
+[1/3] Creating test molecule (propanol)...
+✓ Formula: C3H8O
+✓ Atoms: 12
+✓ Saved: propanol.xyz
+
+[2/3] Generating conformers with RDKit...
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 122, in mol_conformers
+    conformers = gen.generate(mol, n_conformers=n_conformers)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/molecule/conformers.py", line 102, in generate
+    return self._generate_rdkit(molecule, n_conformers, random_seed)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/molecule/conformers.py", line 118, in _generate_rdkit
+    raise ValueError("SMILES required for RDKit conformer generation")
+ValueError: SMILES required for RDKit conformer generation
+
+✅ PASSED: 03_molecule_conformers.sh (5s)
+
+========================================================
+[4/20] Running: 04_molecule_analyze.sh
+Start: Fri Jan 30 19:19:42 KST 2026
+========================================================
+========================================
+Example 04: Molecule Analysis
+========================================
+
+--- Analyzing water ---
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 962
+✓ Saved: 962.mol
+✓ Formula: H2O
+✓ Atoms: 3
+✓ Saved: water.xyz
+
+
+🔍 Structure Analysis: water
+  Formula: H2O
+  Atoms: 3
+
+  Adsorption Centers:
+    • Atom 0 (O)
+
+  Estimated Footprint: 4.5 × 3.6 Å
+
+
+--- Analyzing ethanol ---
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 702
+✓ Saved: 702.mol
+✓ Formula: C2H6O
+✓ Atoms: 9
+✓ Saved: ethanol.xyz
+
+
+🔍 Structure Analysis: ethanol
+  Formula: C2H6O
+  Atoms: 9
+
+  Adsorption Centers:
+    • Atom 0 (O)
+
+  Estimated Footprint: 6.1 × 5.6 Å
+
+
+--- Analyzing benzene ---
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 241
+✓ Saved: 241.mol
+✓ Formula: C6H6
+✓ Atoms: 12
+✓ Saved: benzene.xyz
+
+
+🔍 Structure Analysis: benzene
+  Formula: C6H6
+  Atoms: 12
+
+  Estimated Footprint: 7.8 × 7.8 Å
+
+
+========================================
+✅ Example 04 completed!
+========================================
+
+✅ PASSED: 04_molecule_analyze.sh (38s)
+
+========================================================
+[5/20] Running: 05_surface_create.sh
+Start: Fri Jan 30 19:20:20 KST 2026
+========================================================
+========================================
+Example 05: Surface Creation
+========================================
+
+[1/5] Creating Cu(111) surface...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 36
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+✓ Cu111.xyz created
+
+[2/5] Creating Au(100) surface...
+✓ Surface: Au(100)_2x2
+✓ Atoms: 16
+✓ Area: 33.3 Ų
+✓ Fixed atoms: 8
+✓ Saved: Au100.xyz
+✓ Au100.xyz created
+
+[3/5] Creating Pt(111) surface...
+✓ Surface: Pt(111)_3x3
+✓ Atoms: 36
+✓ Area: 60.0 Ų
+✓ Fixed atoms: 18
+✓ Saved: Pt111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+✓ Pt111.xyz created
+
+[4/5] Creating Ag(110) surface...
+✓ Surface: Ag(110)_2x3
+✓ Atoms: 36
+✓ Area: 64.3 Ų
+✓ Fixed atoms: 12
+✓ Saved: Ag110.xyz
+✓ Ag110.xyz created
+
+[5/5] Creating Cu(111) with fixed bottom layers...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 45
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111_fixed.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+✓ Cu111_fixed.xyz created (2 bottom layers fixed)
+
+========================================
+✅ Example 05 completed!
+Output files:
+-rw-rw-r-- 1 yongsang yongsang 2135 Jan 30 19:20 Ag110.xyz
+-rw-rw-r-- 1 yongsang yongsang 1044 Jan 30 19:20 Au100.xyz
+-rw-rw-r-- 1 yongsang yongsang 2993 Jan 30 19:20 Cu111_fixed.xyz
+-rw-rw-r-- 1 yongsang yongsang 2427 Jan 30 19:20 Cu111.xyz
+-rw-rw-r-- 1 yongsang yongsang 2425 Jan 30 19:20 Pt111.xyz
+========================================
+
+✅ PASSED: 05_surface_create.sh (15s)
+
+========================================================
+[6/20] Running: 06_surface_sites.sh
+Start: Fri Jan 30 19:20:35 KST 2026
+========================================================
+========================================
+Example 06: Adsorption Site Detection
+========================================
+
+[1/3] Creating Cu(111) surface...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 27
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+✓ Cu111.xyz created
+
+[2/3] Detecting adsorption sites...
+
+📍 Detected Adsorption Sites
+┏━━━━━━━━┳━━━━━━━┓
+┃ Type   ┃ Count ┃
+┡━━━━━━━━╇━━━━━━━┩
+│ top    │     9 │
+│ bridge │    27 │
+│ fcc    │     6 │
+│ hcp    │     4 │
+│ Total  │    46 │
+└────────┴───────┘
+
+
+[3/3] Detecting only hollow sites...
+
+📍 Detected Adsorption Sites
+┏━━━━━━━┳━━━━━━━┓
+┃ Type  ┃ Count ┃
+┡━━━━━━━╇━━━━━━━┩
+│ fcc   │     6 │
+│ hcp   │     4 │
+│ Total │    10 │
+└───────┴───────┘
+
+========================================
+✅ Example 06 completed!
+========================================
+
+✅ PASSED: 06_surface_sites.sh (8s)
+
+========================================================
+[7/20] Running: 07_adsorb_generate.sh
+Start: Fri Jan 30 19:20:43 KST 2026
+========================================================
+========================================
+Example 07: Adsorption Config Generation
+========================================
+
+[1/4] Preparing surface and molecule...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 27
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 962
+✓ Saved: 962.mol
+✓ Formula: H2O
+✓ Atoms: 3
+✓ Saved: water.xyz
+✓ Surface and molecule ready
+
+[2/4] Generating default configs...
+
+🎯 Generating adsorption configurations
+
+Generated: 16 configurations
+Valid (no overlap): 0 configurations
+
+✓ Saved to: configs_default//
+✓ Preview: configs_default//preview.html
+✓ configs_default/ created
+
+[3/4] Generating configs with custom rotations and heights...
+
+🎯 Generating adsorption configurations
+
+Generated: 50 configurations
+Valid (no overlap): 0 configurations
+
+✓ Saved to: configs_fine//
+✓ Preview: configs_fine//preview.html
+✓ configs_fine/ created
+
+[4/4] Checking results...
+Default configs: 0 files
+Fine configs: 0 files
+
+========================================
+✅ Example 07 completed!
+========================================
+
+✅ PASSED: 07_adsorb_generate.sh (19s)
+
+========================================================
+[8/20] Running: 08_adsorb_visualize.sh
+Start: Fri Jan 30 19:21:02 KST 2026
+========================================================
+========================================
+Example 08: Adsorption Config Visualization
+========================================
+
+[1/3] Preparing surface and molecule...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 27
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 702
+✓ Saved: 702.mol
+✓ Formula: C2H6O
+✓ Atoms: 9
+✓ Saved: ethanol.xyz
+
+[2/3] Generating configurations...
+
+🎯 Generating adsorption configurations
+
+Generated: 24 configurations
+Valid (no overlap): 0 configurations
+
+✓ Saved to: configs//
+✓ Preview: configs//preview.html
+
+[3/3] Generating HTML visualization...
+
+🔍 Loading configurations from configs/
+
+Found 0 configuration files
+✓ Preview generation not yet implemented for existing configs
+
+========================================
+✅ Example 08 completed!
+Generated: configs_preview.html
+Open in browser: firefox configs_preview.html
+========================================
+
+✅ PASSED: 08_adsorb_visualize.sh (20s)
+
+========================================================
+[9/20] Running: 09_md_mace.sh
+Start: Fri Jan 30 19:21:22 KST 2026
+========================================================
+========================================
+Example 09: MD Simulation with MACE
+========================================
+
+[1/4] Creating surface...
+✓ Surface: Cu(111)_2x2
+✓ Atoms: 12
+✓ Area: 22.6 Ų
+✓ Fixed atoms: 8
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+✓ Cu111.xyz created
+
+[2/4] Running NVT MD (100 steps, CPU mode)...
+
+🚀 Molecular Dynamics Simulation
+
+Structure: Cu111.xyz
+Ensemble: NVT
+Temperature: 300.0 K
+Steps: 100
+Engine: mace
+
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+Using head Default out of ['Default']
+🚀 Starting NVT MD simulation
+   Temperature: 300.0 K
+   Steps: 100
+   Timestep: 1.0 fs
+
+   Progress: 10% | T: 567.8 K | E: -44.4583 eV
+   Progress: 20% | T: 567.8 K | E: -44.4583 eV
+   Progress: 30% | T: 567.8 K | E: -44.4583 eV
+   Progress: 40% | T: 567.8 K | E: -44.4583 eV
+   Progress: 50% | T: 567.8 K | E: -44.4583 eV
+   Progress: 60% | T: 567.8 K | E: -44.4583 eV
+   Progress: 70% | T: 567.8 K | E: -44.4583 eV
+   Progress: 80% | T: 567.8 K | E: -44.4583 eV
+   Progress: 90% | T: 567.8 K | E: -44.4583 eV
+   Progress: 100% | T: 260.8 K | E: -44.5862 eV
+   📁 Exporting 11 frames...
+   ✓ trajectory.extxyz (OVITO/ASE compatible)
+   ✓ trajectory.xyz (VMD/Jmol compatible)
+
+✅ MD completed!
+   Total time: 100.0 fs
+   Avg temperature: 414.3 K
+   Output: md_nvt
+
+✓ MD completed!
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+✓ NVT MD completed
+
+[3/4] Checking MD status...
+
+📊 MD Status: md_nvt/
+
+Total steps: 2
+Total time: 100.0 fs
+Avg temperature: 414.3 K
+Wall time: 6.5 s
+
+[4/4] Generating MD report...
+
+📊 Generating MD Report: md_nvt/
+
+✓ MD Report generated: md_report.html
+
+✓ Report generated: md_report.html
+   - Interactive trajectory playback (3Dmol.js)
+   - Energy/Temperature plots (Plotly)
+   - Download links for OVITO/VMD/ASE
+
+========================================
+✅ Example 09 completed!
+Output directory: md_nvt/
+Report: md_report.html
+Trajectory files:
+-rw-rw-r-- 1 yongsang yongsang  2434 Jan 30 19:21 md_nvt/checkpoint.xyz
+-rw-rw-r-- 1 yongsang yongsang  2431 Jan 30 19:21 md_nvt/final.xyz
+-rw-rw-r-- 1 yongsang yongsang 26789 Jan 30 19:21 md_nvt/trajectory.extxyz
+-rw-rw-r-- 1 yongsang yongsang 17439 Jan 30 19:21 md_nvt/trajectory.traj
+-rw-rw-r-- 1 yongsang yongsang  9548 Jan 30 19:21 md_nvt/trajectory.xyz
+========================================
+
+✅ PASSED: 09_md_mace.sh (20s)
+
+========================================================
+[10/20] Running: 10_md_xtb_molecule.sh
+Start: Fri Jan 30 19:21:42 KST 2026
+========================================================
+========================================
+Example 10: MD Simulation with xTB
+========================================
+
+[1/3] Creating isolated molecule (no PBC)...
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 702
+✓ Saved: 702.mol
+✓ Formula: C2H6O
+✓ Atoms: 9
+✓ Saved: ethanol.xyz
+✓ ethanol.xyz created
+
+[2/3] Running NVT MD with xTB (50 steps)...
+
+🚀 Molecular Dynamics Simulation
+
+Structure: ethanol.xyz
+Ensemble: NVT
+Temperature: 300.0 K
+Steps: 50
+Engine: xtb
+
+🚀 Starting NVT MD simulation
+   Temperature: 300.0 K
+   Steps: 50
+   Timestep: 0.5 fs
+
+   Progress: 10% | T: 245.4 K | E: -309.7357 eV
+   Progress: 20% | T: 245.4 K | E: -309.7357 eV
+   Progress: 30% | T: 245.4 K | E: -309.7357 eV
+   Progress: 40% | T: 245.4 K | E: -309.7357 eV
+   Progress: 50% | T: 245.4 K | E: -309.7357 eV
+   Progress: 60% | T: 245.4 K | E: -309.7357 eV
+   Progress: 70% | T: 245.4 K | E: -309.7357 eV
+   Progress: 80% | T: 245.4 K | E: -309.7357 eV
+   Progress: 90% | T: 245.4 K | E: -309.7357 eV
+   Progress: 100% | T: 245.4 K | E: -309.7357 eV
+   📁 Exporting 6 frames...
+   ✓ trajectory.extxyz (OVITO/ASE compatible)
+   ✓ trajectory.xyz (VMD/Jmol compatible)
+
+✅ MD completed!
+   Total time: 0.0 fs
+   Avg temperature: 245.4 K
+   Output: md_xtb
+
+✓ MD completed!
+✓ xTB MD completed
+
+[3/3] Checking MD status...
+
+📊 MD Status: md_xtb/
+
+Total steps: 1
+Total time: 0.0 fs
+Avg temperature: 245.4 K
+Wall time: 0.1 s
+
+========================================
+✅ Example 10 completed!
+Note: xTB is for molecules without PBC.
+For surfaces, use --engine mace instead.
+========================================
+
+✅ PASSED: 10_md_xtb_molecule.sh (17s)
+
+========================================================
+[11/20] Running: 11_xtb_pbc_warning.sh
+Start: Fri Jan 30 19:21:59 KST 2026
+========================================================
+========================================
+Example 11: xTB + PBC Warning Test
+========================================
+
+[1/3] Creating surface with PBC...
+✓ Surface: Cu(111)_2x2
+✓ Atoms: 8
+✓ Area: 22.6 Ų
+✓ Fixed atoms: 8
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+✓ Cu111.xyz created (has PBC)
+
+[2/3] Testing xTB + PBC (should fail)...
+Running: surfscreen md run Cu111.xyz --engine xtb --steps 10
+
+🚀 Molecular Dynamics Simulation
+
+Structure: Cu111.xyz
+Ensemble: NVT
+Temperature: 300.0 K
+Steps: 10
+Engine: xtb
+
+/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/md/engine.py:195: UserWarning: 
+⚠️  WARNING: xTB with PBC (Periodic Boundary Conditions) detected!
+   xTB does not fully support multipole calculations with PBC.
+   This may cause 'Multipoles not available with PBC' errors.
+
+   Recommended solutions:
+   1. Use MACE instead: --engine mace
+   2. For molecules without PBC, xTB works fine
+   3. Use --force-xtb to proceed anyway (may fail)
+
+  warnings.warn(
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 559, in md_run
+    md_engine = MDEngine(atoms, config, output)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/md/engine.py", line 179, in __init__
+    self._setup_calculator()
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/md/engine.py", line 207, in _setup_calculator
+    raise RuntimeError(
+RuntimeError: xTB + PBC is not supported. Use --engine mace for surface/periodic systems, or use --force-xtb to attempt anyway.
+✓ Expected: xTB + PBC correctly rejected!
+
+[3/3] Testing --force-xtb flag...
+Running: surfscreen md run Cu111.xyz --engine xtb --force-xtb --steps 10
+(This may fail at xTB level, but the warning should appear)
+
+🚀 Molecular Dynamics Simulation
+
+Structure: Cu111.xyz
+Ensemble: NVT
+Temperature: 300.0 K
+Steps: 10
+Engine: xtb
+
+/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/md/engine.py:195: UserWarning: 
+⚠️  WARNING: xTB with PBC (Periodic Boundary Conditions) detected!
+   xTB does not fully support multipole calculations with PBC.
+   This may cause 'Multipoles not available with PBC' errors.
+
+   Recommended solutions:
+   1. Use MACE instead: --engine mace
+   2. For molecules without PBC, xTB works fine
+   3. Use --force-xtb to proceed anyway (may fail)
+
+  warnings.warn(
+🚀 Starting NVT MD simulation
+   Temperature: 300.0 K
+   Steps: 10
+   Timestep: 1.0 fs
+
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/xtb/ase/calculator.py", line 231, in calculate
+    self._res = self._xtb.singlepoint(self._res)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/xtb/interface.py", line 826, in singlepoint
+    raise XTBException(self.get_error("Single point calculation failed"))
+xtb.interface.XTBException: Single point calculation failed:
+-2- xtb_calculator_singlepoint: Electronic structure method terminated
+-1- scf: Multipoles not available with PBC
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 560, in md_run
+    summary = md_engine.run()
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/md/engine.py", line 336, in run
+    self.dynamics.run(1)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/md/md.py", line 178, in run
+    return Dynamics.run(self, steps=steps)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/optimize/optimize.py", line 275, in run
+    for converged in Dynamics.irun(self, steps=steps):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/optimize/optimize.py", line 225, in irun
+    self.optimizable.get_forces()
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/optimize/optimize.py", line 34, in get_forces
+    return self.atoms.get_forces()
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/atoms.py", line 812, in get_forces
+    forces = self._calc.get_forces(self)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/calculators/abc.py", line 30, in get_forces
+    return self.get_property('forces', atoms)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/calculators/calculator.py", line 538, in get_property
+    self.calculate(atoms, [name], system_changes)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/xtb/ase/calculator.py", line 233, in calculate
+    raise ase_calc.CalculationFailed("xtb could not evaluate input")
+ase.calculators.calculator.CalculationFailed: xtb could not evaluate input
+
+========================================
+✅ Example 11 completed!
+This demonstrates the xTB+PBC safety check.
+For surface MD, always use: --engine mace
+========================================
+
+✅ PASSED: 11_xtb_pbc_warning.sh (8s)
+
+========================================================
+[12/20] Running: 12_screen_run.sh
+Start: Fri Jan 30 19:22:07 KST 2026
+========================================================
+========================================
+Example 12: Adsorption Screening
+========================================
+
+[1/4] Preparing surface and molecule...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 27
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 962
+✓ Saved: 962.mol
+✓ Formula: H2O
+✓ Atoms: 3
+✓ Saved: water.xyz
+✓ Surface and molecule ready
+
+[2/4] Running adsorption screening...
+
+🚀 Starting Screening
+  Surface: Cu111.xyz
+  Molecules: 1 files
+  Engine: mace
+  CPUs: 28/36
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+
+Processing: water
+  Generated 10 configurations
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+Using head Default out of ['Default']
+Default dtype float32 does not match model dtype float64, converting models to float32.
+
+=== site0_rot4 (1/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:24     -116.195206        0.219280
+BFGS:    1 19:22:25     -116.195969        0.078872
+BFGS:    2 19:22:25     -116.196091        0.054600
+BFGS:    3 19:22:25     -116.196495        0.063953
+BFGS:    4 19:22:25     -116.196671        0.067493
+BFGS:    5 19:22:25     -116.196846        0.050457
+BFGS:    6 19:22:25     -116.197021        0.060118
+BFGS:    7 19:22:25     -116.197243        0.057732
+BFGS:    8 19:22:25     -116.197403        0.060595
+BFGS:    9 19:22:25     -116.197525        0.047316
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site1_rot4 (2/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:25     -116.195206        0.219276
+BFGS:    1 19:22:25     -116.195969        0.078870
+BFGS:    2 19:22:25     -116.196091        0.054600
+BFGS:    3 19:22:25     -116.196495        0.063942
+BFGS:    4 19:22:25     -116.196671        0.067488
+BFGS:    5 19:22:25     -116.196846        0.050452
+BFGS:    6 19:22:25     -116.197021        0.060131
+BFGS:    7 19:22:26     -116.197243        0.057655
+BFGS:    8 19:22:26     -116.197403        0.060587
+BFGS:    9 19:22:26     -116.197525        0.047303
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site2_rot4 (3/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:26     -116.195206        0.219275
+BFGS:    1 19:22:26     -116.195969        0.078862
+BFGS:    2 19:22:26     -116.196091        0.054600
+BFGS:    3 19:22:26     -116.196495        0.063980
+BFGS:    4 19:22:26     -116.196671        0.067472
+BFGS:    5 19:22:26     -116.196846        0.050464
+BFGS:    6 19:22:26     -116.197021        0.060137
+BFGS:    7 19:22:26     -116.197235        0.057720
+BFGS:    8 19:22:26     -116.197403        0.060581
+BFGS:    9 19:22:26     -116.197525        0.047301
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site3_rot4 (4/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:26     -116.195206        0.219280
+BFGS:    1 19:22:26     -116.195969        0.078872
+BFGS:    2 19:22:26     -116.196098        0.054600
+BFGS:    3 19:22:26     -116.196495        0.063958
+BFGS:    4 19:22:26     -116.196671        0.067544
+BFGS:    5 19:22:26     -116.196838        0.050432
+BFGS:    6 19:22:27     -116.197021        0.060207
+BFGS:    7 19:22:27     -116.197243        0.057764
+BFGS:    8 19:22:27     -116.197403        0.060511
+BFGS:    9 19:22:27     -116.197525        0.047292
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site4_rot4 (5/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:27     -116.195206        0.219290
+BFGS:    1 19:22:27     -116.195969        0.078923
+BFGS:    2 19:22:27     -116.196098        0.054600
+BFGS:    3 19:22:27     -116.196495        0.063952
+BFGS:    4 19:22:27     -116.196671        0.067543
+BFGS:    5 19:22:27     -116.196838        0.050455
+BFGS:    6 19:22:27     -116.197021        0.060086
+BFGS:    7 19:22:27     -116.197235        0.057703
+BFGS:    8 19:22:27     -116.197395        0.060678
+BFGS:    9 19:22:27     -116.197525        0.047387
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site5_rot4 (6/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:27     -116.195206        0.219280
+BFGS:    1 19:22:27     -116.195969        0.078878
+BFGS:    2 19:22:27     -116.196098        0.054600
+BFGS:    3 19:22:27     -116.196495        0.063896
+BFGS:    4 19:22:28     -116.196671        0.067553
+BFGS:    5 19:22:28     -116.196838        0.050437
+BFGS:    6 19:22:28     -116.197021        0.060170
+BFGS:    7 19:22:28     -116.197243        0.057709
+BFGS:    8 19:22:28     -116.197403        0.060616
+BFGS:    9 19:22:28     -116.197525        0.047323
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site6_rot4 (7/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:28     -116.195206        0.219280
+BFGS:    1 19:22:28     -116.195969        0.078870
+BFGS:    2 19:22:28     -116.196098        0.054600
+BFGS:    3 19:22:28     -116.196495        0.063985
+BFGS:    4 19:22:28     -116.196671        0.067522
+BFGS:    5 19:22:28     -116.196846        0.050440
+BFGS:    6 19:22:28     -116.197021        0.060193
+BFGS:    7 19:22:28     -116.197235        0.057818
+BFGS:    8 19:22:28     -116.197403        0.060591
+BFGS:    9 19:22:28     -116.197525        0.047279
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site7_rot4 (8/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:28     -116.195206        0.219280
+BFGS:    1 19:22:28     -116.195969        0.078855
+BFGS:    2 19:22:28     -116.196098        0.054600
+BFGS:    3 19:22:29     -116.196495        0.063992
+BFGS:    4 19:22:29     -116.196671        0.067458
+BFGS:    5 19:22:29     -116.196846        0.050474
+BFGS:    6 19:22:29     -116.197021        0.060137
+BFGS:    7 19:22:29     -116.197235        0.057717
+BFGS:    8 19:22:29     -116.197403        0.060613
+BFGS:    9 19:22:29     -116.197525        0.047298
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site8_rot4 (9/10) ===
+  Site: top, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:29     -116.195206        0.219280
+BFGS:    1 19:22:29     -116.195969        0.078856
+BFGS:    2 19:22:29     -116.196098        0.054600
+BFGS:    3 19:22:29     -116.196495        0.063995
+BFGS:    4 19:22:29     -116.196671        0.067456
+BFGS:    5 19:22:29     -116.196838        0.050468
+BFGS:    6 19:22:29     -116.197021        0.060128
+BFGS:    7 19:22:29     -116.197235        0.057710
+BFGS:    8 19:22:29     -116.197403        0.060576
+BFGS:    9 19:22:29     -116.197525        0.047298
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site9_rot4 (10/10) ===
+  Site: bridge, Rotation: 4.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:22:29     -116.195992        0.227089
+BFGS:    1 19:22:30     -116.196770        0.084538
+BFGS:    2 19:22:30     -116.196899        0.051924
+BFGS:    3 19:22:30     -116.197273        0.061893
+BFGS:    4 19:22:30     -116.197449        0.067742
+BFGS:    5 19:22:30     -116.197639        0.053101
+BFGS:    6 19:22:30     -116.197845        0.066412
+BFGS:    7 19:22:30     -116.198143        0.068334
+BFGS:    8 19:22:30     -116.198395        0.077887
+BFGS:    9 19:22:30     -116.198601        0.062889
+BFGS:   10 19:22:30     -116.198837        0.068034
+BFGS:   11 19:22:30     -116.199448        0.142974
+BFGS:   12 19:22:30     -116.201721        0.274056
+BFGS:   13 19:22:30     -116.204514        0.489874
+BFGS:   14 19:22:30     -116.211327        0.625398
+BFGS:   15 19:22:30     -116.208488        0.567510
+BFGS:   16 19:22:30     -116.216728        0.324740
+BFGS:   17 19:22:30     -116.219604        0.521909
+BFGS:   18 19:22:30     -116.221840        0.352651
+BFGS:   19 19:22:30     -116.229065        0.375121
+BFGS:   20 19:22:31     -116.239136        0.912805
+BFGS:   21 19:22:31     -116.255188        0.387163
+BFGS:   22 19:22:31     -116.252922        1.123704
+BFGS:   23 19:22:31     -116.265106        0.290674
+BFGS:   24 19:22:31     -116.269760        0.208059
+BFGS:   25 19:22:31     -116.264908        1.540923
+BFGS:   26 19:22:31     -116.283638        0.265597
+BFGS:   27 19:22:31     -116.290657        0.290521
+BFGS:   28 19:22:31     -116.297943        1.373013
+BFGS:   29 19:22:31     -116.311050        0.233680
+BFGS:   30 19:22:31     -116.316528        0.245771
+BFGS:   31 19:22:31     -116.319725        1.219568
+BFGS:   32 19:22:31     -116.331757        0.208128
+BFGS:   33 19:22:31     -116.339523        0.203157
+BFGS:   34 19:22:31     -116.356499        1.217951
+BFGS:   35 19:22:31     -116.376472        0.272280
+BFGS:   36 19:22:31     -116.402435        0.450570
+BFGS:   37 19:22:31     -116.408432        1.348758
+BFGS:   38 19:22:31     -116.430557        0.174046
+BFGS:   39 19:22:32     -116.445236        0.261513
+BFGS:   40 19:22:32     -116.461342        0.892721
+BFGS:   41 19:22:32     -116.478096        0.567451
+BFGS:   42 19:22:32     -116.493408        0.607574
+BFGS:   43 19:22:32     -116.509865        0.721608
+BFGS:   44 19:22:32     -116.516541        0.733715
+BFGS:   45 19:22:32     -116.524582        0.476955
+BFGS:   46 19:22:32     -116.530167        0.458034
+BFGS:   47 19:22:32     -116.542236        0.784225
+BFGS:   48 19:22:32     -116.555801        0.385875
+BFGS:   49 19:22:32     -116.572464        0.547707
+BFGS:   50 19:22:32     -116.593567        0.683478
+BFGS:   51 19:22:32     -116.599907        0.309393
+BFGS:   52 19:22:32     -116.603233        0.174103
+BFGS:   53 19:22:32     -116.613312        0.412713
+BFGS:   54 19:22:32     -116.618530        0.406948
+BFGS:   55 19:22:32     -116.623260        0.258880
+BFGS:   56 19:22:32     -116.626396        0.204691
+BFGS:   57 19:22:33     -116.630814        0.182003
+BFGS:   58 19:22:33     -116.633316        0.241196
+BFGS:   59 19:22:33     -116.634926        0.267871
+BFGS:   60 19:22:33     -116.636749        0.260484
+BFGS:   61 19:22:33     -116.639908        0.229439
+BFGS:   62 19:22:33     -116.643784        0.182630
+BFGS:   63 19:22:33     -116.647179        0.156501
+BFGS:   64 19:22:33     -116.649910        0.160496
+BFGS:   65 19:22:33     -116.653473        0.174258
+BFGS:   66 19:22:33     -116.659286        0.185881
+BFGS:   67 19:22:33     -116.667992        0.185734
+BFGS:   68 19:22:33     -116.674820        0.162294
+BFGS:   69 19:22:33     -116.677505        0.113261
+BFGS:   70 19:22:33     -116.679283        0.120254
+BFGS:   71 19:22:33     -116.681854        0.115028
+BFGS:   72 19:22:33     -116.685631        0.140453
+BFGS:   73 19:22:33     -116.690689        0.217826
+BFGS:   74 19:22:33     -116.692879        0.235887
+BFGS:   75 19:22:34     -116.693977        0.239408
+BFGS:   76 19:22:34     -116.694916        0.095725
+BFGS:   77 19:22:34     -116.695946        0.083000
+BFGS:   78 19:22:34     -116.696617        0.091818
+BFGS:   79 19:22:34     -116.697021        0.079114
+BFGS:   80 19:22:34     -116.697433        0.073787
+BFGS:   81 19:22:34     -116.697937        0.051555
+BFGS:   82 19:22:34     -116.698395        0.080841
+BFGS:   83 19:22:34     -116.698769        0.060811
+BFGS:   84 19:22:34     -116.699242        0.085974
+BFGS:   85 19:22:34     -116.699814        0.095548
+BFGS:   86 19:22:34     -116.700317        0.068315
+BFGS:   87 19:22:34     -116.700516        0.029995
+  Initial E: -116.1960 eV
+  Final E: -116.7005 eV (87 steps)
+  E_ads: -0.5284 eV
+
+🏆 Top Results
+┏━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃  # ┃ Config     ┃ E_ads (eV) ┃
+┡━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│  1 │ site9_rot4 │    -0.5284 │
+│  2 │ site0_rot4 │    -0.0255 │
+│  3 │ site1_rot4 │    -0.0255 │
+│  4 │ site2_rot4 │    -0.0255 │
+│  5 │ site3_rot4 │    -0.0255 │
+│  6 │ site4_rot4 │    -0.0255 │
+│  7 │ site5_rot4 │    -0.0255 │
+│  8 │ site6_rot4 │    -0.0255 │
+│  9 │ site7_rot4 │    -0.0255 │
+│ 10 │ site8_rot4 │    -0.0255 │
+└────┴────────────┴────────────┘
+
+✓ Results saved to: screening_results
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+✓ Screening completed
+
+[3/4] Viewing results...
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 369, in screen_results
+    df = pd.read_csv(results_file)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 912, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 577, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 1407, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 1661, in _make_engine
+    self.handles = get_handle(
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/common.py", line 859, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: 'screening_results/results.json'
+
+✅ PASSED: 12_screen_run.sh (31s)
+
+========================================================
+[13/20] Running: 13_analysis_msd.sh
+Start: Fri Jan 30 19:22:38 KST 2026
+========================================================
+========================================
+Example 13: MSD & Diffusion Analysis
+========================================
+
+[1/4] Running MD to generate trajectory...
+✓ Surface: Cu(111)_2x2
+✓ Atoms: 8
+✓ Area: 22.6 Ų
+✓ Fixed atoms: 8
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+
+🚀 Molecular Dynamics Simulation
+
+Structure: Cu111.xyz
+Ensemble: NVT
+Temperature: 500.0 K
+Steps: 200
+Engine: mace
+
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+Using head Default out of ['Default']
+🚀 Starting NVT MD simulation
+   Temperature: 500.0 K
+   Steps: 200
+   Timestep: 1.0 fs
+
+   Progress: 10% | T: 348.6 K | E: -28.4969 eV
+   Progress: 20% | T: 348.6 K | E: -28.4969 eV
+   Progress: 30% | T: 348.6 K | E: -28.4969 eV
+   Progress: 40% | T: 348.6 K | E: -28.4969 eV
+   Progress: 50% | T: 259.0 K | E: -28.4583 eV
+   Progress: 60% | T: 259.0 K | E: -28.4583 eV
+   Progress: 70% | T: 259.0 K | E: -28.4583 eV
+   Progress: 80% | T: 259.0 K | E: -28.4583 eV
+   Progress: 90% | T: 259.0 K | E: -28.4583 eV
+   Progress: 100% | T: 213.2 K | E: -28.4195 eV
+   📁 Exporting 21 frames...
+   ✓ trajectory.extxyz (OVITO/ASE compatible)
+   ✓ trajectory.xyz (VMD/Jmol compatible)
+
+✅ MD completed!
+   Total time: 200.0 fs
+   Avg temperature: 273.6 K
+   Output: md_output
+
+✓ MD completed!
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+✓ MD completed
+
+[2/4] Calculating MSD for Cu atoms...
+
+📈 MSD Analysis: Cu
+
+Loaded 21 frames from md_output/trajectory.traj
+Frames analyzed: 21
+Final MSD: 0.148 Å²
+
+Diffusion coefficient: 1.04e-04 cm²/s
+R² = 0.9869
+
+✓ Plot saved: msd_plot.html
+✓ MSD calculated
+
+[3/4] Calculating diffusion coefficient...
+
+🔬 Diffusion Analysis: Cu
+
+Loaded 21 frames from md_output/trajectory.traj
+Diffusion coefficient: 1.0437e-04 cm²/s
+Error: ±3.7973e-06 cm²/s
+D_x: 1.5006e-04 cm²/s
+D_y: 1.7220e-04 cm²/s
+D_z: -9.1364e-06 cm²/s
+R² = 0.9869
+
+[4/4] Results summary...
+MSD Plot: msd_plot.html
+
+========================================
+✅ Example 13 completed!
+========================================
+
+✅ PASSED: 13_analysis_msd.sh (22s)
+
+========================================================
+[14/20] Running: 14_analysis_rdf.sh
+Start: Fri Jan 30 19:23:00 KST 2026
+========================================================
+========================================
+Example 14: RDF Analysis
+========================================
+
+[1/3] Running MD for trajectory...
+✓ Surface: Cu(111)_2x2
+✓ Atoms: 8
+✓ Area: 22.6 Ų
+✓ Fixed atoms: 8
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+
+🚀 Molecular Dynamics Simulation
+
+Structure: Cu111.xyz
+Ensemble: NVT
+Temperature: 300.0 K
+Steps: 100
+Engine: mace
+
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+Using head Default out of ['Default']
+🚀 Starting NVT MD simulation
+   Temperature: 300.0 K
+   Steps: 100
+   Timestep: 1.0 fs
+
+   Progress: 10% | T: 288.0 K | E: -28.5595 eV
+   Progress: 20% | T: 288.0 K | E: -28.5595 eV
+   Progress: 30% | T: 288.0 K | E: -28.5595 eV
+   Progress: 40% | T: 288.0 K | E: -28.5595 eV
+   Progress: 50% | T: 288.0 K | E: -28.5595 eV
+   Progress: 60% | T: 288.0 K | E: -28.5595 eV
+   Progress: 70% | T: 288.0 K | E: -28.5595 eV
+   Progress: 80% | T: 288.0 K | E: -28.5595 eV
+   Progress: 90% | T: 288.0 K | E: -28.5595 eV
+   Progress: 100% | T: 116.5 K | E: -28.5941 eV
+   📁 Exporting 11 frames...
+   ✓ trajectory.extxyz (OVITO/ASE compatible)
+   ✓ trajectory.xyz (VMD/Jmol compatible)
+
+✅ MD completed!
+   Total time: 100.0 fs
+   Avg temperature: 202.2 K
+   Output: md_output
+
+✓ MD completed!
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+✓ MD completed
+
+[2/3] Calculating Cu-Cu RDF...
+
+🔵 RDF Analysis: Cu-Cu
+
+Loaded 11 frames from md_output/trajectory.traj
+First peak: r = 0.140 Å, g(r) = 0.00
+Coordination number: 0.00
+
+✓ Plot saved: rdf_CuCu.html
+✓ RDF calculated
+
+[3/3] Results...
+RDF Plot: rdf_CuCu.html
+
+========================================
+✅ Example 14 completed!
+========================================
+
+✅ PASSED: 14_analysis_rdf.sh (15s)
+
+========================================================
+[15/20] Running: 15_analysis_boltzmann.sh
+Start: Fri Jan 30 19:23:15 KST 2026
+========================================================
+========================================
+Example 15: Boltzmann Distribution
+========================================
+
+[1/3] Running screening for test data...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 27
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 962
+✓ Saved: 962.mol
+✓ Formula: H2O
+✓ Atoms: 3
+✓ Saved: water.xyz
+
+🚀 Starting Screening
+  Surface: Cu111.xyz
+  Molecules: 1 files
+  Engine: mace
+  CPUs: 28/36
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+
+Processing: water
+  Generated 8 configurations
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+Using head Default out of ['Default']
+Default dtype float32 does not match model dtype float64, converting models to float32.
+
+=== site0_rot0 (1/8) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:33     -116.195198        0.219244
+BFGS:    1 19:23:33     -116.195961        0.078885
+BFGS:    2 19:23:33     -116.196083        0.054600
+BFGS:    3 19:23:33     -116.196487        0.063970
+BFGS:    4 19:23:34     -116.196671        0.067507
+BFGS:    5 19:23:34     -116.196838        0.050459
+BFGS:    6 19:23:34     -116.197014        0.060159
+BFGS:    7 19:23:34     -116.197235        0.057827
+BFGS:    8 19:23:34     -116.197395        0.060605
+BFGS:    9 19:23:34     -116.197517        0.047321
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site0_rot45 (2/8) ===
+  Site: top, Rotation: 45.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:34     -116.195175        0.219131
+BFGS:    1 19:23:34     -116.195938        0.078827
+BFGS:    2 19:23:34     -116.196060        0.054601
+BFGS:    3 19:23:34     -116.196457        0.063907
+BFGS:    4 19:23:34     -116.196640        0.067651
+BFGS:    5 19:23:34     -116.196808        0.050364
+BFGS:    6 19:23:34     -116.196983        0.060118
+BFGS:    7 19:23:34     -116.197205        0.057558
+BFGS:    8 19:23:34     -116.197365        0.060678
+BFGS:    9 19:23:34     -116.197487        0.047348
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site0_rot90 (3/8) ===
+  Site: top, Rotation: 90.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:34     -116.195190        0.219265
+BFGS:    1 19:23:34     -116.195953        0.078861
+BFGS:    2 19:23:34     -116.196075        0.054604
+BFGS:    3 19:23:35     -116.196480        0.063883
+BFGS:    4 19:23:35     -116.196655        0.067528
+BFGS:    5 19:23:35     -116.196823        0.050403
+BFGS:    6 19:23:35     -116.196999        0.060041
+BFGS:    7 19:23:35     -116.197220        0.057517
+BFGS:    8 19:23:35     -116.197380        0.060500
+BFGS:    9 19:23:35     -116.197495        0.047265
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site0_rot135 (4/8) ===
+  Site: top, Rotation: 135.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:35     -116.195221        0.219343
+BFGS:    1 19:23:35     -116.195976        0.078901
+BFGS:    2 19:23:35     -116.196098        0.054598
+BFGS:    3 19:23:35     -116.196503        0.063830
+BFGS:    4 19:23:35     -116.196686        0.067557
+BFGS:    5 19:23:35     -116.196854        0.050444
+BFGS:    6 19:23:35     -116.197021        0.060096
+BFGS:    7 19:23:35     -116.197243        0.057705
+BFGS:    8 19:23:35     -116.197403        0.060663
+BFGS:    9 19:23:35     -116.197525        0.047263
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site1_rot0 (5/8) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:35     -116.195198        0.219240
+BFGS:    1 19:23:35     -116.195961        0.078881
+BFGS:    2 19:23:36     -116.196083        0.054600
+BFGS:    3 19:23:36     -116.196487        0.063936
+BFGS:    4 19:23:36     -116.196663        0.067551
+BFGS:    5 19:23:36     -116.196838        0.050424
+BFGS:    6 19:23:36     -116.197014        0.060178
+BFGS:    7 19:23:36     -116.197227        0.057707
+BFGS:    8 19:23:36     -116.197388        0.060608
+BFGS:    9 19:23:36     -116.197510        0.047354
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site1_rot45 (6/8) ===
+  Site: top, Rotation: 45.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:36     -116.195175        0.219132
+BFGS:    1 19:23:36     -116.195938        0.078829
+BFGS:    2 19:23:36     -116.196060        0.054601
+BFGS:    3 19:23:36     -116.196457        0.063921
+BFGS:    4 19:23:36     -116.196640        0.067656
+BFGS:    5 19:23:36     -116.196808        0.050365
+BFGS:    6 19:23:36     -116.196991        0.060126
+BFGS:    7 19:23:36     -116.197205        0.057664
+BFGS:    8 19:23:36     -116.197357        0.060636
+BFGS:    9 19:23:36     -116.197487        0.047363
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site1_rot90 (7/8) ===
+  Site: top, Rotation: 90.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:36     -116.195190        0.219261
+BFGS:    1 19:23:36     -116.195953        0.078863
+BFGS:    2 19:23:36     -116.196075        0.054604
+BFGS:    3 19:23:37     -116.196472        0.063890
+BFGS:    4 19:23:37     -116.196655        0.067532
+BFGS:    5 19:23:37     -116.196823        0.050407
+BFGS:    6 19:23:37     -116.196999        0.060031
+BFGS:    7 19:23:37     -116.197220        0.057524
+BFGS:    8 19:23:37     -116.197380        0.060501
+BFGS:    9 19:23:37     -116.197495        0.047281
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site1_rot135 (8/8) ===
+  Site: top, Rotation: 135.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:23:37     -116.195213        0.219343
+BFGS:    1 19:23:37     -116.195976        0.078897
+BFGS:    2 19:23:37     -116.196098        0.054598
+BFGS:    3 19:23:37     -116.196503        0.063836
+BFGS:    4 19:23:37     -116.196678        0.067596
+BFGS:    5 19:23:37     -116.196854        0.050441
+BFGS:    6 19:23:37     -116.197029        0.060093
+BFGS:    7 19:23:37     -116.197243        0.057627
+BFGS:    8 19:23:37     -116.197403        0.060614
+BFGS:    9 19:23:37     -116.197525        0.047297
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+🏆 Top Results
+┏━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ # ┃ Config       ┃ E_ads (eV) ┃
+┡━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ 1 │ site0_rot135 │    -0.0255 │
+│ 2 │ site1_rot135 │    -0.0255 │
+│ 3 │ site0_rot0   │    -0.0254 │
+│ 4 │ site1_rot0   │    -0.0254 │
+│ 5 │ site0_rot90  │    -0.0254 │
+│ 6 │ site1_rot90  │    -0.0254 │
+│ 7 │ site0_rot45  │    -0.0254 │
+│ 8 │ site1_rot45  │    -0.0254 │
+└───┴──────────────┴────────────┘
+
+✓ Results saved to: screening
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+✓ Screening completed
+
+[2/3] Calculating Boltzmann distribution at different temperatures...
+  Temperature: 300K
+
+🎲 Boltzmann Analysis (T = 300.0 K)
+
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 787, in analysis_boltzmann
+    result = analyzer.calculate_boltzmann(temperature)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/analysis/thermodynamic.py", line 118, in calculate_boltzmann
+    raise ValueError("No results to analyze")
+ValueError: No results to analyze
+
+✅ PASSED: 15_analysis_boltzmann.sh (26s)
+
+========================================================
+[16/20] Running: 16_md_ensembles.sh
+Start: Fri Jan 30 19:23:41 KST 2026
+========================================================
+========================================
+Example 16: MD Ensemble Comparison
+========================================
+
+[1/4] Creating surface...
+✓ Surface: Cu(111)_2x2
+✓ Atoms: 8
+✓ Area: 22.6 Ų
+✓ Fixed atoms: 8
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+
+[2/4] Running NVT MD...
+
+🚀 Molecular Dynamics Simulation
+
+Structure: Cu111.xyz
+Ensemble: NVT
+Temperature: 300.0 K
+Steps: 100
+Engine: mace
+
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+Using head Default out of ['Default']
+🚀 Starting NVT MD simulation
+   Temperature: 300.0 K
+   Steps: 100
+   Timestep: 1.0 fs
+
+   Progress: 10% | T: 222.4 K | E: -28.6274 eV
+   Progress: 20% | T: 222.4 K | E: -28.6274 eV
+   Progress: 30% | T: 222.4 K | E: -28.6274 eV
+   Progress: 40% | T: 222.4 K | E: -28.6274 eV
+   Progress: 50% | T: 222.4 K | E: -28.6274 eV
+   Progress: 60% | T: 222.4 K | E: -28.6274 eV
+   Progress: 70% | T: 222.4 K | E: -28.6274 eV
+   Progress: 80% | T: 222.4 K | E: -28.6274 eV
+   Progress: 90% | T: 222.4 K | E: -28.6274 eV
+   Progress: 100% | T: 121.6 K | E: -28.5687 eV
+   📁 Exporting 11 frames...
+   ✓ trajectory.extxyz (OVITO/ASE compatible)
+   ✓ trajectory.xyz (VMD/Jmol compatible)
+
+✅ MD completed!
+   Total time: 100.0 fs
+   Avg temperature: 172.0 K
+   Output: md_nvt
+
+✓ MD completed!
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+✓ NVT completed
+
+[3/4] Running NVE MD...
+
+🚀 Molecular Dynamics Simulation
+
+Structure: Cu111.xyz
+Ensemble: NVE
+Temperature: 300.0 K
+Steps: 100
+Engine: mace
+
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+Using head Default out of ['Default']
+🚀 Starting NVE MD simulation
+   Temperature: 300.0 K
+   Steps: 100
+   Timestep: 1.0 fs
+
+   Progress: 10% | T: 216.5 K | E: -28.6334 eV
+   Progress: 20% | T: 216.5 K | E: -28.6334 eV
+   Progress: 30% | T: 216.5 K | E: -28.6334 eV
+   Progress: 40% | T: 216.5 K | E: -28.6334 eV
+   Progress: 50% | T: 216.5 K | E: -28.6334 eV
+   Progress: 60% | T: 216.5 K | E: -28.6334 eV
+   Progress: 70% | T: 216.5 K | E: -28.6334 eV
+   Progress: 80% | T: 216.5 K | E: -28.6334 eV
+   Progress: 90% | T: 216.5 K | E: -28.6334 eV
+   Progress: 100% | T: 122.5 K | E: -28.6334 eV
+   📁 Exporting 11 frames...
+   ✓ trajectory.extxyz (OVITO/ASE compatible)
+   ✓ trajectory.xyz (VMD/Jmol compatible)
+
+✅ MD completed!
+   Total time: 100.0 fs
+   Avg temperature: 169.5 K
+   Output: md_nve
+
+✓ MD completed!
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+✓ NVE completed
+
+[4/4] Generating reports...
+
+📊 Generating MD Report: md_nvt/
+
+✓ MD Report generated: report_nvt.html
+
+✓ Report generated: report_nvt.html
+   - Interactive trajectory playback (3Dmol.js)
+   - Energy/Temperature plots (Plotly)
+   - Download links for OVITO/VMD/ASE
+
+📊 Generating MD Report: md_nve/
+
+✓ MD Report generated: report_nve.html
+
+✓ Report generated: report_nve.html
+   - Interactive trajectory playback (3Dmol.js)
+   - Energy/Temperature plots (Plotly)
+   - Download links for OVITO/VMD/ASE
+
+========================================
+✅ Example 16 completed!
+Compare: report_nvt.html vs report_nve.html
+
+NVT: Temperature controlled (thermostat)
+NVE: Energy conserved (no thermostat)
+========================================
+
+✅ PASSED: 16_md_ensembles.sh (27s)
+
+========================================================
+[17/20] Running: 17_config_show.sh
+Start: Fri Jan 30 19:24:08 KST 2026
+========================================================
+========================================
+Example 17: Configuration Check
+========================================
+
+Current SurfScreen Configuration:
+==================================
+
+SurfScreen Configuration
+
+Available engines: ['mace', 'xtb', 'cp2k']
+Available elements: ['Cu', 'Ag', 'Au', 'Pd', 'Pt', 'Ni', 'Al', 'Pb', 'Rh', 'Ir', 'Fe', 'W', 'Mo', 'V', 'Cr', 'Nb', 'Ta', 'Ti', 'Zn', 
+'Co', 'Ru', 'Zr']
+
+========================================
+✅ Example 17 completed!
+========================================
+
+✅ PASSED: 17_config_show.sh (3s)
+
+========================================================
+[18/20] Running: 18_analysis_height.sh
+Start: Fri Jan 30 19:24:11 KST 2026
+========================================================
+========================================
+Example 18: Adsorption Height Analysis
+========================================
+
+[1/3] Generating adsorption structures...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 27
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 962
+✓ Saved: 962.mol
+✓ Formula: H2O
+✓ Atoms: 3
+✓ Saved: water.xyz
+
+🎯 Generating adsorption configurations
+
+Generated: 48 configurations
+Valid (no overlap): 0 configurations
+
+✓ Saved to: configs//
+✓ Preview: configs//preview.html
+✓ Configs generated
+
+[2/3] Analyzing adsorption heights...
+
+--- *.xyz ---
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 648, in analysis_height
+    atoms = read(structure)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/formats.py", line 793, in read
+    format = format or filetype(filename, read=isinstance(filename, str))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/formats.py", line 965, in filetype
+    fd = open_with_compression(filename, 'rb')
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/formats.py", line 597, in open_with_compression
+    return open(filename, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'configs/*.xyz'
+
+✅ PASSED: 18_analysis_height.sh (19s)
+
+========================================================
+[19/20] Running: 19_multi_molecule_screen.sh
+Start: Fri Jan 30 19:24:30 KST 2026
+========================================================
+========================================
+Example 19: Multi-Molecule Screening
+========================================
+
+[1/4] Preparing surface...
+✓ Surface: Cu(111)_3x3
+✓ Atoms: 27
+✓ Area: 50.9 Ų
+✓ Fixed atoms: 18
+✓ Saved: Cu111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+
+[2/4] Preparing multiple molecules...
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 962
+✓ Saved: 962.mol
+✓ Formula: H2O
+✓ Atoms: 3
+✓ Saved: water.xyz
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 887
+✓ Saved: 887.mol
+✓ Formula: CH4O
+✓ Atoms: 6
+✓ Saved: methanol.xyz
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00000001_00025000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 702
+✓ Saved: 702.mol
+✓ Formula: C2H6O
+✓ Atoms: 9
+✓ Saved: ethanol.xyz
+✓ 3 molecules ready
+
+[3/4] Screening each molecule...
+
+--- Screening water ---
+
+🚀 Starting Screening
+  Surface: Cu111.xyz
+  Molecules: 1 files
+  Engine: mace
+  CPUs: 28/36
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+
+Processing: water
+  Generated 5 configurations
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+Using head Default out of ['Default']
+Default dtype float32 does not match model dtype float64, converting models to float32.
+
+=== site0_rot0 (1/5) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:07     -116.195198        0.219244
+BFGS:    1 19:25:07     -116.195961        0.078884
+BFGS:    2 19:25:08     -116.196083        0.054600
+BFGS:    3 19:25:08     -116.196487        0.063970
+BFGS:    4 19:25:08     -116.196663        0.067506
+BFGS:    5 19:25:08     -116.196838        0.050459
+BFGS:    6 19:25:08     -116.197014        0.060158
+BFGS:    7 19:25:08     -116.197227        0.057827
+BFGS:    8 19:25:08     -116.197388        0.060607
+BFGS:    9 19:25:08     -116.197517        0.047329
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site0_rot45 (2/5) ===
+  Site: top, Rotation: 45.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:08     -116.195175        0.219131
+BFGS:    1 19:25:08     -116.195938        0.078826
+BFGS:    2 19:25:08     -116.196060        0.054601
+BFGS:    3 19:25:08     -116.196457        0.063911
+BFGS:    4 19:25:08     -116.196640        0.067647
+BFGS:    5 19:25:08     -116.196808        0.050366
+BFGS:    6 19:25:08     -116.196983        0.060114
+BFGS:    7 19:25:08     -116.197197        0.057563
+BFGS:    8 19:25:08     -116.197365        0.060670
+BFGS:    9 19:25:08     -116.197487        0.047348
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site0_rot90 (3/5) ===
+  Site: top, Rotation: 90.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:09     -116.195190        0.219265
+BFGS:    1 19:25:09     -116.195953        0.078861
+BFGS:    2 19:25:09     -116.196075        0.054604
+BFGS:    3 19:25:09     -116.196480        0.063881
+BFGS:    4 19:25:09     -116.196655        0.067532
+BFGS:    5 19:25:09     -116.196823        0.050409
+BFGS:    6 19:25:09     -116.196999        0.060041
+BFGS:    7 19:25:09     -116.197220        0.057542
+BFGS:    8 19:25:09     -116.197372        0.060527
+BFGS:    9 19:25:09     -116.197495        0.047255
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+=== site0_rot135 (4/5) ===
+  Site: top, Rotation: 135.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:09     -116.195221        0.219343
+BFGS:    1 19:25:09     -116.195976        0.078901
+BFGS:    2 19:25:09     -116.196098        0.054598
+BFGS:    3 19:25:09     -116.196503        0.063830
+BFGS:    4 19:25:09     -116.196678        0.067557
+BFGS:    5 19:25:09     -116.196854        0.050443
+BFGS:    6 19:25:09     -116.197021        0.060094
+BFGS:    7 19:25:09     -116.197243        0.057694
+BFGS:    8 19:25:10     -116.197403        0.060651
+BFGS:    9 19:25:10     -116.197525        0.047263
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0255 eV
+
+=== site1_rot0 (5/5) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:10     -116.195198        0.219240
+BFGS:    1 19:25:10     -116.195961        0.078881
+BFGS:    2 19:25:10     -116.196083        0.054600
+BFGS:    3 19:25:10     -116.196487        0.063938
+BFGS:    4 19:25:10     -116.196663        0.067552
+BFGS:    5 19:25:10     -116.196838        0.050425
+BFGS:    6 19:25:10     -116.197014        0.060177
+BFGS:    7 19:25:10     -116.197235        0.057766
+BFGS:    8 19:25:10     -116.197388        0.060582
+BFGS:    9 19:25:10     -116.197517        0.047357
+  Initial E: -116.1952 eV
+  Final E: -116.1975 eV (9 steps)
+  E_ads: -0.0254 eV
+
+🏆 Top Results
+┏━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ # ┃ Config       ┃ E_ads (eV) ┃
+┡━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ 1 │ site0_rot135 │    -0.0255 │
+│ 2 │ site0_rot0   │    -0.0254 │
+│ 3 │ site1_rot0   │    -0.0254 │
+│ 4 │ site0_rot90  │    -0.0254 │
+│ 5 │ site0_rot45  │    -0.0254 │
+└───┴──────────────┴────────────┘
+
+✓ Results saved to: results_water
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+
+--- Screening methanol ---
+
+🚀 Starting Screening
+  Surface: Cu111.xyz
+  Molecules: 1 files
+  Engine: mace
+  CPUs: 28/36
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+
+Processing: methanol
+  Generated 5 configurations
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+Using head Default out of ['Default']
+Default dtype float32 does not match model dtype float64, converting models to float32.
+
+=== site0_rot0 (1/5) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:16     -132.229370        0.443943
+BFGS:    1 19:25:16     -132.235306        0.298915
+BFGS:    2 19:25:16     -132.240875        0.173599
+BFGS:    3 19:25:16     -132.242233        0.163221
+BFGS:    4 19:25:16     -132.248108        0.241160
+BFGS:    5 19:25:16     -132.250000        0.164302
+BFGS:    6 19:25:16     -132.250885        0.087276
+BFGS:    7 19:25:16     -132.251328        0.067099
+BFGS:    8 19:25:16     -132.251770        0.062652
+BFGS:    9 19:25:16     -132.251923        0.042626
+  Initial E: -132.2294 eV
+  Final E: -132.2519 eV (9 steps)
+  E_ads: -0.0505 eV
+
+=== site0_rot45 (2/5) ===
+  Site: top, Rotation: 45.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:16     -132.229156        0.443871
+BFGS:    1 19:25:16     -132.235107        0.298522
+BFGS:    2 19:25:16     -132.240662        0.173308
+BFGS:    3 19:25:16     -132.242004        0.162969
+BFGS:    4 19:25:16     -132.247833        0.239755
+BFGS:    5 19:25:17     -132.249725        0.163784
+BFGS:    6 19:25:17     -132.250610        0.087360
+BFGS:    7 19:25:17     -132.251053        0.067325
+BFGS:    8 19:25:17     -132.251495        0.062805
+BFGS:    9 19:25:17     -132.251648        0.042739
+  Initial E: -132.2292 eV
+  Final E: -132.2516 eV (9 steps)
+  E_ads: -0.0502 eV
+
+=== site0_rot90 (3/5) ===
+  Site: top, Rotation: 90.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:17     -132.230148        0.449013
+BFGS:    1 19:25:17     -132.236084        0.296185
+BFGS:    2 19:25:17     -132.241577        0.171738
+BFGS:    3 19:25:17     -132.242889        0.160868
+BFGS:    4 19:25:17     -132.248657        0.233650
+BFGS:    5 19:25:17     -132.250473        0.157199
+BFGS:    6 19:25:17     -132.251328        0.088092
+BFGS:    7 19:25:17     -132.251785        0.067214
+BFGS:    8 19:25:17     -132.252228        0.062122
+BFGS:    9 19:25:17     -132.252380        0.041552
+  Initial E: -132.2301 eV
+  Final E: -132.2524 eV (9 steps)
+  E_ads: -0.0509 eV
+
+=== site0_rot135 (4/5) ===
+  Site: top, Rotation: 135.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:18     -132.229980        0.447089
+BFGS:    1 19:25:18     -132.235886        0.296411
+BFGS:    2 19:25:18     -132.241409        0.171994
+BFGS:    3 19:25:18     -132.242737        0.161029
+BFGS:    4 19:25:18     -132.248566        0.234802
+BFGS:    5 19:25:18     -132.250366        0.157715
+BFGS:    6 19:25:18     -132.251236        0.088133
+BFGS:    7 19:25:18     -132.251694        0.066994
+BFGS:    8 19:25:18     -132.252136        0.061946
+BFGS:    9 19:25:18     -132.252289        0.041460
+  Initial E: -132.2300 eV
+  Final E: -132.2523 eV (9 steps)
+  E_ads: -0.0509 eV
+
+=== site1_rot0 (5/5) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:18     -132.229370        0.443943
+BFGS:    1 19:25:18     -132.235306        0.298915
+BFGS:    2 19:25:18     -132.240875        0.173599
+BFGS:    3 19:25:18     -132.242233        0.163221
+BFGS:    4 19:25:18     -132.248108        0.241188
+BFGS:    5 19:25:18     -132.250000        0.164327
+BFGS:    6 19:25:18     -132.250885        0.087249
+BFGS:    7 19:25:18     -132.251328        0.067122
+BFGS:    8 19:25:19     -132.251770        0.062677
+BFGS:    9 19:25:19     -132.251923        0.042631
+  Initial E: -132.2294 eV
+  Final E: -132.2519 eV (9 steps)
+  E_ads: -0.0505 eV
+
+🏆 Top Results
+┏━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ # ┃ Config       ┃ E_ads (eV) ┃
+┡━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ 1 │ site0_rot90  │    -0.0509 │
+│ 2 │ site0_rot135 │    -0.0509 │
+│ 3 │ site0_rot0   │    -0.0505 │
+│ 4 │ site1_rot0   │    -0.0505 │
+│ 5 │ site0_rot45  │    -0.0502 │
+└───┴──────────────┴────────────┘
+
+✓ Results saved to: results_methanol
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+
+--- Screening ethanol ---
+
+🚀 Starting Screening
+  Surface: Cu111.xyz
+  Molecules: 1 files
+  Engine: mace
+  CPUs: 28/36
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+
+Processing: ethanol
+  Generated 5 configurations
+Using Materials Project MACE for MACECalculator with /home/yongsang/.cache/mace/20231203mace128L1_epoch199model
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+Using head Default out of ['Default']
+Default dtype float32 does not match model dtype float64, converting models to float32.
+
+=== site0_rot0 (1/5) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:24     -149.047424        0.751742
+BFGS:    1 19:25:24     -149.059250        0.476982
+BFGS:    2 19:25:24     -149.067383        0.232352
+BFGS:    3 19:25:24     -149.072174        0.269291
+BFGS:    4 19:25:24     -149.079071        0.328658
+BFGS:    5 19:25:25     -149.083878        0.269879
+BFGS:    6 19:25:25     -149.087723        0.172157
+BFGS:    7 19:25:25     -149.090332        0.154984
+BFGS:    8 19:25:25     -149.092484        0.112097
+BFGS:    9 19:25:25     -149.093689        0.084821
+BFGS:   10 19:25:25     -149.094452        0.082716
+BFGS:   11 19:25:25     -149.095078        0.081362
+BFGS:   12 19:25:25     -149.095535        0.074290
+BFGS:   13 19:25:25     -149.095886        0.056499
+BFGS:   14 19:25:25     -149.096176        0.050295
+BFGS:   15 19:25:25     -149.096390        0.048704
+  Initial E: -149.0474 eV
+  Final E: -149.0964 eV (15 steps)
+  E_ads: -0.1249 eV
+
+=== site0_rot45 (2/5) ===
+  Site: top, Rotation: 45.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:25     -149.045990        0.753151
+BFGS:    1 19:25:25     -149.057877        0.477621
+BFGS:    2 19:25:25     -149.065964        0.232995
+BFGS:    3 19:25:25     -149.070831        0.270338
+BFGS:    4 19:25:25     -149.077759        0.331094
+BFGS:    5 19:25:25     -149.082687        0.274074
+BFGS:    6 19:25:26     -149.086670        0.175623
+BFGS:    7 19:25:26     -149.089386        0.158495
+BFGS:    8 19:25:26     -149.091614        0.114088
+BFGS:    9 19:25:26     -149.092865        0.087386
+BFGS:   10 19:25:26     -149.093643        0.083092
+BFGS:   11 19:25:26     -149.094299        0.082591
+BFGS:   12 19:25:26     -149.094757        0.075537
+BFGS:   13 19:25:26     -149.095123        0.057712
+BFGS:   14 19:25:26     -149.095413        0.051477
+BFGS:   15 19:25:26     -149.095627        0.050398
+BFGS:   16 19:25:26     -149.095749        0.027447
+  Initial E: -149.0460 eV
+  Final E: -149.0957 eV (16 steps)
+  E_ads: -0.1243 eV
+
+=== site0_rot90 (3/5) ===
+  Site: top, Rotation: 90.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:26     -149.043488        0.759046
+BFGS:    1 19:25:26     -149.055435        0.480897
+BFGS:    2 19:25:26     -149.063660        0.234756
+BFGS:    3 19:25:27     -149.068542        0.272899
+BFGS:    4 19:25:27     -149.075562        0.333627
+BFGS:    5 19:25:27     -149.080566        0.274947
+BFGS:    6 19:25:27     -149.084625        0.176466
+BFGS:    7 19:25:27     -149.087402        0.159827
+BFGS:    8 19:25:27     -149.089691        0.117466
+BFGS:    9 19:25:27     -149.090988        0.088496
+BFGS:   10 19:25:27     -149.091797        0.083302
+BFGS:   11 19:25:27     -149.092438        0.083344
+BFGS:   12 19:25:27     -149.092911        0.074563
+BFGS:   13 19:25:27     -149.093262        0.056548
+BFGS:   14 19:25:27     -149.093552        0.050991
+BFGS:   15 19:25:27     -149.093765        0.049306
+  Initial E: -149.0435 eV
+  Final E: -149.0938 eV (15 steps)
+  E_ads: -0.1223 eV
+
+=== site0_rot135 (4/5) ===
+  Site: top, Rotation: 135.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:27     -149.045349        0.757020
+BFGS:    1 19:25:27     -149.057205        0.479533
+BFGS:    2 19:25:28     -149.065445        0.232535
+BFGS:    3 19:25:28     -149.070221        0.270627
+BFGS:    4 19:25:28     -149.077194        0.329318
+BFGS:    5 19:25:28     -149.082001        0.268735
+BFGS:    6 19:25:28     -149.085907        0.172783
+BFGS:    7 19:25:28     -149.088577        0.156202
+BFGS:    8 19:25:28     -149.090790        0.116053
+BFGS:    9 19:25:28     -149.092041        0.086287
+BFGS:   10 19:25:28     -149.092819        0.083487
+BFGS:   11 19:25:28     -149.093460        0.082227
+BFGS:   12 19:25:28     -149.093903        0.073734
+BFGS:   13 19:25:28     -149.094254        0.055688
+BFGS:   14 19:25:28     -149.094543        0.049754
+  Initial E: -149.0453 eV
+  Final E: -149.0945 eV (14 steps)
+  E_ads: -0.1231 eV
+
+=== site1_rot0 (5/5) ===
+  Site: top, Rotation: 0.0°
+      Step     Time          Energy          fmax
+BFGS:    0 19:25:28     -149.047424        0.751738
+BFGS:    1 19:25:28     -149.059250        0.476985
+BFGS:    2 19:25:28     -149.067383        0.232349
+BFGS:    3 19:25:29     -149.072159        0.269285
+BFGS:    4 19:25:29     -149.079071        0.328657
+BFGS:    5 19:25:29     -149.083878        0.269881
+BFGS:    6 19:25:29     -149.087723        0.172146
+BFGS:    7 19:25:29     -149.090332        0.154991
+BFGS:    8 19:25:29     -149.092484        0.112149
+BFGS:    9 19:25:29     -149.093689        0.084803
+BFGS:   10 19:25:29     -149.094452        0.082731
+BFGS:   11 19:25:29     -149.095078        0.081365
+BFGS:   12 19:25:29     -149.095535        0.074285
+BFGS:   13 19:25:29     -149.095886        0.056445
+BFGS:   14 19:25:29     -149.096176        0.050330
+BFGS:   15 19:25:29     -149.096390        0.048685
+  Initial E: -149.0474 eV
+  Final E: -149.0964 eV (15 steps)
+  E_ads: -0.1249 eV
+
+🏆 Top Results
+┏━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ # ┃ Config       ┃ E_ads (eV) ┃
+┡━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━┩
+│ 1 │ site0_rot0   │    -0.1249 │
+│ 2 │ site1_rot0   │    -0.1249 │
+│ 3 │ site0_rot45  │    -0.1243 │
+│ 4 │ site0_rot135 │    -0.1231 │
+│ 5 │ site0_rot90  │    -0.1223 │
+└───┴──────────────┴────────────┘
+
+✓ Results saved to: results_ethanol
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/mace/calculators/mace.py:197: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+
+[4/4] Comparing results...
+
+=== water on Cu(111) ===
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 369, in screen_results
+    df = pd.read_csv(results_file)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 912, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 577, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 1407, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/parsers/readers.py", line 1661, in _make_engine
+    self.handles = get_handle(
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/pandas/io/common.py", line 859, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: 'results_water/results.json'
+
+✅ PASSED: 19_multi_molecule_screen.sh (63s)
+
+========================================================
+[20/20] Running: 20_full_pipeline.sh
+Start: Fri Jan 30 19:25:33 KST 2026
+========================================================
+========================================================
+Example 20: Complete SurfScreen Pipeline Demo
+========================================================
+
+🚀 Starting complete pipeline...
+
+=========================================
+Step 1/7: Surface Creation
+=========================================
+✓ Surface: Pt(111)_3x3
+✓ Atoms: 36
+✓ Area: 60.0 Ų
+✓ Fixed atoms: 18
+✓ Saved: Pt111.xyz
+/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/ase/io/extxyz.py:311: UserWarning: Skipping unhashable information adsorbate_info
+  warnings.warn('Skipping unhashable information '
+
+📍 Detected Adsorption Sites
+┏━━━━━━━━┳━━━━━━━┓
+┃ Type   ┃ Count ┃
+┡━━━━━━━━╇━━━━━━━┩
+│ top    │     9 │
+│ bridge │    27 │
+│ fcc    │     5 │
+│ hcp    │     4 │
+│ Total  │    45 │
+└────────┴───────┘
+✓ Pt(111) surface created
+
+=========================================
+Step 2/7: Molecule Preparation
+=========================================
+📦 Downloading: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound_3D/01_conf_per_cmpd/SDF/00100001_00125000.sdf.gz
+📂 Extracting...
+🔍 Searching for CID: 104730
+Traceback (most recent call last):
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/bin/surfscreen", line 8, in <module>
+    sys.exit(main())
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1130, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1055, in main
+    rv = self.invoke(ctx)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1657, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 1404, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/yongsang/anaconda3/envs/equiformer_v2/lib/python3.8/site-packages/click/core.py", line 760, in invoke
+    return __callback(*args, **kwargs)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cli.py", line 95, in mol_from_pubchem
+    mol = MoleculeBuilder.from_pubchem(name=query)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/molecule/builder.py", line 202, in from_pubchem
+    mol_path = fetcher.fetch_by_cid(cid, output_dir)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/molecule/pubchem.py", line 196, in fetch_by_cid
+    return self._extract_mol(sdf_path, cid, output_dir)
+  File "/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/molecule/pubchem.py", line 222, in _extract_mol
+    raise ValueError(f"CID {cid} not found in the SDF file")
+ValueError: CID 104730 not found in the SDF file
+
+✅ PASSED: 20_full_pipeline.sh (16s)
+
+========================================================
+📊 FINAL TEST SUMMARY
+========================================================
+
+End Time: Fri Jan 30 19:25:49 KST 2026
+
+Results:
+  Total:   20
+  Passed:  20 ✅
+  Failed:  0 ❌
+  Skipped: 0 ⚠️
+
+Success Rate: 100%
+
+Passed Tests:
+  ✅ 01_molecule_from_pubchem.sh
+  ✅ 02_molecule_from_smiles.sh
+  ✅ 03_molecule_conformers.sh
+  ✅ 04_molecule_analyze.sh
+  ✅ 05_surface_create.sh
+  ✅ 06_surface_sites.sh
+  ✅ 07_adsorb_generate.sh
+  ✅ 08_adsorb_visualize.sh
+  ✅ 09_md_mace.sh
+  ✅ 10_md_xtb_molecule.sh
+  ✅ 11_xtb_pbc_warning.sh
+  ✅ 12_screen_run.sh
+  ✅ 13_analysis_msd.sh
+  ✅ 14_analysis_rdf.sh
+  ✅ 15_analysis_boltzmann.sh
+  ✅ 16_md_ensembles.sh
+  ✅ 17_config_show.sh
+  ✅ 18_analysis_height.sh
+  ✅ 19_multi_molecule_screen.sh
+  ✅ 20_full_pipeline.sh
+
+Execution Times:
+  01_molecule_from_pubchem.sh: 30s
+  02_molecule_from_smiles.sh: 11s
+  03_molecule_conformers.sh: 5s
+  04_molecule_analyze.sh: 38s
+  05_surface_create.sh: 15s
+  06_surface_sites.sh: 8s
+  07_adsorb_generate.sh: 19s
+  08_adsorb_visualize.sh: 20s
+  09_md_mace.sh: 20s
+  10_md_xtb_molecule.sh: 17s
+  11_xtb_pbc_warning.sh: 8s
+  12_screen_run.sh: 31s
+  13_analysis_msd.sh: 22s
+  14_analysis_rdf.sh: 15s
+  15_analysis_boltzmann.sh: 26s
+  16_md_ensembles.sh: 27s
+  17_config_show.sh: 3s
+  18_analysis_height.sh: 19s
+  19_multi_molecule_screen.sh: 63s
+  20_full_pipeline.sh: 16s
+
+Log File: test_results_20260130_191853.log
+Output Directory: output/
+
+========================================================
+🏁 Test Suite Complete
+========================================================
+
+Output directory size:
+2.0M	output/

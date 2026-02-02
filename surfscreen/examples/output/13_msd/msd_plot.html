@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MSD Plot - Cu</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { text-align: center; }
+        #plot { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Mean Square Displacement - Cu</h1>
+        <div id="plot"></div>
+    </div>
+    
+    <script>
+        const time = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0];
+        const msd = [0.0, 0.0013007900150196327, 0.004791823124882235, 0.00975764157083878, 0.015627905238960103, 0.021746460028246234, 0.02764057315550289, 0.033169940022920376, 0.03807009304729326, 0.04283706674254403, 0.047969152655429184, 0.05418104623666755, 0.061522291673588955, 0.06940117392956752, 0.0782549346547215, 0.08789332166360772, 0.09833044356815504, 0.10966222487486073, 0.12195066015029807, 0.13465049912779006, 0.14778439042736485];
+        
+        const data = [{
+            x: time,
+            y: msd,
+            mode: 'lines',
+            name: 'MSD',
+            line: { color: '#00ff88', width: 2 }
+        }];
+        
+        
+        const fitTrace = {
+            x: [0.0, 20.0],
+            y: [0.0, 0.12524802527707724],
+            mode: 'lines',
+            name: 'Linear Fit (D = 1.04e-04 cm²/s)',
+            line: { color: 'red', dash: 'dash', width: 2 }
+        };
+        data.push(fitTrace);
+        
+        
+        const layout = {
+            paper_bgcolor: 'rgba(0,0,0,0)',
+            plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#fff' },
+            xaxis: {
+                title: 'Time (fs)',
+                gridcolor: 'rgba(255,255,255,0.1)'
+            },
+            yaxis: {
+                title: 'MSD (Å²)',
+                gridcolor: 'rgba(255,255,255,0.1)'
+            },
+            legend: { x: 0.02, y: 0.98 },
+            margin: { t: 30, r: 30, b: 60, l: 60 }
+        };
+        
+        Plotly.newPlot('plot', data, layout, {responsive: true});
+    </script>
+</body>
+</html>

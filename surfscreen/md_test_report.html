@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Simulation Report - SurfScreen</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .header p { color: rgba(255,255,255,0.8); }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat {
+            background: var(--bg-card);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        #viewer {
+            width: 100%;
+            height: 450px;
+            border-radius: 0.5rem;
+            background: #000;
+        }
+        
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 0.5rem;
+        }
+        
+        .controls button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .controls button:hover { opacity: 0.9; }
+        
+        #frame-slider {
+            flex: 1;
+            height: 8px;
+            accent-color: var(--primary);
+        }
+        
+        #frame-info {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            min-width: 120px;
+            text-align: right;
+        }
+        
+        .download-section {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .download-btn {
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .download-btn:hover { border-color: var(--primary); }
+        
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔬 MD Simulation Report</h1>
+        <p>md_test | Generated 2026-01-30 16:23</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Total Steps</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">0.0</div>
+                <div class="stat-label">Time (fs)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">240.7</div>
+                <div class="stat-label">Avg Temp (K)</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Saved Frames</div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🎬 Trajectory Playback</h3>
+                <div id="viewer"></div>
+                <div class="controls">
+                    <button id="play-btn" onclick="togglePlay()">▶ Play</button>
+                    <input type="range" id="frame-slider" min="0" max="5" value="0" onchange="showFrame(this.value)">
+                    <span id="frame-info">Frame 1 / 6</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📊 Energy Profile</h3>
+                <div id="energy-plot" style="height: 450px;"></div>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🌡️ Temperature Profile</h3>
+                <div id="temp-plot" style="height: 300px;"></div>
+            </div>
+            
+            <div class="card">
+                <h3>⚡ Kinetic vs Potential Energy</h3>
+                <div id="energy-breakdown-plot" style="height: 300px;"></div>
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <a class="download-btn" href="trajectory.extxyz" download>📥 trajectory.extxyz (OVITO)</a>
+            <a class="download-btn" href="trajectory.xyz" download>📥 trajectory.xyz (VMD)</a>
+            <a class="download-btn" href="trajectory.traj" download>📥 trajectory.traj (ASE)</a>
+            <a class="download-btn" href="final.xyz" download>📥 final.xyz</a>
+        </div>
+    </div>
+    
+    <script>
+        const frames = ["12\\nEnergy=-45.338905\\nCu 1.278096 0.737909 15.000000\\nCu 3.834287 0.737909 15.000000\\nCu 2.556191 2.951635 15.000000\\nCu 5.112382 2.951635 15.000000\\nCu -0.000000 1.475818 17.087121\\nCu 2.556191 1.475818 17.087121\\nCu 1.278096 3.689544 17.087121\\nCu 3.834287 3.689544 17.087121\\nCu 0.000000 0.000000 19.174242\\nCu 2.556191 0.000000 19.174242\\nCu 1.278096 2.213726 19.174242\\nCu 3.834287 2.213726 19.174242", "12\\nEnergy=-45.302043\\nCu 1.308166 0.726083 15.012687\\nCu 3.829908 0.728021 15.012799\\nCu 2.536467 2.963530 15.023967\\nCu 5.111058 2.966324 15.000250\\nCu -0.019530 1.495471 17.060817\\nCu 2.571465 1.482536 17.099094\\nCu 1.245353 3.697661 17.081394\\nCu 3.854530 3.691626 17.116590\\nCu -0.012260 0.026611 19.172869\\nCu 2.580283 -0.001494 19.157371\\nCu 1.294913 2.196999 19.168760\\nCu 3.844434 2.205449 19.139768", "12\\nEnergy=-45.207801\\nCu 1.332917 0.713403 15.024593\\nCu 3.824455 0.718724 15.022818\\nCu 2.519762 2.976310 15.050842\\nCu 5.111619 2.978271 14.996653\\nCu -0.036270 1.517331 17.035982\\nCu 2.585958 1.487485 17.109743\\nCu 1.217503 3.703805 17.079042\\nCu 3.873778 3.699335 17.144650\\nCu -0.022821 0.052221 19.168950\\nCu 2.602113 -0.007781 19.141196\\nCu 1.309494 2.181187 19.162637\\nCu 3.852705 2.199670 19.110161", "12\\nEnergy=-45.095896\\nCu 1.351646 0.706423 15.039216\\nCu 3.823961 0.713113 15.027097\\nCu 2.509892 2.986525 15.075654\\nCu 5.110654 2.986211 14.993870\\nCu -0.048296 1.534392 17.012325\\nCu 2.597802 1.496565 17.120413\\nCu 1.194884 3.707695 17.079884\\nCu 3.887621 3.713487 17.171286\\nCu -0.031144 0.068158 19.163585\\nCu 2.619897 -0.016396 19.128520\\nCu 1.321785 2.168411 19.152978\\nCu 3.858677 2.196120 19.083333", "12\\nEnergy=-45.022380\\nCu 1.367151 0.703524 15.052544\\nCu 3.828203 0.714480 15.025451\\nCu 2.505883 2.991595 15.097022\\nCu 5.104387 2.986033 14.992336\\nCu -0.054295 1.546265 16.993059\\nCu 2.605000 1.507324 17.125649\\nCu 1.181948 3.710680 17.083796\\nCu 3.889046 3.730934 17.190839\\nCu -0.037582 0.078783 19.154742\\nCu 2.632437 -0.025567 19.124337\\nCu 1.336088 2.161619 19.141343\\nCu 3.865024 2.195381 19.067928", "12\\nEnergy=-45.020857\\nCu 1.374129 0.701090 15.066421\\nCu 3.836421 0.721206 15.016898\\nCu 2.507830 2.997497 15.118139\\nCu 5.096921 2.979414 14.989035\\nCu -0.052832 1.550792 16.977670\\nCu 2.605106 1.522477 17.122205\\nCu 1.183880 3.713026 17.089103\\nCu 3.877409 3.751566 17.201433\\nCu -0.038184 0.082248 19.144583\\nCu 2.637515 -0.035541 19.131426\\nCu 1.347938 2.159038 19.130622\\nCu 3.872816 2.198190 19.062388"];
+        const logData = [{"step": 0, "time": 0.0, "temperature": 240.66, "e_pot": -45.338905, "e_kin": 0.373294, "e_tot": -44.965611}];
+        
+        let viewer = null;
+        let currentFrame = 0;
+        let isPlaying = false;
+        let playInterval = null;
+        
+        // 3Dmol viewer 초기화
+        function initViewer() {
+            const element = document.getElementById('viewer');
+            viewer = $3Dmol.createViewer(element, {
+                backgroundColor: '#0f172a'
+            });
+            
+            if (frames.length > 0) {
+                showFrame(0);
+            }
+        }
+        
+        // 프레임 표시
+        function showFrame(idx) {
+            if (!viewer || frames.length === 0) return;
+            
+            currentFrame = parseInt(idx);
+            viewer.removeAllModels();
+            
+            const xyz = frames[currentFrame].replace(/\\n/g, '\n');
+            viewer.addModel(xyz, 'xyz');
+            viewer.setStyle({}, {sphere: {radius: 0.4, colorscheme: 'Jmol'}});
+            viewer.zoomTo();
+            viewer.render();
+            
+            document.getElementById('frame-slider').value = currentFrame;
+            document.getElementById('frame-info').textContent = `Frame ${currentFrame + 1} / ${frames.length}`;
+        }
+        
+        // 재생/일시정지
+        function togglePlay() {
+            const btn = document.getElementById('play-btn');
+            
+            if (isPlaying) {
+                clearInterval(playInterval);
+                btn.textContent = '▶ Play';
+            } else {
+                playInterval = setInterval(() => {
+                    currentFrame = (currentFrame + 1) % frames.length;
+                    showFrame(currentFrame);
+                }, 100);
+                btn.textContent = '⏸ Pause';
+            }
+            
+            isPlaying = !isPlaying;
+        }
+        
+        // Plotly 그래프
+        function initPlots() {
+            if (logData.length === 0) return;
+            
+            const steps = logData.map(d => d.step);
+            const times = logData.map(d => d.time);
+            const temps = logData.map(d => d.temperature);
+            const ePot = logData.map(d => d.e_pot);
+            const eKin = logData.map(d => d.e_kin);
+            const eTot = logData.map(d => d.e_tot);
+            
+            // 총 에너지 플롯
+            Plotly.newPlot('energy-plot', [{
+                x: times,
+                y: eTot,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Total Energy',
+                line: { color: '#3b82f6', width: 2 }
+            }], {
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#94a3b8' },
+                xaxis: { title: 'Time (fs)', gridcolor: '#334155' },
+                yaxis: { title: 'Energy (eV)', gridcolor: '#334155' },
+                margin: { t: 20, r: 20, b: 50, l: 60 }
+            });
+            
+            // 온도 플롯
+            Plotly.newPlot('temp-plot', [{
+                x: times,
+                y: temps,
+                type: 'scatter',
+                mode: 'lines',
+                name: 'Temperature',
+                line: { color: '#f59e0b', width: 2 }
+            }], {
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#94a3b8' },
+                xaxis: { title: 'Time (fs)', gridcolor: '#334155' },
+                yaxis: { title: 'Temperature (K)', gridcolor: '#334155' },
+                margin: { t: 20, r: 20, b: 50, l: 60 }
+            });
+            
+            // E_pot vs E_kin
+            Plotly.newPlot('energy-breakdown-plot', [
+                {
+                    x: times,
+                    y: ePot,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Potential',
+                    line: { color: '#10b981', width: 2 }
+                },
+                {
+                    x: times,
+                    y: eKin,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Kinetic',
+                    line: { color: '#ef4444', width: 2 }
+                }
+            ], {
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                font: { color: '#94a3b8' },
+                xaxis: { title: 'Time (fs)', gridcolor: '#334155' },
+                yaxis: { title: 'Energy (eV)', gridcolor: '#334155' },
+                margin: { t: 20, r: 20, b: 50, l: 60 },
+                legend: { x: 0.02, y: 0.98 }
+            });
+        }
+        
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            initViewer();
+            initPlots();
+        });
+    </script>
+</body>
+</html>
