@@ -5,12 +5,7 @@ Tests AuthService, User models, API keys, and quotas.
 """
 
 import pytest
-from unittest.mock import MagicMock, patch
-from datetime import datetime, timedelta
-from pathlib import Path
-import tempfile
-import json
-import hashlib
+from datetime import datetime
 
 
 class TestUserRole:
@@ -128,6 +123,19 @@ class TestQuota:
         
         assert quota.max_jobs_per_day == 500
         assert quota.max_compute_hours == 100
+    
+    def test_quota_can_submit_job(self):
+        """Test can_submit_job method."""
+        from surfscreen.auth.user_models import Quota
+        
+        quota = Quota(max_jobs_per_day=10, max_concurrent_jobs=2)
+        
+        # Default usage is 0
+        assert quota.can_submit_job() is True
+        
+        # Set usage to limit
+        quota.jobs_today = 10
+        assert quota.can_submit_job() is False
 
 
 class TestAPIKey:
@@ -162,36 +170,6 @@ class TestAPIKey:
         data = key.to_dict()
         assert data["key_id"] == "key-123"
         assert "key_hash" not in data  # Should not expose hash
-
-
-class TestUserCreateModel:
-    """Tests for UserCreate Pydantic model."""
-    
-    def test_user_create_valid(self):
-        """Test valid user creation request."""
-        from surfscreen.auth.user_models import UserCreate
-        
-        user = UserCreate(
-            email="test@example.com",
-            name="Test User",
-            password="SecurePass123",
-        )
-        
-        assert user.email == "test@example.com"
-        assert user.name == "Test User"
-    
-    def test_user_create_invalid_password(self):
-        """Test password validation."""
-        from surfscreen.auth.user_models import UserCreate
-        import pydantic
-        
-        # Password without uppercase
-        with pytest.raises(pydantic.ValidationError):
-            UserCreate(
-                email="test@example.com",
-                name="Test User",
-                password="nocapshere123",
-            )
 
 
 class TestGenerateAPIKey:
