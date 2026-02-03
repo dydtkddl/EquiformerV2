@@ -126,6 +126,7 @@ class TestCacheManager:
     def test_get_with_mock_redis(self, mock_redis):
         """Test get operation with mocked Redis."""
         from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
+        import pickle
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
@@ -137,12 +138,9 @@ class TestCacheManager:
         result = manager.get("missing_key")
         assert result is None
         
-        # Test cache hit
+        # Test cache hit - use pickle serialization as in actual implementation
         cached_data = {"result": 42}
-        mock_redis.get.return_value = json.dumps({
-            "data": cached_data,
-            "metadata": {},
-        }).encode()
+        mock_redis.get.return_value = pickle.dumps(cached_data)
         
         result = manager.get("existing_key")
         assert result == cached_data
@@ -160,7 +158,7 @@ class TestCacheManager:
         success = manager.set("test_key", {"data": "value"}, ttl=600)
         
         assert success is True
-        mock_redis.setex.assert_called_once()
+        mock_redis.setex.assert_called()  # Multiple calls for data + metadata
     
     def test_delete_with_mock_redis(self, mock_redis):
         """Test delete operation."""
@@ -175,7 +173,7 @@ class TestCacheManager:
         success = manager.delete("test_key")
         
         assert success is True
-        mock_redis.delete.assert_called_once()
+        mock_redis.delete.assert_called()  # Multiple calls for key + meta + hits
     
     def test_clear_with_pattern(self, mock_redis):
         """Test clear operation with pattern matching."""
@@ -186,6 +184,7 @@ class TestCacheManager:
             b"surfscreen:key2",
             b"surfscreen:key3",
         ])
+        mock_redis.delete.return_value = 3  # Returns number of deleted keys
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
