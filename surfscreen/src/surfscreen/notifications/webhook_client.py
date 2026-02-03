@@ -13,7 +13,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from enum import Enum
 
 logger = logging.getLogger(__name__)
@@ -254,7 +254,7 @@ class WebhookClient:
         url: str,
         payload: str,
         headers: Dict[str, str],
-    ) -> tuple[int, Optional[str]]:
+    ) -> Tuple[int, Optional[str]]:
         """
         Make HTTP POST request.
         

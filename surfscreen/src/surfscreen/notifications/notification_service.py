@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 from enum import Enum
 from dataclasses import dataclass, field
 
@@ -122,7 +122,7 @@ class NotificationService:
         name: str,
         events: List[str],
         user_id: Optional[str] = None,
-    ) -> tuple[Webhook, str]:
+    ) -> Tuple[Webhook, str]:
         """
         Register a new webhook.
         

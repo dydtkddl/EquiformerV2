@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from .user_models import (
     User,
@@ -195,7 +195,7 @@ class AuthService:
         user_id: str,
         name: str,
         expires_days: Optional[int] = None,
-    ) -> tuple[str, APIKey]:
+    ) -> Tuple[str, APIKey]:
         """
         Create a new API key for a user.
         

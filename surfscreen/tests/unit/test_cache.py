@@ -22,7 +22,7 @@ class TestCacheConfig:
         assert config.host == "localhost"
         assert config.port == 6379
         assert config.db == 0
-        assert config.default_ttl == 3600
+        assert config.default_ttl == 604800  # 7 days
         assert config.key_prefix == "surfscreen:"
     
     def test_custom_config(self):
@@ -92,41 +92,45 @@ class TestCacheManager:
     
     def test_manager_without_redis(self):
         """Test manager works without Redis (graceful degradation)."""
-        with patch("surfscreen.cache.cache_manager.redis", None):
-            from surfscreen.cache.cache_manager import CacheManager
-            
-            # Reset module state
-            manager = CacheManager.__new__(CacheManager)
-            manager._redis = None
-            manager._config = MagicMock()
-            manager._config.key_prefix = "test:"
-            manager._config.default_ttl = 3600
-            
-            assert manager.is_connected() is False
+        from surfscreen.cache.cache_manager import CacheManager, CacheStats
+        
+        # Create manager manually
+        manager = CacheManager.__new__(CacheManager)
+        manager._redis = None
+        manager._connected = False
+        manager._local_stats = CacheStats()
+        manager._config = MagicMock()
+        manager._config.key_prefix = "test:"
+        manager._config.default_ttl = 3600
+        
+        assert manager.is_connected is False
     
     def test_get_set_without_redis(self):
         """Test get/set operations without Redis return gracefully."""
-        from surfscreen.cache.cache_manager import CacheManager, CacheConfig
+        from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
         
-        with patch("surfscreen.cache.cache_manager.redis", None):
-            manager = CacheManager.__new__(CacheManager)
-            manager._redis = None
-            manager._config = CacheConfig()
-            
-            # Should return None without error
-            result = manager.get("test_key")
-            assert result is None
-            
-            # Should return False without error
-            success = manager.set("test_key", {"data": "value"})
-            assert success is False
+        manager = CacheManager.__new__(CacheManager)
+        manager._redis = None
+        manager._connected = False
+        manager._local_stats = CacheStats()
+        manager._config = CacheConfig()
+        
+        # Should return None without error
+        result = manager.get("test_key")
+        assert result is None
+        
+        # Should return False without error
+        success = manager.set("test_key", {"data": "value"})
+        assert success is False
     
     def test_get_with_mock_redis(self, mock_redis):
         """Test get operation with mocked Redis."""
-        from surfscreen.cache.cache_manager import CacheManager, CacheConfig
+        from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
+        manager._connected = True
+        manager._local_stats = CacheStats()
         manager._config = CacheConfig()
         
         # Test cache miss
@@ -145,10 +149,12 @@ class TestCacheManager:
     
     def test_set_with_mock_redis(self, mock_redis):
         """Test set operation with mocked Redis."""
-        from surfscreen.cache.cache_manager import CacheManager, CacheConfig
+        from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
+        manager._connected = True
+        manager._local_stats = CacheStats()
         manager._config = CacheConfig()
         
         success = manager.set("test_key", {"data": "value"}, ttl=600)
@@ -158,10 +164,12 @@ class TestCacheManager:
     
     def test_delete_with_mock_redis(self, mock_redis):
         """Test delete operation."""
-        from surfscreen.cache.cache_manager import CacheManager, CacheConfig
+        from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
+        manager._connected = True
+        manager._local_stats = CacheStats()
         manager._config = CacheConfig()
         
         success = manager.delete("test_key")
@@ -171,7 +179,7 @@ class TestCacheManager:
     
     def test_clear_with_pattern(self, mock_redis):
         """Test clear operation with pattern matching."""
-        from surfscreen.cache.cache_manager import CacheManager, CacheConfig
+        from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
         
         mock_redis.scan_iter.return_value = iter([
             b"surfscreen:key1",
@@ -181,6 +189,8 @@ class TestCacheManager:
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
+        manager._connected = True
+        manager._local_stats = CacheStats()
         manager._config = CacheConfig()
         
         deleted = manager.clear("key*")
@@ -189,10 +199,14 @@ class TestCacheManager:
     
     def test_get_stats(self, mock_redis):
         """Test getting cache statistics."""
-        from surfscreen.cache.cache_manager import CacheManager, CacheConfig
+        from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
+        
+        mock_redis.scan_iter.return_value = iter([])
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
+        manager._connected = True
+        manager._local_stats = CacheStats()
         manager._config = CacheConfig()
         
         stats = manager.get_stats()
@@ -308,12 +322,12 @@ class TestCacheAside:
         mock_manager.set.return_value = True
         
         with patch("surfscreen.cache.cache_decorators.get_cache_manager", return_value=mock_manager):
-            cache = CacheAside(key_prefix="test")
+            cache = CacheAside(prefix="test")
             
             def loader():
                 return {"data": "from_loader"}
             
-            result = cache.get_or_set("my_key", loader)
+            result = cache.get_or_compute("my_key", compute_fn=loader)
             
             assert result == {"data": "from_loader"}
             mock_manager.set.assert_called_once()
@@ -326,7 +340,7 @@ class TestCacheAside:
         mock_manager.get.return_value = {"cached": "data"}
         
         with patch("surfscreen.cache.cache_decorators.get_cache_manager", return_value=mock_manager):
-            cache = CacheAside(key_prefix="test")
+            cache = CacheAside(prefix="test")
             
             loader_called = False
             
@@ -335,7 +349,7 @@ class TestCacheAside:
                 loader_called = True
                 return {"new": "data"}
             
-            result = cache.get_or_set("my_key", loader)
+            result = cache.get_or_compute("my_key", compute_fn=loader)
             
             assert result == {"cached": "data"}
             assert loader_called is False
