@@ -1,20 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="24" time="6.110" timestamp="2026-02-03T04:39:42.675688+09:00" hostname="ga00"><testcase classname="tests.unit.test_batch.TestBatchConfig" name="test_custom_config" time="2.362" /><testcase classname="tests.unit.test_auth.TestUserRole" name="test_role_values" time="2.311"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:16: in test_role_values
-    from surfscreen.auth.user_models import UserRole
-src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
-    from .auth_service import AuthService, get_auth_service
-src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
-    class AuthService:
-src/surfscreen/auth/auth_service.py:198: in AuthService
-    ) -&gt; tuple[str, APIKey]:
-E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_auth.TestQuota" name="test_quota_defaults" time="2.426"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:105: in test_quota_defaults
-    from surfscreen.auth.user_models import Quota
-src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
-    from .auth_service import AuthService, get_auth_service
-src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
-    class AuthService:
-src/surfscreen/auth/auth_service.py:198: in AuthService
-    ) -&gt; tuple[str, APIKey]:
-E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchJob" name="test_job_status_transitions" time="2.355" /><testcase classname="tests.unit.test_batch.TestBatchProgress" name="test_progress_zero_total" time="2.300" /><testcase classname="tests.unit.test_auth.TestUser" name="test_user_to_dict" time="2.309"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:52: in test_user_to_dict
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="14" failures="32" skipped="0" tests="99" time="7.318" timestamp="2026-02-03T13:14:21.542631+09:00" hostname="ga00"><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_get_with_mock_redis" time="2.563"><failure message="AttributeError: 'CacheManager' object has no attribute '_connected'">tests/unit/test_cache.py:133: in test_get_with_mock_redis
+    result = manager.get("missing_key")
+src/surfscreen/cache/cache_manager.py:207: in get
+    if not self.is_connected:
+src/surfscreen/cache/cache_manager.py:134: in is_connected
+    if not self._connected or not self._redis:
+E   AttributeError: 'CacheManager' object has no attribute '_connected'</failure></testcase><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_get_stats" time="2.485"><failure message="AttributeError: 'CacheManager' object has no attribute '_connected'">tests/unit/test_cache.py:198: in test_get_stats
+    stats = manager.get_stats()
+src/surfscreen/cache/cache_manager.py:362: in get_stats
+    if not self.is_connected:
+src/surfscreen/cache/cache_manager.py:134: in is_connected
+    if not self._connected or not self._redis:
+E   AttributeError: 'CacheManager' object has no attribute '_connected'</failure></testcase><testcase classname="tests.unit.test_auth.TestUser" name="test_user_creation" time="2.896"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:36: in test_user_creation
     from surfscreen.auth.user_models import User, UserRole
 src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
     from .auth_service import AuthService, get_auth_service
@@ -22,15 +18,7 @@ src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
     class AuthService:
 src/surfscreen/auth/auth_service.py:198: in AuthService
     ) -&gt; tuple[str, APIKey]:
-E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_auth.TestAPIKey" name="test_apikey_creation" time="2.377"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:146: in test_apikey_creation
-    from surfscreen.auth.user_models import APIKey
-src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
-    from .auth_service import AuthService, get_auth_service
-src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
-    class AuthService:
-src/surfscreen/auth/auth_service.py:198: in AuthService
-    ) -&gt; tuple[str, APIKey]:
-E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_auth.TestGenerateAPIKey" name="test_generate_key_id" time="2.367"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:189: in test_generate_key_id
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchConfig" name="test_default_config" time="2.745" /><testcase classname="tests.unit.test_auth.TestGenerateAPIKey" name="test_generate_key_id" time="2.736"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:189: in test_generate_key_id
     from surfscreen.auth.user_models import generate_key_id
 src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
     from .auth_service import AuthService, get_auth_service
@@ -38,19 +26,367 @@ src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
     class AuthService:
 src/surfscreen/auth/auth_service.py:198: in AuthService
     ) -&gt; tuple[str, APIKey]:
-E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchProgress" name="test_success_rate" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchJob" name="test_job_creation" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_create_job" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_get_job" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_list_jobs" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_cancel_job" time="0.001" /><testcase classname="tests.unit.test_batch.TestTaskResult" name="test_success_result" time="0.001" /><testcase classname="tests.unit.test_batch.TestTaskResult" name="test_failure_result" time="0.001" /><testcase classname="tests.unit.test_cache.TestCacheConfig" name="test_default_config" time="0.006"><failure message="AssertionError: assert 604800 == 3600&#10; +  where 604800 = CacheConfig(host='localhost', port=6379, db=0, password=None, default_ttl=604800, max_memory='1gb', key_prefix='surfscreen:', enabled=True).default_ttl">tests/unit/test_cache.py:25: in test_default_config
-    assert config.default_ttl == 3600
-E   AssertionError: assert 604800 == 3600
-E    +  where 604800 = CacheConfig(host='localhost', port=6379, db=0, password=None, default_ttl=604800, max_memory='1gb', key_prefix='surfscreen:', enabled=True).default_ttl</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchJob" name="test_job_progress" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_processor_creation" time="0.001" /><testcase classname="tests.unit.test_cache.TestCacheStats" name="test_stats_zero_requests" time="0.003" /><testcase classname="tests.unit.test_batch.TestBatchConfig" name="test_config_to_dict" time="0.001" /><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_manager_without_redis" time="0.001"><failure message="AttributeError: &lt;module 'surfscreen.cache.cache_manager' from '/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cache/cache_manager.py'&gt; does not have the attribute 'redis'">tests/unit/test_cache.py:95: in test_manager_without_redis
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_delete_with_mock_redis" time="2.649"><failure message="AttributeError: 'CacheManager' object has no attribute '_connected'">tests/unit/test_cache.py:167: in test_delete_with_mock_redis
+    success = manager.delete("test_key")
+src/surfscreen/cache/cache_manager.py:298: in delete
+    if not self.is_connected:
+src/surfscreen/cache/cache_manager.py:134: in is_connected
+    if not self._connected or not self._redis:
+E   AttributeError: 'CacheManager' object has no attribute '_connected'</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchProgress" name="test_progress_zero_total" time="2.607" /><testcase classname="tests.unit.test_batch.TestBatchJob" name="test_job_progress" time="2.715" /><testcase classname="tests.unit.test_batch.TestTaskResult" name="test_success_result" time="2.725" /><testcase classname="tests.unit.test_cache.TestCacheDecorators" name="test_cache_result_cache_hit" time="2.570" /><testcase classname="tests.unit.test_cache.TestCacheKeyGeneration" name="test_key_with_specific_params" time="2.548" /><testcase classname="tests.unit.test_auth.TestQuota" name="test_quota_can_submit_job" time="2.798"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:129: in test_quota_can_submit_job
+    from surfscreen.auth.user_models import Quota
+src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
+    from .auth_service import AuthService, get_auth_service
+src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
+    class AuthService:
+src/surfscreen/auth/auth_service.py:198: in AuthService
+    ) -&gt; tuple[str, APIKey]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_auth.TestUserRole" name="test_role_values" time="2.801"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:16: in test_role_values
+    from surfscreen.auth.user_models import UserRole
+src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
+    from .auth_service import AuthService, get_auth_service
+src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
+    class AuthService:
+src/surfscreen/auth/auth_service.py:198: in AuthService
+    ) -&gt; tuple[str, APIKey]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_cache.TestCacheAside" name="test_cache_aside_cache_hit" time="2.521"><failure message="TypeError: __init__() got an unexpected keyword argument 'key_prefix'">tests/unit/test_cache.py:329: in test_cache_aside_cache_hit
+    cache = CacheAside(key_prefix="test")
+E   TypeError: __init__() got an unexpected keyword argument 'key_prefix'</failure></testcase><testcase classname="tests.unit.test_notifications.TestWebhookConfig" name="test_config_to_dict" time="2.601"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:64: in test_config_to_dict
+    from surfscreen.notifications.webhook_client import WebhookConfig, WebhookStatus
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestWebhookClient" name="test_signature_generation" time="2.611"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:138: in test_signature_generation
+    from surfscreen.notifications.webhook_client import WebhookClient
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchConfig" name="test_config_to_dict" time="2.688" /><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_create_job" time="2.854" /><testcase classname="tests.unit.test_auth.TestTeam" name="test_team_creation" time="2.864"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:73: in test_team_creation
+    from surfscreen.auth.user_models import Team
+src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
+    from .auth_service import AuthService, get_auth_service
+src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
+    class AuthService:
+src/surfscreen/auth/auth_service.py:198: in AuthService
+    ) -&gt; tuple[str, APIKey]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchJob" name="test_job_creation" time="2.667" /><testcase classname="tests.unit.test_cache.TestCacheDecorators" name="test_cache_result_async" time="2.525" /><testcase classname="tests.unit.test_auth.TestQuota" name="test_quota_defaults" time="2.721"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:105: in test_quota_defaults
+    from surfscreen.auth.user_models import Quota
+src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
+    from .auth_service import AuthService, get_auth_service
+src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
+    class AuthService:
+src/surfscreen/auth/auth_service.py:198: in AuthService
+    ) -&gt; tuple[str, APIKey]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_auth.TestAPIKey" name="test_apikey_to_dict" time="2.763"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_auth.py:161: in test_apikey_to_dict
+    from surfscreen.auth.user_models import APIKey
+src/surfscreen/auth/__init__.py:8: in &lt;module&gt;
+    from .auth_service import AuthService, get_auth_service
+src/surfscreen/auth/auth_service.py:29: in &lt;module&gt;
+    class AuthService:
+src/surfscreen/auth/auth_service.py:198: in AuthService
+    ) -&gt; tuple[str, APIKey]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestWebhookClient" name="test_send_webhook_success" time="2.638"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:173: in test_send_webhook_success
+    from surfscreen.notifications.webhook_client import WebhookClient, WebhookConfig
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestWebhookDelivery" name="test_delivery_success" time="2.653"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:101: in test_delivery_success
+    from surfscreen.notifications.webhook_client import WebhookDelivery
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestWebhookStatus" name="test_webhook_status_values" time="2.509"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:36: in test_webhook_status_values
+    from surfscreen.notifications.webhook_client import WebhookStatus
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_service_creation" time="2.562"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:240: in test_service_creation
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_list_jobs" time="2.564" /><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_manager_without_redis" time="2.419"><failure message="AttributeError: &lt;module 'surfscreen.cache.cache_manager' from '/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cache/cache_manager.py'&gt; does not have the attribute 'redis'">tests/unit/test_cache.py:95: in test_manager_without_redis
     with patch("surfscreen.cache.cache_manager.redis", None):
 ../../anaconda3/envs/equiformer_v2/lib/python3.8/unittest/mock.py:1393: in __enter__
     original, local = self.get_original()
 ../../anaconda3/envs/equiformer_v2/lib/python3.8/unittest/mock.py:1366: in get_original
     raise AttributeError(
-E   AttributeError: &lt;module 'surfscreen.cache.cache_manager' from '/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cache/cache_manager.py'&gt; does not have the attribute 'redis'</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchProgress" name="test_progress_calculation" time="0.001" /><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_get_with_mock_redis" time="0.005"><failure message="AttributeError: 'CacheManager' object has no attribute '_connected'">tests/unit/test_cache.py:133: in test_get_with_mock_redis
-    result = manager.get("missing_key")
-src/surfscreen/cache/cache_manager.py:207: in get
+E   AttributeError: &lt;module 'surfscreen.cache.cache_manager' from '/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cache/cache_manager.py'&gt; does not have the attribute 'redis'</failure></testcase><testcase classname="tests.unit.test_cache.TestCacheConfig" name="test_default_config" time="2.606"><failure message="AssertionError: assert 604800 == 3600&#10; +  where 604800 = CacheConfig(host='localhost', port=6379, db=0, password=None, default_ttl=604800, max_memory='1gb', key_prefix='surfscreen:', enabled=True).default_ttl">tests/unit/test_cache.py:25: in test_default_config
+    assert config.default_ttl == 3600
+E   AssertionError: assert 604800 == 3600
+E    +  where 604800 = CacheConfig(host='localhost', port=6379, db=0, password=None, default_ttl=604800, max_memory='1gb', key_prefix='surfscreen:', enabled=True).default_ttl</failure></testcase><testcase classname="tests.unit.test_cache.TestCacheStats" name="test_stats_creation" time="2.545"><failure message="assert 83.33333333333334 == 0.833 ± 8.3e-03&#10;  &#10;  comparison failed&#10;  Obtained: 83.33333333333334&#10;  Expected: 0.833 ± 8.3e-03">tests/unit/test_cache.py:62: in test_stats_creation
+    assert stats.hit_rate == pytest.approx(0.833, rel=0.01)
+E   assert 83.33333333333334 == 0.833 ± 8.3e-03
+E     
+E     comparison failed
+E     Obtained: 83.33333333333334
+E     Expected: 0.833 ± 8.3e-03</failure></testcase><testcase classname="tests.unit.test_cache.TestCacheAside" name="test_cache_aside_get_or_set" time="0.003"><failure message="TypeError: __init__() got an unexpected keyword argument 'key_prefix'">tests/unit/test_cache.py:311: in test_cache_aside_get_or_set
+    cache = CacheAside(key_prefix="test")
+E   TypeError: __init__() got an unexpected keyword argument 'key_prefix'</failure></testcase><testcase classname="tests.unit.test_notifications.TestEventType" name="test_event_type_values" time="0.003"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:22: in test_event_type_values
+    from surfscreen.notifications.notification_service import EventType
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_cancel_job" time="0.002" /><testcase classname="tests.unit.test_cache.TestCacheDecorators" name="test_invalidate_cache_decorator" time="0.002" /><testcase classname="tests.unit.test_notifications.TestNotificationPayload" name="test_quota_warning_payload" time="0.003"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:545: in test_quota_warning_payload
+    from surfscreen.notifications.notification_service import NotificationService, EventType
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestBatchProgress" name="test_success_rate" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestScheduleStatus" name="test_schedule_statuses" time="0.021" /><testcase classname="tests.unit.test_scheduler.TestScheduledJob" name="test_job_creation" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestScheduledJob" name="test_job_to_dict" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestScheduleCreate" name="test_cron_schedule_validation" time="0.001" /><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_get_set_without_redis" time="0.001"><failure message="AttributeError: &lt;module 'surfscreen.cache.cache_manager' from '/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cache/cache_manager.py'&gt; does not have the attribute 'redis'">tests/unit/test_cache.py:111: in test_get_set_without_redis
+    with patch("surfscreen.cache.cache_manager.redis", None):
+../../anaconda3/envs/equiformer_v2/lib/python3.8/unittest/mock.py:1393: in __enter__
+    original, local = self.get_original()
+../../anaconda3/envs/equiformer_v2/lib/python3.8/unittest/mock.py:1366: in get_original
+    raise AttributeError(
+E   AttributeError: &lt;module 'surfscreen.cache.cache_manager' from '/home/yongsang/20260129_Equiformer/surfscreen/src/surfscreen/cache/cache_manager.py'&gt; does not have the attribute 'redis'</failure></testcase><testcase classname="tests.unit.test_scheduler.TestScheduleCreate" name="test_interval_schedule_validation" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchJob" name="test_job_status_transitions" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_create_cron_schedule" time="0.820" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_scheduler_creation" time="0.819" /><testcase classname="tests.unit.test_cache.TestCacheDecorators" name="test_cache_result_decorator" time="0.003" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_get_schedule" time="0.805" /><testcase classname="tests.unit.test_batch.TestBatchProgress" name="test_progress_calculation" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_pause_and_resume_schedule" time="0.801" /><testcase classname="tests.unit.test_cache.TestCacheKeyGeneration" name="test_generate_function_key" time="0.001" /><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_processor_creation" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_schedule_execution" time="0.777" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_schedule_execution_failure" time="0.775" /><testcase classname="tests.unit.test_notifications.TestDeliveryHistory" name="test_get_delivery_history_limit" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:479: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_notifications.TestWebhookConfig" name="test_config_creation" time="0.003"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:48: in test_config_creation
+    from surfscreen.notifications.webhook_client import WebhookConfig
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_cache.TestCacheConfig" name="test_custom_config" time="0.001" /><testcase classname="tests.unit.test_notifications.TestNotificationPayload" name="test_job_completed_payload" time="0.003"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:525: in test_job_completed_payload
+    from surfscreen.notifications.notification_service import NotificationService, EventType
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_batch.TestTaskResult" name="test_failure_result" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestNextRunCalculation" name="test_once_next_run" time="0.150" /><testcase classname="tests.unit.test_cache.TestCacheStats" name="test_stats_zero_requests" time="0.001" /><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_delete_webhook" time="2.523"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_scheduler.TestScheduleCreate" name="test_interval_minimum" time="0.080" /><testcase classname="tests.unit.test_batch.TestBatchConfig" name="test_custom_config" time="0.001" /><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_set_with_mock_redis" time="0.003"><failure message="AttributeError: 'CacheManager' object has no attribute '_connected'">tests/unit/test_cache.py:154: in test_set_with_mock_redis
+    success = manager.set("test_key", {"data": "value"}, ttl=600)
+src/surfscreen/cache/cache_manager.py:253: in set
     if not self.is_connected:
 src/surfscreen/cache/cache_manager.py:134: in is_connected
     if not self._connected or not self._redis:
-E   AttributeError: 'CacheManager' object has no attribute '_connected'</failure></testcase></testsuite></testsuites>
+E   AttributeError: 'CacheManager' object has no attribute '_connected'</failure></testcase><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_persistence" time="0.736" /><testcase classname="tests.unit.test_scheduler.TestNextRunCalculation" name="test_interval_next_run" time="0.015" /><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_send_notification_filters_events" time="2.542"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_notifications.TestEventHandlers" name="test_multiple_handlers" time="0.004"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:406: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_list_webhooks" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_regenerate_secret" time="2.577"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_test_webhook" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_scheduler.TestScheduleType" name="test_schedule_types" time="0.079" /><testcase classname="tests.unit.test_notifications.TestDeliveryHistory" name="test_record_delivery" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:479: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_register_webhook" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_notifications.TestWebhookDelivery" name="test_delivery_creation" time="0.003"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:87: in test_delivery_creation
+    from surfscreen.notifications.webhook_client import WebhookDelivery
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestWebhookClient" name="test_signature_verification" time="0.003"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:152: in test_signature_verification
+    from surfscreen.notifications.webhook_client import WebhookClient
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_send_notification" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_cache.TestCacheManager" name="test_clear_with_pattern" time="0.003"><failure message="AttributeError: 'CacheManager' object has no attribute '_connected'">tests/unit/test_cache.py:186: in test_clear_with_pattern
+    deleted = manager.clear("key*")
+src/surfscreen/cache/cache_manager.py:337: in clear
+    if not self.is_connected:
+src/surfscreen/cache/cache_manager.py:134: in is_connected
+    if not self._connected or not self._redis:
+E   AttributeError: 'CacheManager' object has no attribute '_connected'</failure></testcase><testcase classname="tests.unit.test_notifications.TestWebhookClient" name="test_send_webhook_failure" time="0.004"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:203: in test_send_webhook_failure
+    from surfscreen.notifications.webhook_client import WebhookClient, WebhookConfig
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_get_webhook" time="2.638"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_batch.TestBatchProcessor" name="test_get_job" time="0.001" /><testcase classname="tests.unit.test_auth.TestQuota" name="test_custom_quota" time="0.001" /><testcase classname="tests.unit.test_notifications.TestWebhookDelivery" name="test_delivery_failure" time="0.003"><failure message="TypeError: 'type' object is not subscriptable">tests/unit/test_notifications.py:118: in test_delivery_failure
+    from surfscreen.notifications.webhook_client import WebhookDelivery
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</failure></testcase><testcase classname="tests.unit.test_notifications.TestNotificationService" name="test_update_webhook" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:233: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_batch.TestBatchJobStatus" name="test_status_values" time="0.016" /><testcase classname="tests.unit.test_auth.TestGenerateAPIKey" name="test_generate_api_key" time="0.001" /><testcase classname="tests.unit.test_notifications.TestEventHandlers" name="test_register_handler" time="2.710"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:406: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_auth.TestUserRole" name="test_role_ordering" time="0.001" /><testcase classname="tests.unit.test_notifications.TestEventHandlers" name="test_handler_invocation" time="0.003"><error message="failed on setup with &quot;TypeError: 'type' object is not subscriptable&quot;">tests/unit/test_notifications.py:406: in notification_service
+    from surfscreen.notifications.notification_service import NotificationService
+src/surfscreen/notifications/__init__.py:7: in &lt;module&gt;
+    from .notification_service import NotificationService, get_notification_service
+src/surfscreen/notifications/notification_service.py:19: in &lt;module&gt;
+    from .webhook_client import WebhookClient, Webhook, WebhookStatus, WebhookDelivery
+src/surfscreen/notifications/webhook_client.py:85: in &lt;module&gt;
+    class WebhookClient:
+src/surfscreen/notifications/webhook_client.py:257: in WebhookClient
+    ) -&gt; tuple[int, Optional[str]]:
+E   TypeError: 'type' object is not subscriptable</error></testcase><testcase classname="tests.unit.test_auth.TestAPIKey" name="test_apikey_creation" time="0.001" /><testcase classname="tests.unit.test_auth.TestTeam" name="test_team_with_members" time="0.001" /><testcase classname="tests.unit.test_auth.TestUser" name="test_user_to_dict" time="0.001" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_list_schedules" time="0.002" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_delete_schedule" time="0.002" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_max_runs_limit" time="0.002" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_create_interval_schedule" time="0.002" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_get_history" time="0.002" /><testcase classname="tests.unit.test_scheduler.TestScheduler" name="test_create_once_schedule" time="0.002" /></testsuite></testsuites>
