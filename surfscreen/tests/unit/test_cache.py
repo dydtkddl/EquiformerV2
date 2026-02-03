@@ -201,7 +201,16 @@ class TestCacheManager:
         """Test getting cache statistics."""
         from surfscreen.cache.cache_manager import CacheManager, CacheConfig, CacheStats
         
-        mock_redis.scan_iter.return_value = iter([])
+        mock_redis.scan_iter.return_value = iter([
+            b"surfscreen:key1",
+            b"surfscreen:key2",
+        ])
+        mock_redis.info.return_value = {
+            "keyspace_hits": 100,
+            "keyspace_misses": 20,
+            "used_memory_human": "1MB",
+            "uptime_in_seconds": 3600,
+        }
         
         manager = CacheManager.__new__(CacheManager)
         manager._redis = mock_redis
@@ -214,7 +223,7 @@ class TestCacheManager:
         assert stats.connected is True
         assert stats.hits == 100
         assert stats.misses == 20
-        assert stats.total_keys == 50
+        assert stats.total_keys == 2
 
 
 class TestCacheDecorators:
