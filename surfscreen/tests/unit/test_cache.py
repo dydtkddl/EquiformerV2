@@ -59,7 +59,7 @@ class TestCacheStats:
         assert stats.connected is True
         assert stats.hits == 100
         assert stats.misses == 20
-        assert stats.hit_rate == pytest.approx(0.833, rel=0.01)
+        assert stats.hit_rate == pytest.approx(83.33, rel=0.01)
     
     def test_stats_zero_requests(self):
         """Test hit rate with zero requests."""
@@ -131,7 +131,7 @@ class TestCacheManager:
         manager._redis = mock_redis
         manager._connected = True
         manager._local_stats = CacheStats()
-        manager._config = CacheConfig()
+        manager.config = CacheConfig()
         
         # Test cache miss
         result = manager.get("missing_key")
@@ -155,7 +155,7 @@ class TestCacheManager:
         manager._redis = mock_redis
         manager._connected = True
         manager._local_stats = CacheStats()
-        manager._config = CacheConfig()
+        manager.config = CacheConfig()
         
         success = manager.set("test_key", {"data": "value"}, ttl=600)
         
@@ -170,7 +170,7 @@ class TestCacheManager:
         manager._redis = mock_redis
         manager._connected = True
         manager._local_stats = CacheStats()
-        manager._config = CacheConfig()
+        manager.config = CacheConfig()
         
         success = manager.delete("test_key")
         
@@ -191,7 +191,7 @@ class TestCacheManager:
         manager._redis = mock_redis
         manager._connected = True
         manager._local_stats = CacheStats()
-        manager._config = CacheConfig()
+        manager.config = CacheConfig()
         
         deleted = manager.clear("key*")
         
@@ -216,7 +216,7 @@ class TestCacheManager:
         manager._redis = mock_redis
         manager._connected = True
         manager._local_stats = CacheStats()
-        manager._config = CacheConfig()
+        manager.config = CacheConfig()
         
         stats = manager.get_stats()
         

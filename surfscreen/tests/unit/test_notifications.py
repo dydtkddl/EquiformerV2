@@ -106,11 +106,13 @@ class TestWebhookDelivery:
             delivery_id="del-123",
             webhook_id="wh-123",
             event_type="job.completed",
+            payload={"job_id": "test-job"},
             status="success",
             response_status=200,
             delivered_at="2026-01-01T12:00:00",
             attempts=1,
         )
+
         
         assert delivery.status == "success"
         assert delivery.response_status == 200
@@ -123,10 +125,12 @@ class TestWebhookDelivery:
             delivery_id="del-123",
             webhook_id="wh-123",
             event_type="job.completed",
+            payload={"job_id": "test-job"},
             status="failed",
             error="Connection refused",
             attempts=3,
         )
+
         
         assert delivery.status == "failed"
         assert delivery.error == "Connection refused"
@@ -174,14 +178,24 @@ class TestWebhookClient:
         """Test successful webhook sending."""
         from surfscreen.notifications.webhook_client import WebhookClient, Webhook
         
-        mock_response = AsyncMock()
+        mock_response = MagicMock()
         mock_response.status = 200
-        mock_response.text.return_value = "OK"
+        mock_response.text = AsyncMock(return_value="OK")
+        
+        # Create async context manager for response
+        mock_response_cm = AsyncMock()
+        mock_response_cm.__aenter__.return_value = mock_response
+        mock_response_cm.__aexit__.return_value = None
         
         with patch("aiohttp.ClientSession") as mock_session:
-            mock_session_instance = AsyncMock()
-            mock_session_instance.post.return_value.__aenter__.return_value = mock_response
-            mock_session.return_value.__aenter__.return_value = mock_session_instance
+            mock_session_instance = MagicMock()
+            mock_session_instance.post.return_value = mock_response_cm
+            
+            # Create async context manager for session
+            mock_session_cm = AsyncMock()
+            mock_session_cm.__aenter__.return_value = mock_session_instance
+            mock_session_cm.__aexit__.return_value = None
+            mock_session.return_value = mock_session_cm
             
             client = WebhookClient()
             
@@ -199,6 +213,7 @@ class TestWebhookClient:
             
             assert delivery.status == "success"
             assert delivery.response_status == 200
+
     
     @pytest.mark.asyncio
     async def test_send_webhook_failure(self):
@@ -206,9 +221,14 @@ class TestWebhookClient:
         from surfscreen.notifications.webhook_client import WebhookClient, Webhook
         
         with patch("aiohttp.ClientSession") as mock_session:
-            mock_session_instance = AsyncMock()
+            mock_session_instance = MagicMock()
             mock_session_instance.post.side_effect = Exception("Connection refused")
-            mock_session.return_value.__aenter__.return_value = mock_session_instance
+            
+            # Create async context manager for session
+            mock_session_cm = AsyncMock()
+            mock_session_cm.__aenter__.return_value = mock_session_instance
+            mock_session_cm.__aexit__.return_value = None
+            mock_session.return_value = mock_session_cm
             
             client = WebhookClient(max_retries=1)  # Reduce retries for test
             
@@ -224,6 +244,7 @@ class TestWebhookClient:
             
             assert delivery.status == "failed"
             assert "Connection refused" in str(delivery.error)
+
 
 
 class TestNotificationService:
