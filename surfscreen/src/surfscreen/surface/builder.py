@@ -88,8 +88,31 @@ class Surface:
             properties=self.properties.copy()
         )
     
-    def save(self, path: str, format: str = "extxyz") -> None:
-        """표면을 파일로 저장 (extxyz로 cell 정보 보존)"""
+    def save(self, path: str, format: Optional[str] = None) -> None:
+        """표면을 파일로 저장
+        
+        지원 형식: extxyz, cif, xyz, pdb, vasp, mol2 등 (ASE 지원 형식)
+        format이 None이면 파일 확장자에서 자동 감지
+        """
+        if format is None:
+            # 파일 확장자에서 format 추출
+            ext = Path(path).suffix.lower().lstrip('.')
+            # ASE format 매핑
+            format_map = {
+                'extxyz': 'extxyz',
+                'xyz': 'xyz',
+                'cif': 'cif',
+                'pdb': 'proteindatabank',
+                'mol2': 'mol2',
+                'vasp': 'vasp',
+                'poscar': 'vasp',
+                'contcar': 'vasp',
+                'car': 'dmol-car',
+                'gen': 'dftb',
+                'json': 'json',
+            }
+            format = format_map.get(ext, ext)  # 매핑 없으면 확장자 그대로 사용
+        
         write(path, self.atoms, format=format)
         
     def get_surface_atoms(self) -> List[int]:

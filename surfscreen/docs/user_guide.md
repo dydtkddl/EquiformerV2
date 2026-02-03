@@ -190,8 +190,10 @@ surfscreen validate adsorption -m CO -s "Cu(111)" -e -0.55
 | ------------ | --------- | ------------------------ |
 | XYZ          | .xyz      | Standard XYZ coordinates |
 | Extended XYZ | .extxyz   | With cell and properties |
-| VASP POSCAR  | POSCAR    | VASP structure format    |
 | CIF          | .cif      | Crystallographic format  |
+| VASP POSCAR  | POSCAR    | VASP structure format    |
+| PDB          | .pdb      | Protein Data Bank        |
+| MOL2         | .mol2     | Tripos format            |
 
 ### Output Files
 
@@ -201,6 +203,19 @@ surfscreen validate adsorption -m CO -s "Cu(111)" -e -0.55
 | trajectory.traj   | MD trajectory (ASE format) |
 | optimized\_\*.xyz | Optimized structures       |
 | report.html       | Analysis report            |
+
+### Surface Export Formats
+
+`surfscreen surface create` 명령어는 파일 확장자에 따라 자동으로 형식을 결정합니다:
+
+| Extension | Format       | Use Case                                   |
+| --------- | ------------ | ------------------------------------------ |
+| .extxyz   | Extended XYZ | **Default**, preserves cell and properties |
+| .cif      | CIF          | Crystallographic exchange                  |
+| .xyz      | XYZ          | Basic coordinates only                     |
+| .pdb      | PDB          | Protein Data Bank format                   |
+| .mol2     | MOL2         | Tripos format for molecular modeling       |
+| POSCAR    | VASP         | VASP/DFT calculations                      |
 
 ## Calculators
 
