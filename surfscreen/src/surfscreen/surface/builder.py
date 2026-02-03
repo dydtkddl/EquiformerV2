@@ -263,6 +263,24 @@ class SurfaceBuilder:
                 "Im-3m", [[a, 0, 0], [0, a, 0], [0, 0, a]],
                 [element], [[0, 0, 0]]
             )
+        elif structure == "hcp":
+            # HCP 구조: c/a 비율 ≈ 1.633 (이상적)
+            # 실제 c/a는 원소에 따라 다름
+            c_over_a = {
+                "Ti": 1.587, "Zn": 1.856, "Co": 1.622, 
+                "Ru": 1.582, "Zr": 1.593, "Mg": 1.624
+            }
+            c = a * c_over_a.get(element, 1.633)
+            
+            # HCP 격자: P6_3/mmc (space group 194)
+            struct = Structure.from_spacegroup(
+                "P6_3/mmc",
+                [[a, 0, 0], 
+                 [-a/2, a*np.sqrt(3)/2, 0], 
+                 [0, 0, c]],
+                [element, element], 
+                [[1/3, 2/3, 1/4], [2/3, 1/3, 3/4]]
+            )
         else:
             raise ValueError(f"Unsupported structure type: {structure}")
         
