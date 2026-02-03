@@ -201,6 +201,11 @@ class SurfaceBuilder:
             # HCP (0001) 표면: 4-index (h,k,i,l) 또는 3-index (h,k,l) 모두 지원
             atoms = hcp0001(element, size=(supercell[0], supercell[1], layers),
                            a=a, vacuum=vacuum, orthogonal=orthogonal)
+        elif structure == "hcp":
+            # HCP 일반 표면: ASE bulk + surface 사용 (pymatgen 대칭 분석 문제 우회)
+            atoms = cls._build_hcp_surface(
+                element, a, miller_index, layers, vacuum, supercell
+            )
         else:
             # pymatgen 사용 - 4-index를 3-index로 변환
             if len(miller_index) == 4:
@@ -237,6 +242,35 @@ class SurfaceBuilder:
             vacuum=vacuum,
             fixed_atoms=fixed_atoms
         )
+    
+    @classmethod
+    def _build_hcp_surface(cls,
+                           element: str,
+                           a: float,
+                           miller_index: Tuple[int, int, int],
+                           layers: int,
+                           vacuum: float,
+                           supercell: Tuple[int, int, int]) -> Atoms:
+        """ASE bulk + surface로 HCP 표면 생성 (pymatgen 대칭 분석 문제 우회)"""
+        from ase.build import bulk
+        
+        # HCP c/a 비율
+        c_over_a = {
+            "Ti": 1.587, "Zn": 1.856, "Co": 1.622, 
+            "Ru": 1.582, "Zr": 1.593, "Mg": 1.624
+        }
+        c = a * c_over_a.get(element, 1.633)
+        
+        # ASE로 HCP 벌크 생성
+        bulk_atoms = bulk(element, 'hcp', a=a, c=c)
+        
+        # ase.build.surface로 표면 생성
+        atoms = ase_surface(bulk_atoms, miller_index, layers, vacuum=vacuum)
+        
+        # 슈퍼셀 적용
+        atoms = atoms.repeat([supercell[0], supercell[1], 1])
+        
+        return atoms
     
     @classmethod
     def _build_with_pymatgen(cls,
